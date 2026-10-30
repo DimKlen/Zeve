@@ -5,7 +5,9 @@
   },
   "common": {
     "loading": "Chargement…",
-    "close": "Fermer"
+    "close": "Fermer",
+    "cancel": "Annuler",
+    "save": "Enregistrer"
   },
   "login": {
     "title": "Zeve",
@@ -93,7 +95,18 @@
     "menuRoom": "Changer de pièce",
     "menuInterval": "Rythme d'arrosage",
     "menuHistory": "Historique d'arrosage",
-    "menuDelete": "Supprimer la plante"
+    "menuDelete": "Supprimer la plante",
+    "chatA11y": "Poser une question sur {name}",
+    "intervalValue": "Tous les {n} jours",
+    "intervalValueOne": "Tous les jours",
+    "intervalLess": "Arroser plus souvent",
+    "intervalMore": "Arroser moins souvent",
+    "historyEmpty": "Pas encore d’arrosage.",
+    "deleteConfirm": "Supprimer {name} ? Son historique d’arrosage et ses messages disparaîtront.",
+    "deletedToast": "{name} a quitté ton jardin",
+    "savedToast": "C’est noté !",
+    "noRoom": "Sans pièce",
+    "notFound": "Cette plante n’est plus dans ton jardin."
   },
   "chat": {
     "backA11y": "Retour à la fiche",

@@ -21,6 +21,11 @@ export const IconPlus = ({ size, color = '#1F3D2B', strokeWidth = 2.4 }: P) => (
     <Path d="M12 5v14M5 12h14" {...line(color, strokeWidth)} />
   </S>
 );
+export const IconMinus = ({ size, color = '#1F3D2B', strokeWidth = 2.4 }: P) => (
+  <S size={size}>
+    <Path d="M5 12h14" {...line(color, strokeWidth)} />
+  </S>
+);
 export const IconBack = ({ size = 20, color = '#1F3D2B', strokeWidth = 2 }: P) => (
   <S size={size}>
     <Path d="M15 5l-7 7 7 7" {...line(color, strokeWidth)} />

@@ -74,15 +74,16 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: radius.xl,
     borderBottomRightRadius: 6,
   },
+  // Largeurs max du prototype + padding (box-sizing content-box dans le prototype).
   me: {
-    maxWidth: 260,
+    maxWidth: 260 + space.ml * 2,
     backgroundColor: colors.forest,
     paddingVertical: space.m,
     paddingHorizontal: space.ml,
   },
   meText: { ...type.bodyS, color: colors.bg },
   bot: {
-    maxWidth: 300,
+    maxWidth: 300 + space.ml * 2,
     backgroundColor: colors.surface,
     borderTopLeftRadius: radius.xl,
     borderTopRightRadius: radius.xl,

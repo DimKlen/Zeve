@@ -75,6 +75,7 @@ export type Database = {
       plants: {
         Row: {
           archived_at: string | null;
+          care_tip: string | null;
           created_at: string;
           id: string;
           light: Database['public']['Enums']['light_exposure'];
@@ -89,6 +90,7 @@ export type Database = {
         ComputedFields: never;
         Insert: {
           archived_at?: string | null;
+          care_tip?: string | null;
           created_at?: string;
           id?: string;
           light?: Database['public']['Enums']['light_exposure'];
@@ -102,6 +104,7 @@ export type Database = {
         };
         Update: {
           archived_at?: string | null;
+          care_tip?: string | null;
           created_at?: string;
           id?: string;
           light?: Database['public']['Enums']['light_exposure'];
@@ -327,6 +330,7 @@ export type Database = {
         Row: {
           air: string;
           archived_at: string | null;
+          care_tip: string | null;
           created_at: string;
           days_since_created: number | null;
           days_since_water: number | null;
@@ -339,13 +343,14 @@ export type Database = {
           light_label: string;
           nickname: string;
           photo_path: string | null;
+          previous_watered_at: string | null;
           room_id: string | null;
           room_name: string | null;
           species_id: string;
           species_light: string;
           species_name: string;
           species_source: string | null;
-          tip: string;
+          tip: string | null;
           user_id: string;
           water_every_days: number;
         };

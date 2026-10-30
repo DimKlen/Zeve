@@ -11,6 +11,8 @@ export type PlantRow = {
 };
 
 const DAY = 86_400_000;
+const THIRSTY_LEVEL = 0.18;
+const WATERED_LEVEL = 0.92;
 const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
 export const daysBetween = (a: Date, b: Date) =>
   Math.round((startOfDay(b).getTime() - startOfDay(a).getTime()) / DAY);
@@ -43,9 +45,8 @@ export function plantStatus(p: PlantRow, now = new Date()): PlantStatus {
     daysUntilNext,
     thirsty,
     wateredToday,
-    waterLevel: thirsty
-      ? Math.min(waterLevel, 0.18)
-      : Math.max(waterLevel, wateredToday ? 0.92 : 0),
+    // docs/06 F3 : affichée à 18 % si soif, 92 % après un arrosage du jour, niveau réel sinon.
+    waterLevel: thirsty ? THIRSTY_LEVEL : wateredToday ? WATERED_LEVEL : waterLevel,
     waterText: thirsty ? 'Sèche' : waterLevel < 0.5 ? 'Bientôt' : 'Parfait',
     nextLabel:
       daysUntilNext <= 0
