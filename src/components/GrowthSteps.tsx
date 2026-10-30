@@ -52,6 +52,7 @@ const styles = StyleSheet.create({
     paddingVertical: space.sm,
     paddingHorizontal: space.s,
     alignItems: 'center',
+    justifyContent: 'center',
     gap: space.xs,
   },
   hint: { ...type.hint, color: colors.inkMuted },

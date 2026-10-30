@@ -40,5 +40,6 @@ Ne réinvente rien de visuel. Si un écran ou un état n'est pas maquetté (erre
 ## Notes d'environnement
 - Expo SDK 58 (React Native 0.88, Reanimated 4.7). Routes dans `app/` à la racine ; le Jardin est `app/(app)/(tabs)/garden.tsx` (route `/garden`).
 - Supabase local sur les ports **553xx** (API 55321, DB 55322, Studio 55323, Mailpit 55324) : Windows réserve 54310–54409 (Hyper-V) et Zabava utilise les 543xx.
+- Compte de démo (seed `supabase/seed.dev.sql`, docs/06 F13) : « Continuer avec un e-mail » → `camille@zeve.test`, lien dans Mailpit (http://127.0.0.1:55324). Reproduit les captures 07 et 08.
 - `.env.local` (non versionné) : `EXPO_PUBLIC_SUPABASE_URL` / `EXPO_PUBLIC_SUPABASE_ANON_KEY` — voir `.env.example`.
 - `reference/` reste la copie d'origine du kit ; le code vit dans `src/`.

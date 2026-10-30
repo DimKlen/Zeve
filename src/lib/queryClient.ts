@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
-import { QueryClient } from '@tanstack/react-query';
+import { focusManager, QueryClient } from '@tanstack/react-query';
+import { AppState, Platform } from 'react-native';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -9,6 +10,14 @@ export const queryClient = new QueryClient({
     queries: { gcTime: DAY_MS, staleTime: 30 * 1000, retry: 2 },
   },
 });
+
+// Retour au premier plan = « focus » : les données périmées sont rechargées (docs/06 F3).
+if (Platform.OS !== 'web') {
+  focusManager.setEventListener((setFocused) => {
+    const sub = AppState.addEventListener('change', (state) => setFocused(state === 'active'));
+    return () => sub.remove();
+  });
+}
 
 // Cache persisté : le jardin s'affiche hors ligne (docs/11, Phase 7).
 export const queryPersister = createAsyncStoragePersister({
