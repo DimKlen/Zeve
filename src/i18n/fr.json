@@ -165,7 +165,15 @@
     "lightSunHint": "derrière la vitre",
     "add": "Ajouter au jardin",
     "addDisabled": "Choisis d’abord son espèce",
-    "addFailed": "La plante n'a pas pu être ajoutée. Réessaie."
+    "addFailed": "La plante n'a pas pu être ajoutée. Réessaie.",
+    "addRoom": "Pièce",
+    "addRoomA11y": "Ajouter une pièce",
+    "newRoomTitle": "Nouvelle pièce",
+    "newRoomPlaceholder": "Ex. : Bureau",
+    "identifyTimeout": "La reconnaissance prend trop de temps. Choisis-la dans la liste.",
+    "addingA11y": "Ajout en cours",
+    "changeA11y": "Changer d’espèce",
+    "namePlaceholderDefault": "Ex. : Monty"
   },
   "species": {
     "title": "Choisir une espèce",
@@ -176,7 +184,8 @@
     "searchPlaceholder": "Monstera, basilic, cactus…",
     "emptyTitle": "Aucune espèce trouvée",
     "emptyText": "Essaie un autre nom, ou prends-la en photo.",
-    "emptyCta": "Prendre une photo"
+    "emptyCta": "Prendre une photo",
+    "selectedA11y": "sélectionnée"
   },
   "toast": {
     "remindersOn": "Rappels activés",

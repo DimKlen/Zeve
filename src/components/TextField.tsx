@@ -1,5 +1,5 @@
 import { useId, type ComponentRef, type Ref } from 'react';
-import { StyleSheet, Text, TextInput, View, type TextInputProps } from 'react-native';
+import { Platform, StyleSheet, Text, TextInput, View, type TextInputProps } from 'react-native';
 
 import { colors, control, fonts, radius, space, type } from '@/theme';
 
@@ -85,6 +85,8 @@ const styles = StyleSheet.create({
     fontFamily: fonts.body,
     fontSize: 16,
     color: colors.ink,
+    // Web : pas de contour de focus du navigateur par-dessus la bordure du champ.
+    ...Platform.select({ web: { outlineWidth: 0 }, default: {} }),
   },
   email: { borderColor: colors.strongBorder, paddingHorizontal: space.l },
   small: { fontSize: 15 },

@@ -1,5 +1,5 @@
 import type { ReactElement } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { duration } from '@/motion';
@@ -7,9 +7,10 @@ import { usePop } from '@/motion/useEnter';
 import { colors, control, space, type } from '@/theme';
 
 import { PressableScale } from './PressableScale';
+import { Dots } from './TypingDots';
 import { useColorTransition } from './useColorTransition';
 
-export type ButtonVariant = 'primary' | 'sun' | 'sage' | 'secondary';
+export type ButtonVariant = 'primary' | 'sun' | 'sage' | 'secondary' | 'outline';
 type Size = 'l' | 'water' | 's';
 
 type Props = {
@@ -32,12 +33,14 @@ const BG: Record<ButtonVariant, string> = {
   sun: colors.sun,
   sage: colors.sage,
   secondary: 'transparent',
+  outline: 'transparent',
 };
 const FG: Record<ButtonVariant, string> = {
   primary: colors.bg,
   sun: colors.forest,
   sage: colors.forest,
   secondary: colors.forest,
+  outline: colors.forest,
 };
 const HEIGHT: Record<Size, number> = {
   l: control.primaryButton,
@@ -85,11 +88,12 @@ export function Button({
           { height, borderRadius: height / 2 },
           size === 's' && styles.compact,
           variant === 'secondary' && styles.secondary,
+          variant === 'outline' && styles.outline,
           animatedBg,
         ]}
       >
         {loading ? (
-          <ActivityIndicator color={fg} />
+          <Dots color={fg} />
         ) : (
           <View style={styles.content}>
             {icon?.(fg)}
@@ -107,5 +111,7 @@ const styles = StyleSheet.create({
   base: { alignItems: 'center', justifyContent: 'center', paddingHorizontal: space.l },
   compact: { alignSelf: 'flex-start', paddingHorizontal: space.l },
   secondary: { borderWidth: 1.5, borderColor: colors.forest },
+  // « Changer » de la carte espèce : contour clair.
+  outline: { borderWidth: 1.5, borderColor: colors.strongBorder },
   content: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
 });

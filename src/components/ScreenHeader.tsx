@@ -10,13 +10,15 @@ type Props = {
   title: string;
   onBack: () => void;
   backLabel: string;
+  /** Ligne sous le titre (compteur de la liste des espèces). */
+  caption?: string;
   /** Variante centrée de la fiche : sous-titre « latin · pièce » et bouton à droite. */
   subtitle?: string;
   right?: ReactNode;
 };
 
 /** En-tête : bouton retour 44 + titre (docs/02 §7). Centré si `subtitle` ou `right` est fourni. */
-export function ScreenHeader({ title, onBack, backLabel, subtitle, right }: Props) {
+export function ScreenHeader({ title, onBack, backLabel, caption, subtitle, right }: Props) {
   const back = (
     <IconButton
       accessibilityLabel={backLabel}
@@ -29,9 +31,16 @@ export function ScreenHeader({ title, onBack, backLabel, subtitle, right }: Prop
     return (
       <View style={styles.row}>
         {back}
-        <Text style={styles.title} accessibilityRole="header" numberOfLines={1}>
-          {title}
-        </Text>
+        <View style={styles.titleColumn}>
+          <Text style={styles.title} accessibilityRole="header" numberOfLines={1}>
+            {title}
+          </Text>
+          {caption !== undefined && (
+            <Text style={styles.caption} accessibilityLiveRegion="polite">
+              {caption}
+            </Text>
+          )}
+        </View>
       </View>
     );
   }
@@ -57,7 +66,9 @@ export function ScreenHeader({ title, onBack, backLabel, subtitle, right }: Prop
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: space.m },
   centered: { justifyContent: 'space-between' },
-  title: { ...type.subTitle, color: colors.forest, flexShrink: 1 },
+  titleColumn: { flexShrink: 1 },
+  title: { ...type.subTitle, color: colors.forest },
+  caption: { ...type.caption, color: colors.inkMuted },
   middle: { flex: 1, alignItems: 'center' },
   plantName: { ...type.plantName, color: colors.forest },
   subtitle: { ...type.caption, fontStyle: 'italic', color: colors.inkMuted },
