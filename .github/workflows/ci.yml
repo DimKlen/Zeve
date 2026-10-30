@@ -1,0 +1,73 @@
+# CI Zeve : construit l'app mobile, lance les tests et vérifie la base Supabase.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  mobile:
+    name: Mobile (types, lint, tests, bundle)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npx eslint .
+
+      - name: Tests
+        run: npx jest --ci
+
+      - name: Bundle Android et iOS
+        run: npx expo export --platform android --platform ios --output-dir dist
+
+  supabase:
+    name: Supabase (migrations, seed, types)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      # Base seule (sans Auth, Storage, Studio…) : applique supabase/migrations dans un Postgres neuf.
+      - name: Démarrer Postgres et appliquer les migrations
+        run: npx supabase db start
+
+      # Critère de la Phase 0 (docs/09) : tables créées et 52 espèces.
+      - name: Vérifier le seed des espèces
+        run: |
+          count=$(psql "postgresql://postgres:postgres@127.0.0.1:55322/postgres" -tAc "select count(*) from public.species")
+          echo "Espèces : $count"
+          test "$count" -eq 52
+
+      # Échoue si src/lib/database.types.ts n'a pas été régénéré après une migration.
+      - name: Types de la base à jour
+        run: |
+          npm run db:types
+          git diff --exit-code -- src/lib/database.types.ts

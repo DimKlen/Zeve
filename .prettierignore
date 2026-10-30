@@ -1,0 +1,12 @@
+node_modules
+.expo
+dist
+android
+ios
+package-lock.json
+reference
+design
+docs
+supabase/.temp
+*.md
+src/plants/plantForms.generated.ts

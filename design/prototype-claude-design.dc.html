@@ -1,0 +1,1493 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Zeve — prototype complet</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&amp;family=Figtree:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F3D2B}a:hover{color:#0F2418}
+button{-webkit-tap-highlight-color:transparent}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #E8B931;outline-offset:2px}
+.fwd{animation:fwd .44s cubic-bezier(.22,.8,.24,1) both}
+@keyframes fwd{0%{transform:translateX(60px);opacity:0}100%{transform:none;opacity:1}}
+.back{animation:back .44s cubic-bezier(.22,.8,.24,1) both}
+@keyframes back{0%{transform:translateX(-60px);opacity:0}100%{transform:none;opacity:1}}
+.up{animation:up .5s cubic-bezier(.22,.8,.24,1) both}
+@keyframes up{0%{transform:translateY(90px);opacity:0}100%{transform:none;opacity:1}}
+.fade{animation:fade .5s ease both}
+@keyframes fade{0%{opacity:0}100%{opacity:1}}
+.zoom{animation:zoom .5s cubic-bezier(.22,.8,.24,1) both}
+@keyframes zoom{0%{transform:scale(.92);opacity:0}100%{transform:none;opacity:1}}
+.dim{animation:fade .3s ease both}
+.sheet{animation:sheet .5s cubic-bezier(.22,.9,.24,1) both}
+@keyframes sheet{0%{transform:translateY(100%)}100%{transform:none}}
+.alert{animation:alert .32s cubic-bezier(.22,.9,.24,1) both}
+@keyframes alert{0%{transform:scale(1.1);opacity:0}100%{transform:none;opacity:1}}
+.rise{animation:rise .55s cubic-bezier(.22,.8,.24,1) both}
+@keyframes rise{0%{transform:translateY(26px);opacity:0}100%{transform:none;opacity:1}}
+.d1{animation-delay:.08s}.d2{animation-delay:.16s}.d3{animation-delay:.24s}.d4{animation-delay:.32s}.d5{animation-delay:.6s}.d6{animation-delay:1s}
+.draw{stroke-dasharray:140;stroke-dashoffset:140;animation:draw 1s .2s ease-out forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.grow{transform-box:fill-box;transform-origin:50% 100%;animation:grow .55s cubic-bezier(.3,1.5,.5,1) both}
+.growL{transform-box:fill-box;transform-origin:100% 100%;animation:grow .55s .8s cubic-bezier(.3,1.5,.5,1) both}
+.growR{transform-box:fill-box;transform-origin:0% 100%;animation:grow .55s 1s cubic-bezier(.3,1.5,.5,1) both}
+@keyframes grow{0%{transform:scale(0)}100%{transform:scale(1)}}
+.sway{transform-origin:50px 62px;animation:sway 4.5s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(-2.5deg)}50%{transform:rotate(2.5deg)}}
+.bob{animation:bob 3.2s ease-in-out infinite}
+.bob2{animation-delay:-1.1s}.bob3{animation-delay:-2.2s}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.blink{transform-box:fill-box;transform-origin:center;animation:blink 5s infinite}
+@keyframes blink{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+.drop{animation:drop 1.1s ease-in forwards}
+@keyframes drop{0%{transform:translateY(-16px);opacity:0}30%{opacity:1}100%{transform:translateY(30px);opacity:0}}
+.pop{animation:pop .5s ease-out}
+@keyframes pop{0%{transform:scale(.9)}60%{transform:scale(1.05)}100%{transform:scale(1)}}
+.ring{transform-origin:center;transform-box:fill-box;animation:ring 2.4s ease-out infinite}
+.ring2{animation-delay:.8s}.ring3{animation-delay:1.6s}
+@keyframes ring{0%{transform:scale(.4);opacity:.9}100%{transform:scale(1.25);opacity:0}}
+.spin{transform-box:fill-box;transform-origin:center;animation:spin 1.1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.write{stroke-dasharray:478;stroke-dashoffset:478;animation:write 1.9s ease-in-out forwards}
+@keyframes write{to{stroke-dashoffset:0}}
+.check{stroke-dasharray:40;stroke-dashoffset:40;animation:draw .5s .2s ease-out forwards}
+.dot{animation:tdot 1.2s infinite}
+.dot2{animation-delay:.2s}.dot3{animation-delay:.4s}
+@keyframes tdot{0%,60%,100%{opacity:.25;transform:none}30%{opacity:1;transform:translateY(-3px)}}
+.toast{animation:toast .4s cubic-bezier(.22,.9,.24,1) both}
+@keyframes toast{0%{transform:translateY(-30px);opacity:0}100%{transform:none;opacity:1}}
+.notif{animation:notif .6s .5s cubic-bezier(.22,.9,.24,1) both}
+@keyframes notif{0%{transform:translateY(-24px) scale(.95);opacity:0}100%{transform:none;opacity:1}}
+.press{transition:transform .15s ease}
+.press:active{transform:scale(.96)}
+.chips::-webkit-scrollbar{display:none}
+@media (prefers-reduced-motion: reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;animation-delay:0s!important}}
+</style>
+</helmet>
+<div style="width: {{rootW}}; height: {{rootH}}; box-sizing: border-box; background: #F3EEE3; font-family: 'Figtree', system-ui, sans-serif; color: #1C2A21; position: relative; overflow: hidden">
+
+  <!-- ============ LANCEMENT ============ -->
+  <sc-if value="{{isSplash}}" hint-placeholder-val="{{false}}">
+    <div class="{{anim}}" style="position: absolute; inset: 0; background: #1F3D2B; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px">
+      <svg width="120" height="130" viewBox="0 0 120 130" aria-hidden="true">
+        <path class="draw" d="M60 124 C60 100 58 76 60 40" stroke="#8DB46A" stroke-width="5" fill="none" stroke-linecap="round"></path>
+        <path class="growL" d="M60 84 C40 84 26 72 22 52 C42 52 58 64 60 84 Z" fill="#6E9F4E"></path>
+        <path class="growR" d="M60 66 C80 65 94 52 97 32 C77 32 62 45 60 66 Z" fill="#8DB46A"></path>
+        <circle class="grow d6" cx="60" cy="30" r="8" fill="#E8B931"></circle>
+      </svg>
+      <span class="rise d5" style="font-family: 'Bricolage Grotesque', 'Figtree', sans-serif; font-weight: 700; font-size: 56px; letter-spacing: -0.03em; color: #F3EEE3">Zeve</span>
+      <span class="rise d6" style="font-size: 16px; color: #C9D6C0">Tes plantes te parlent.</span>
+    </div>
+  </sc-if>
+
+  <!-- ============ CONNEXION ============ -->
+  <sc-if value="{{isLogin}}" hint-placeholder-val="{{false}}">
+    <div class="{{anim}}" style="position: absolute; inset: 0; display: flex; flex-direction: column; padding: 0 22px 34px; box-sizing: border-box">
+      <div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; padding-top: 40px">
+        <div style="position: relative; width: 300px; height: 190px; display: flex; align-items: flex-end; justify-content: center; gap: 0">
+          <div style="position: absolute; left: 40px; top: 0; width: 220px; height: 190px; border-radius: 110px; background: #F6E3A6"></div>
+          <sc-for list="{{trio}}" as="m" hint-placeholder-count="3">
+            <svg class="{{m.cls}}" width="{{m.size}}" height="{{m.h}}" viewBox="0 0 100 110" aria-hidden="true" style="position: relative">
+              <g transform="{{m.g.scale}}"><g class="sway">
+                <sc-for list="{{m.g.shapes}}" as="sh" hint-placeholder-count="6"><path d="{{sh.d}}" transform="{{sh.t}}" fill="{{sh.f}}" stroke="{{sh.st}}" stroke-width="{{sh.sw}}" stroke-linecap="round" stroke-linejoin="round"></path></sc-for>
+              </g></g>
+              <rect x="23" y="62" width="54" height="10" rx="4" fill="#E8B931"></rect>
+              <path d="M27 72 H73 L66 106 H34 Z" fill="#D6A132"></path>
+              <circle cx="43" cy="84" r="2.6" fill="#1F3D2B"></circle>
+              <circle cx="57" cy="84" r="2.6" fill="#1F3D2B"></circle>
+              <path d="M44 91 Q50 96 56 91" stroke="#1F3D2B" stroke-width="2" fill="none" stroke-linecap="round"></path>
+            </svg>
+          </sc-for>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center">
+          <h1 class="rise d1" style="margin: 0; font-family: 'Bricolage Grotesque', 'Figtree', sans-serif; font-weight: 700; font-size: 48px; letter-spacing: -0.03em; color: #1F3D2B">Zeve</h1>
+          <p class="rise d2" style="margin: 0; font-size: 17px; line-height: 1.4; color: #55604F; max-width: 280px">Tes plantes te disent quand elles ont soif. Toi, tu n'as plus qu'à arroser.</p>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <button class="rise d2 press" onClick="{{pickGoogle}}" style="height: 56px; border-radius: 28px; border: 1.5px solid #CFC6B2; background: #FFFFFF; color: #1C2A21; font-family: inherit; font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 12px; cursor: pointer">
+          <span aria-hidden="true" style="width: 26px; height: 26px; border-radius: 13px; border: 1.5px solid #CFC6B2; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: #1C2A21">G</span>
+          Continuer avec Google
+        </button>
+        <button class="rise d3 press" onClick="{{pickApple}}" style="height: 56px; border-radius: 28px; border: none; background: #141414; color: #FFFFFF; font-family: inherit; font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 12px; cursor: pointer">
+          <span aria-hidden="true" style="width: 26px; height: 26px; border-radius: 13px; border: 1.5px solid #5A5A5A; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px">A</span>
+          Continuer avec Apple
+        </button>
+        <sc-if value="{{emailClosed}}" hint-placeholder-val="{{true}}">
+          <button class="rise d4" onClick="{{openEmail}}" style="height: 48px; border: none; background: transparent; color: #1F3D2B; font-family: inherit; font-size: 15px; font-weight: 600; text-decoration: underline; cursor: pointer">Continuer avec un e-mail</button>
+        </sc-if>
+        <sc-if value="{{emailOpen}}" hint-placeholder-val="{{false}}">
+          <form class="rise" onSubmit="{{sendMagic}}" style="display: flex; flex-direction: column; gap: 8px; margin: 4px 0 0">
+            <label for="mail" style="font-size: 13px; font-weight: 600; color: #55604F">Ton adresse e-mail</label>
+            <div style="display: flex; gap: 8px">
+              <input id="mail" type="email" value="{{email}}" onChange="{{onEmail}}" placeholder="nom@exemple.fr" style="flex-grow: 1; min-width: 0; height: 52px; box-sizing: border-box; border-radius: 26px; border: 1.5px solid #CFC6B2; background: #FBF8F1; padding: 0 18px; font-family: inherit; font-size: 16px; color: #1C2A21">
+              <button type="submit" aria-label="Recevoir un lien de connexion" style="width: 52px; height: 52px; flex-shrink: 0; border-radius: 26px; border: none; background: #1F3D2B; display: flex; align-items: center; justify-content: center; cursor: pointer">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F3EEE3" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+              </button>
+            </div>
+            <span style="font-size: 13px; color: #55604F">On t'envoie un lien magique, pas de mot de passe.</span>
+          </form>
+        </sc-if>
+        <p class="rise d4" style="margin: 6px 0 0; font-size: 12px; line-height: 1.45; color: #55604F; text-align: center">En continuant, tu acceptes les <a href="#">Conditions d'utilisation</a> et la <a href="#">Politique de confidentialité</a>.</p>
+      </div>
+
+      <sc-if value="{{sheetAsk}}" hint-placeholder-val="{{false}}">
+        <div class="dim" style="position: absolute; inset: 0; background: rgba(15,30,20,0.45); display: flex; align-items: center; justify-content: center; padding: 0 40px">
+          <div class="alert" role="dialog" aria-modal="true" aria-labelledby="askt" style="width: 100%; background: #FBF8F1; border-radius: 22px; overflow: hidden; display: flex; flex-direction: column; text-align: center">
+            <div style="padding: 22px 20px 18px; display: flex; flex-direction: column; gap: 8px">
+              <span id="askt" style="font-weight: 700; font-size: 17px; line-height: 1.3; color: #1C2A21">« Zeve » souhaite utiliser « {{domain}} » pour se connecter</span>
+              <span style="font-size: 14px; line-height: 1.4; color: #55604F">L'app et le site pourront partager des informations te concernant.</span>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid #E2D9C6">
+              <button onClick="{{cancelSheet}}" style="height: 52px; border: none; border-right: 1px solid #E2D9C6; background: transparent; color: #1F3D2B; font-family: inherit; font-size: 16px; font-weight: 500; cursor: pointer">Annuler</button>
+              <button onClick="{{continueAsk}}" style="height: 52px; border: none; background: transparent; color: #1F3D2B; font-family: inherit; font-size: 16px; font-weight: 700; cursor: pointer">Continuer</button>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{sheetPick}}" hint-placeholder-val="{{false}}">
+        <div class="dim" style="position: absolute; inset: 0; background: rgba(15,30,20,0.45)"></div>
+        <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="pickt" style="position: absolute; left: 0; right: 0; bottom: 0; top: 56px; background: #FFFFFF; border-radius: 26px 26px 0 0; display: flex; flex-direction: column; overflow: hidden">
+          <div style="height: 56px; padding: 0 10px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #ECE6D9; background: #F7F4ED">
+            <button onClick="{{cancelSheet}}" style="height: 44px; padding: 0 10px; border: none; background: transparent; color: #1F3D2B; font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer">Annuler</button>
+            <span style="display: flex; align-items: center; gap: 6px; font-size: 14px; color: #3A453C">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3A453C" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>
+              accounts.{{domain}}
+            </span>
+            <span style="width: 74px"></span>
+          </div>
+          <div style="flex-grow: 1; overflow-y: auto; padding: 28px 22px; display: flex; flex-direction: column; gap: 22px">
+            <div class="rise" style="display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center">
+              <span aria-hidden="true" style="width: 52px; height: 52px; border-radius: 26px; border: 1.5px solid #D8CFBB; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 22px; color: #1C2A21">{{providerInitial}}</span>
+              <h2 id="pickt" style="margin: 0; font-size: 22px; font-weight: 700; color: #1C2A21">Choisis un compte</h2>
+              <span style="font-size: 15px; color: #55604F">pour continuer vers <strong style="color: #1F3D2B">Zeve</strong></span>
+            </div>
+            <div class="rise d1" style="display: flex; flex-direction: column; border: 1px solid #E2D9C6; border-radius: 18px; overflow: hidden">
+              <button class="press" onClick="{{chooseAccount}}" style="min-height: 68px; padding: 10px 16px; border: none; border-bottom: 1px solid #E2D9C6; background: #FFFFFF; display: flex; align-items: center; gap: 12px; font-family: inherit; text-align: left; cursor: pointer">
+                <span aria-hidden="true" style="width: 40px; height: 40px; border-radius: 20px; background: #DCE8CF; color: #1F3D2B; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px">C</span>
+                <span style="flex-grow: 1; display: flex; flex-direction: column">
+                  <span style="font-weight: 600; font-size: 15px; color: #1C2A21">Camille</span>
+                  <span style="font-size: 14px; color: #55604F">camille@exemple.fr</span>
+                </span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#55604F" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
+              </button>
+              <button onClick="{{chooseAccount}}" style="min-height: 56px; padding: 10px 16px; border: none; background: #FFFFFF; display: flex; align-items: center; gap: 12px; font-family: inherit; font-size: 15px; font-weight: 500; color: #1C2A21; text-align: left; cursor: pointer">
+                <span aria-hidden="true" style="width: 40px; height: 40px; border-radius: 20px; border: 1.5px dashed #B9AF99; display: flex; align-items: center; justify-content: center">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#55604F" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+                </span>
+                Utiliser un autre compte
+              </button>
+            </div>
+            <sc-if value="{{isApple}}" hint-placeholder-val="{{false}}">
+              <div class="rise d2" style="display: flex; flex-direction: column; gap: 8px">
+                <span style="font-size: 13px; font-weight: 600; color: #55604F">Adresse e-mail transmise</span>
+                <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+                  <button onClick="{{shareMail}}" aria-pressed="{{shareOn}}" style="min-height: 56px; border-radius: 14px; border: 1.5px solid {{shareBorder}}; background: {{shareBg}}; font-family: inherit; font-size: 14px; font-weight: 600; color: #1C2A21; cursor: pointer">Partager</button>
+                  <button onClick="{{hideMail}}" aria-pressed="{{hideOn}}" style="min-height: 56px; border-radius: 14px; border: 1.5px solid {{hideBorder}}; background: {{hideBg}}; font-family: inherit; font-size: 14px; font-weight: 600; color: #1C2A21; cursor: pointer">Masquer</button>
+                </div>
+              </div>
+            </sc-if>
+            <div class="rise d2" style="background: #F7F4ED; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+              <span style="font-size: 14px; font-weight: 700; color: #1C2A21">Zeve pourra voir :</span>
+              <span style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #1C2A21">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2F5A3A" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1-4 4.5-6 8-6s7 2 8 6"></path></svg>
+                Ton nom et ta photo de profil
+              </span>
+              <span style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #1C2A21">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2F5A3A" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 7l9 6 9-6"></path></svg>
+                Ton adresse e-mail
+              </span>
+            </div>
+            <p class="rise d3" style="margin: 0; font-size: 13px; line-height: 1.45; color: #55604F; text-align: center">Tu peux retirer cet accès à tout moment depuis les réglages de Zeve ou de ton compte {{providerName}}.</p>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <!-- ============ CONNEXION EN COURS ============ -->
+  <sc-if value="{{isConnecting}}" hint-placeholder-val="{{false}}">
+    <div class="{{anim}}" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 26px">
+      <div style="position: relative; width: 200px; height: 200px; display: flex; align-items: center; justify-content: center">
+        <svg width="200" height="200" viewBox="0 0 200 200" aria-hidden="true" style="position: absolute; inset: 0">
+          <circle cx="100" cy="100" r="90" fill="#DCE8CF"></circle>
+          <circle class="spin" cx="100" cy="100" r="96" fill="none" stroke="#1F3D2B" stroke-width="4" stroke-linecap="round" stroke-dasharray="120 484"></circle>
+        </svg>
+        <svg class="bob" width="120" height="132" viewBox="0 0 100 110" aria-hidden="true" style="position: relative">
+          <g transform="{{hero.scale}}"><g class="sway">
+            <sc-for list="{{hero.shapes}}" as="sh" hint-placeholder-count="6"><path d="{{sh.d}}" transform="{{sh.t}}" fill="{{sh.f}}" stroke="{{sh.st}}" stroke-width="{{sh.sw}}" stroke-linecap="round" stroke-linejoin="round"></path></sc-for>
+          </g></g>
+          <rect x="23" y="62" width="54" height="10" rx="4" fill="#E8B931"></rect>
+          <path d="M27 72 H73 L66 106 H34 Z" fill="#D6A132"></path>
+          <circle cx="43" cy="84" r="2.6" fill="#1F3D2B"></circle>
+          <circle cx="57" cy="84" r="2.6" fill="#1F3D2B"></circle>
+          <path d="M44 91 Q50 96 56 91" stroke="#1F3D2B" stroke-width="2" fill="none" stroke-linecap="round"></path>
+        </svg>
+      </div>
+      <div role="status" style="display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center">
+        <span style="font-family: 'Bricolage Grotesque', 'Figtree', sans-serif; font-weight: 700; font-size: 24px; color: #1F3D2B">Connexion via {{providerName}}…</span>
+        <span style="font-size: 15px; color: #55604F">On prépare ton jardin.</span>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ BIENVENUE : RAPPELS ============ -->
+  <sc-if value="{{isNotif}}" hint-placeholder-val="{{false}}">
+    <div class="{{anim}}" style="position: absolute; inset: 0; display: flex; flex-direction: column; padding: 70px 22px 34px; box-sizing: border-box">
+      <div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px">
+        <div class="notif" style="width: 300px; background: #FBF8F1; border-radius: 20px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 10px 30px rgba(31,61,43,0.12)">
+          <span style="width: 40px; height: 40px; flex-shrink: 0; border-radius: 12px; background: #1F3D2B; display: flex; align-items: center; justify-content: center">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8DB46A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21V11"></path><path d="M12 13c-4 0-7-3-7-7 4 0 7 3 7 7z"></path><path d="M12 11c0-4 3-7 7-7 0 4-3 7-7 7z"></path></svg>
+          </span>
+          <span style="display: flex; flex-direction: column; gap: 2px">
+            <span style="font-weight: 700; font-size: 14px">Gaston</span>
+            <span style="font-size: 14px; color: #3A453C">J'ai un peu soif… ça fait 9 jours.</span>
+          </span>
+        </div>
+        <svg class="bob" width="200" height="220" viewBox="0 0 100 110" aria-hidden="true">
+          <g transform="{{hero.scale}}"><g class="sway">
+            <sc-for list="{{hero.shapes}}" as="sh" hint-placeholder-count="6"><path d="{{sh.d}}" transform="{{sh.t}}" fill="{{sh.f}}" stroke="{{sh.st}}" stroke-width="{{sh.sw}}" stroke-linecap="round" stroke-linejoin="round"></path></sc-for>
+          </g></g>
+          <rect x="23" y="62" width="54" height="10" rx="4" fill="#E8B931"></rect>
+          <path d="M27 72 H73 L66 106 H34 Z" fill="#D6A132"></path>
+          <g class="blink"><ellipse cx="43" cy="84" rx="2.7" ry="3.2" fill="#1F3D2B"></ellipse></g>
+          <g class="blink"><ellipse cx="57" cy="84" rx="2.7" ry="3.2" fill="#1F3D2B"></ellipse></g>
+          <circle cx="37" cy="90" r="2.4" fill="#E98B6B" opacity="0.55"></circle>
+          <circle cx="63" cy="90" r="2.4" fill="#E98B6B" opacity="0.55"></circle>
+          <path d="M44 91 Q50 97 56 91" stroke="#1F3D2B" stroke-width="2" fill="none" stroke-linecap="round"></path>
+        </svg>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; margin-top: 8px">
+          <h1 class="rise d1" style="margin: 0; font-family: 'Bricolage Grotesque', 'Figtree', sans-serif; font-weight: 700; font-size: 30px; letter-spacing: -0.02em; color: #1F3D2B">Bienvenue, {{firstName}} !</h1>
+          <p class="rise d2" style="margin: 0; font-size: 16px; line-height: 1.45; color: #55604F; max-width: 300px">Tes plantes t'enverront un petit mot quand elles auront soif. Rien de plus, promis.</p>
+        </div>
+      </div>
+      <div class="rise d3" style="display: flex; flex-direction: column; gap: 8px">
+        <button class="press" onClick="{{allowNotif}}" style="height: 56px; border-radius: 28px; border: none; background: #1F3D2B; color: #F3EEE3; font-family: inherit; font-size: 16px; font-weight: 700; cursor: pointer">Activer les rappels</button>
+        <button onClick="{{skipNotif}}" style="height: 48px; border: none; background: transparent; color: #1F3D2B; font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer">Plus tard</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ MON JARDIN ============ -->
+  <sc-if value="{{isGarden}}" hint-placeholder-val="{{true}}">
+    <div class="{{anim}}" style="position: absolute; inset: 0; display: flex; flex-direction: column">
+      <div style="padding: 60px 22px 120px; display: flex; flex-direction: column; gap: 20px; flex-grow: 1; overflow-y: auto">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start">
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <span style="font-size: 15px; font-weight: 600; color: #55604F">Bonjour {{firstName}}</span>
+            <h1 style="margin: 0; font-family: 'Bricolage Grotesque', 'Figtree', sans-serif; font-weight: 700; font-size: 32px; letter-spacing: -0.02em; color: #1F3D2B">Mon jardin</h1>
+            <p style="margin: 0; font-size: 15px; color: #55604F">{{count}} plantes · {{thirstLine}}</p>
+          </div>
+          <button class="press" onClick="{{openCreate}}" aria-label="Ajouter une plante" style="width: 48px; height: 48px; border-radius: 24px; border: none; background: #E8B931; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 6px 16px rgba(196,138,14,0.3)">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1F3D2B" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+          </button>
+        </div>
+
+        <sc-if value="{{hasTodo}}" hint-placeholder-val="{{true}}">
+          <section class="rise d1" style="background: {{accent}}; border-radius: 24px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+            <div style="display: flex; align-items: center; gap: 8px">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1F3D2B" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"></path></svg>
+              <h2 style="margin: 0; font-size: 15px; font-weight: 700; color: #1F3D2B">À arroser aujourd'hui</h2>
+            </div>
+            <sc-for list="{{todo}}" as="t" hint-placeholder-count="2">
+              <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(251,248,241,0.7); border-radius: 16px; padding: 10px 10px 10px 14px">
+                <div style="display: flex; flex-direction: column">
+                  <span style="font-weight: 600; font-size: 16px">{{t.name}}</span>
+                  <span style="font-size: 13px; color: #55604F">{{t.room}} · {{t.since}}</span>
+                </div>
+                <sc-if value="{{t.done}}" hint-placeholder-val="{{false}}">
+                  <span class="pop" style="display: flex; align-items: center; gap: 6px; height: 44px; padding: 0 14px; font-size: 14px; font-weight: 600; color: #2F5A3A">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2F5A3A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+                    Arrosé
+                  </span>
+                </sc-if>
+                <sc-if value="{{t.todo}}" hint-placeholder-val="{{true}}">
+                  <button class="press" onClick="{{t.water}}" style="height: 44px; padding: 0 18px; border-radius: 22px; border: none; background: #1F3D2B; color: #FBF8F1; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer">J'ai arrosé</button>
+                </sc-if>
+              </div>
+            </sc-for>
+          </section>
+        </sc-if>
+
+        <h2 style="margin: 4px 0 0; font-size: 15px; font-weight: 700; color: #1F3D2B">Toutes mes plantes</h2>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+          <sc-for list="{{plants}}" as="p" hint-placeholder-count="6">
+            <button class="rise press {{p.delay}}" onClick="{{p.open}}" style="border: none; text-align: left; font-family: inherit; color: #1C2A21; background: #FBF8F1; border-radius: 22px; padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 6px; cursor: pointer">
+              <span style="position: relative; height: 104px; width: 100%; border-radius: 16px; background: #EDE5D4; display: flex; align-items: flex-end; justify-content: center">
+                <svg width="86" height="95" viewBox="0 0 100 110" aria-hidden="true">
+                  <g transform="{{p.g.tilt}}"><g transform="{{p.g.scale}}"><g class="sway">
+                    <sc-for list="{{p.g.shapes}}" as="sh" hint-placeholder-count="6"><path d="{{sh.d}}" transform="{{sh.t}}" fill="{{sh.f}}" stroke="{{sh.st}}" stroke-width="{{sh.sw}}" stroke-linecap="round" stroke-linejoin="round"></path></sc-for>
+                  </g></g></g>
+                  <rect x="23" y="62" width="54" height="10" rx="4" fill="#E8B931"></rect>
+                  <path d="M27 72 H73 L66 106 H34 Z" fill="#D6A132"></path>
+                  <circle cx="43" cy="84" r="2.6" fill="#1F3D2B"></circle>
+                  <circle cx="57" cy="84" r="2.6" fill="#1F3D2B"></circle>
+                  <path d="{{p.g.mouth}}" stroke="#1F3D2B" stroke-width="2" fill="none" stroke-linecap="round"></path>
+                </svg>
+                <span style="position: absolute; top: 8px; left: 8px; height: 22px; padding: 0 8px; border-radius: 11px; background: rgba(251,248,241,0.85); font-size: 11px; font-weight: 700; color: #3A453C; display: flex; align-items: center">{{p.stageLabel}}</span>
+              </span>
+              <span style="display: flex; flex-direction: column">
+                <span style="font-weight: 600; font-size: 16px">{{p.name}}</span>
+                <span style="font-size: 12px; color: #55604F; font-style: italic">{{p.common}}</span>
+              </span>
+              <span style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: #55604F">
+                <span style="width: 8px; height: 8px; border-radius: 4px; background: {{p.dot}}"></span>
+                {{p.status}}
+              </span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ FICHE PLANTE ============ -->
+  <sc-if value="{{isPlant}}" hint-placeholder-val="{{false}}">
+    <div class="{{anim}}" style="position: absolute; inset: 0; display: flex; flex-direction: column; overflow-y: auto">
+      <div style="padding: 54px 18px 0; display: flex; align-items: center; justify-content: space-between">
+        <button class="press" onClick="{{backToGarden}}" aria-label="Retour au jardin" style="width: 44px; height: 44px; border-radius: 22px; border: none; background: #FBF8F1; display: flex; align-items: center; justify-content: center; cursor: pointer">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1F3D2B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+        </button>
+        <div style="display: flex; flex-direction: column; align-items: center">
+          <span style="font-family: 'Bricolage Grotesque', 'Figtree', sans-serif; font-weight: 700; font-size: 22px; color: #1F3D2B">{{cur.name}}</span>
+          <span style="font-size: 13px; color: #55604F; font-style: italic">{{cur.latin}} · {{cur.room}}</span>
+        </div>
+        <button aria-label="Plus d'options" style="width: 44px; height: 44px; border-radius: 22px; border: none; background: #FBF8F1; display: flex; align-items: center; justify-content: center; cursor: pointer">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#1F3D2B" aria-hidden="true"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg>
+        </button>
+      </div>
+
+      <div style="position: relative; height: 290px; flex-shrink: 0; display: flex; align-items: flex-end; justify-content: center">
+        <div style="position: absolute; top: 30px; left: 50%; margin-left: -125px; width: 250px; height: 250px; border-radius: 125px; background: {{cur.halo}}; transition: background .6s ease"></div>
+        <div class="pop" style="position: absolute; top: 14px; left: 22px; max-width: 170px; background: #FBF8F1; border-radius: 18px 18px 18px 4px; padding: 10px 12px; font-size: 14px; line-height: 1.35; color: #1C2A21; box-shadow: 0 2px 0 rgba(31,61,43,0.06); z-index: 1">{{cur.bubble}}</div>
+        <svg class="bob" width="230" height="253" viewBox="0 0 100 110" role="img" aria-label="{{cur.moodLabel}}" style="position: relative">
+          <g transform="{{cur.g.tilt}}" style="transition: transform .6s ease"><g transform="{{cur.g.scale}}"><g class="sway">
+            <sc-for list="{{cur.g.shapes}}" as="sh" hint-placeholder-count="8"><path d="{{sh.d}}" transform="{{sh.t}}" fill="{{sh.f}}" stroke="{{sh.st}}" stroke-width="{{sh.sw}}" stroke-linecap="round" stroke-linejoin="round" style="transition: fill .6s ease"></path></sc-for>
+          </g></g></g>
+          <rect x="23" y="62" width="54" height="10" rx="4" fill="#E8B931"></rect>
+          <path d="M27 72 H73 L66 106 H34 Z" fill="#D6A132"></path>
+          <ellipse cx="50" cy="72" rx="24" ry="1.4" fill="#B88424" opacity="0.5"></ellipse>
+          <g class="blink"><ellipse cx="43" cy="84" rx="2.7" ry="3.2" fill="#1F3D2B"></ellipse></g>
+          <g class="blink"><ellipse cx="57" cy="84" rx="2.7" ry="3.2" fill="#1F3D2B"></ellipse></g>
+          <circle cx="37" cy="90" r="2.4" fill="#E98B6B" opacity="{{cur.blush}}"></circle>
+          <circle cx="63" cy="90" r="2.4" fill="#E98B6B" opacity="{{cur.blush}}"></circle>
+          <path d="{{cur.g.mouth}}" stroke="#1F3D2B" stroke-width="2" fill="none" stroke-linecap="round"></path>
+          <sc-if value="{{dropOn}}" hint-placeholder-val="{{false}}">
+            <g transform="translate(50 8)"><g class="drop"><path d="M0 0C0 0-4 5-4 7.5a4 4 0 0 0 8 0C4 5 0 0 0 0Z" fill="#3E77A8"></path></g></g>
+            <g transform="translate(40 12)"><g class="drop" style="animation-delay: .25s"><path d="M0 0C0 0-3 4-3 6a3 3 0 0 0 6 0C3 4 0 0 0 0Z" fill="#3E77A8"></path></g></g>
+            <g transform="translate(61 10)"><g class="drop" style="animation-delay: .4s"><path d="M0 0C0 0-3 4-3 6a3 3 0 0 0 6 0C3 4 0 0 0 0Z" fill="#3E77A8"></path></g></g>
+          </sc-if>
+        </svg>
+      </div>
+
+      <div style="padding: 18px 18px 30px; display: flex; flex-direction: column; gap: 14px">
+        <div class="rise d1" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+          <div style="background: #FBF8F1; border-radius: 18px; padding: 12px; display: flex; flex-direction: column; gap: 8px">
+            <span style="font-size: 12px; font-weight: 600; color: #55604F; text-transform: uppercase; letter-spacing: 0.06em">Eau</span>
+            <div style="height: 8px; border-radius: 4px; background: #E6DDCB; overflow: hidden"><div style="height: 8px; width: {{cur.water}}; background: #3E77A8; border-radius: 4px; transition: width .8s cubic-bezier(.22,.8,.24,1)"></div></div>
+            <span style="font-size: 14px; font-weight: 600">{{cur.waterText}}</span>
+          </div>
+          <div style="background: #FBF8F1; border-radius: 18px; padding: 12px; display: flex; flex-direction: column; gap: 8px">
+            <span style="font-size: 12px; font-weight: 600; color: #55604F; text-transform: uppercase; letter-spacing: 0.06em">Lumière</span>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C48A0E" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M5 19l1.5-1.5M17.5 6.5L19 5"></path></svg>
+            <span style="font-size: 14px; font-weight: 600">{{cur.lightLabel}}</span>
+          </div>
+          <div style="background: #FBF8F1; border-radius: 18px; padding: 12px; display: flex; flex-direction: column; gap: 8px">
+            <span style="font-size: 12px; font-weight: 600; color: #55604F; text-transform: uppercase; letter-spacing: 0.06em">Air</span>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4F8350" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 9h11a3 3 0 1 0-3-3"></path><path d="M3 15h15a3 3 0 1 1-3 3"></path></svg>
+            <span style="font-size: 14px; font-weight: 600">{{cur.air}}</span>
+          </div>
+        </div>
+
+        <button class="rise d2 press {{cur.btnAnim}}" onClick="{{toggleWater}}" style="height: 58px; flex-shrink: 0; border-radius: 29px; border: none; background: {{cur.btnBg}}; color: #1F3D2B; font-family: inherit; font-size: 17px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: background .3s ease">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1F3D2B" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"></path></svg>
+          {{cur.btnText}}
+        </button>
+
+        <div class="rise d3" style="background: #FBF8F1; border-radius: 18px; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px">
+          <div style="display: flex; justify-content: space-between; align-items: baseline">
+            <span style="font-size: 12px; font-weight: 600; color: #55604F; text-transform: uppercase; letter-spacing: 0.06em">Croissance</span>
+            <span style="font-size: 13px; color: #55604F">avec toi depuis {{cur.sinceText}}</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+            <sc-for list="{{cur.steps}}" as="st" hint-placeholder-count="3">
+              <div style="border-radius: 14px; padding: 10px 8px; background: {{st.bg}}; display: flex; flex-direction: column; align-items: center; gap: 6px; border: 1.5px solid {{st.border}}">
+                <svg width="{{st.icon}}" height="{{st.icon}}" viewBox="0 0 24 24" fill="none" stroke="{{st.fg}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21V11"></path><path d="M12 13c-4 0-7-3-7-7 4 0 7 3 7 7z"></path><path d="M12 11c0-4 3-7 7-7 0 4-3 7-7 7z"></path></svg>
+                <span style="font-size: 13px; font-weight: 700; color: {{st.fg}}">{{st.label}}</span>
+                <span style="font-size: 11px; color: #55604F">{{st.hint}}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div class="rise d3" style="background: #FBF8F1; border-radius: 18px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px">
+          <span style="font-size: 12px; font-weight: 600; color: #55604F; text-transform: uppercase; letter-spacing: 0.06em">Bon à savoir</span>
+          <p style="margin: 0; font-size: 14px; line-height: 1.45">{{cur.tip}}</p>
+        </div>
+
+        <button class="rise d4 press" onClick="{{toChat}}" style="border: none; font-family: inherit; text-align: left; color: #1C2A21; background: #DCE8CF; border-radius: 18px; padding: 12px 12px 12px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer">
+          <span style="flex-grow: 1; display: flex; flex-direction: column">
+            <span style="font-weight: 700; font-size: 15px; color: #1F3D2B">Une question sur {{cur.name}} ?</span>
+            <span style="font-size: 13px; color: #3F5A45">Décris ou prends une photo</span>
+          </span>
+          <span style="width: 44px; height: 44px; flex-shrink: 0; border-radius: 22px; background: #1F3D2B; display: flex; align-items: center; justify-content: center">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F3EEE3" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"></path><circle cx="12" cy="13" r="3.5"></circle></svg>
+          </span>
+        </button>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ CHAT IA ============ -->
+  <sc-if value="{{isChat}}" hint-placeholder-val="{{false}}">
+    <div class="{{anim}}" style="position: absolute; inset: 0; display: flex; flex-direction: column">
+      <div style="padding: 54px 18px 14px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #E2D9C6">
+        <button class="press" onClick="{{backToPlant}}" aria-label="Retour à la fiche" style="width: 44px; height: 44px; border-radius: 22px; border: none; background: #FBF8F1; display: flex; align-items: center; justify-content: center; cursor: pointer">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1F3D2B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+        </button>
+        <span style="width: 44px; height: 44px; border-radius: 22px; background: #DCE8CF; display: flex; align-items: flex-end; justify-content: center; overflow: hidden">
+          <svg width="36" height="40" viewBox="0 0 100 110" aria-hidden="true">
+            <g transform="{{cur.g.scale}}">
+              <sc-for list="{{cur.g.shapes}}" as="sh" hint-placeholder-count="6"><path d="{{sh.d}}" transform="{{sh.t}}" fill="{{sh.f}}" stroke="{{sh.st}}" stroke-width="{{sh.sw}}" stroke-linecap="round" stroke-linejoin="round"></path></sc-for>
+            </g>
+            <rect x="23" y="62" width="54" height="10" rx="4" fill="#E8B931"></rect>
+            <path d="M27 72 H73 L66 106 H34 Z" fill="#D6A132"></path>
+          </svg>
+        </span>
+        <div style="display: flex; flex-direction: column">
+          <span style="font-weight: 700; font-size: 16px; color: #1F3D2B">{{cur.name}}</span>
+          <span style="font-size: 13px; color: #55604F">Assistant plantes · connaît son historique</span>
+        </div>
+      </div>
+
+      <div style="flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column-reverse">
+        <div style="padding: 18px; display: flex; flex-direction: column; gap: 12px">
+          <span style="align-self: center; font-size: 12px; color: #55604F">Aujourd'hui</span>
+          <sc-for list="{{messages}}" as="m" hint-placeholder-count="3">
+            <sc-if value="{{m.isPhoto}}" hint-placeholder-val="{{false}}">
+              <div class="rise" style="align-self: flex-end; width: 190px; height: 150px; border-radius: 20px 20px 6px 20px; background: #CFE0C3; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border: 1.5px dashed #8DAA80">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#3F6B45" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"></path><circle cx="12" cy="13" r="3.5"></circle></svg>
+                <span style="font-size: 13px; color: #2F5A3A">[Photo de la feuille]</span>
+              </div>
+            </sc-if>
+            <sc-if value="{{m.isMe}}" hint-placeholder-val="{{true}}">
+              <div class="rise" style="align-self: flex-end; max-width: 260px; background: #1F3D2B; color: #F3EEE3; border-radius: 20px 20px 6px 20px; padding: 12px 14px; font-size: 15px; line-height: 1.4">{{m.text}}</div>
+            </sc-if>
+            <sc-if value="{{m.isBot}}" hint-placeholder-val="{{false}}">
+              <div class="rise" style="align-self: flex-start; max-width: 300px; background: #FBF8F1; border-radius: 20px 20px 20px 6px; padding: 14px; font-size: 15px; line-height: 1.45; display: flex; flex-direction: column; gap: 10px">
+                <span style="white-space: pre-line">{{m.text}}</span>
+                <sc-if value="{{m.hasCta}}" hint-placeholder-val="{{false}}">
+                  <button class="press" onClick="{{remind}}" style="align-self: flex-start; height: 44px; padding: 0 16px; border-radius: 22px; border: 1.5px solid #1F3D2B; background: transparent; color: #1F3D2B; font-family: inherit; font-weight: 600; font-size: 14px; cursor: pointer">Me rappeler dans 3 jours</button>
+                </sc-if>
+              </div>
+            </sc-if>
+          </sc-for>
+          <sc-if value="{{typing}}" hint-placeholder-val="{{false}}">
+            <div class="rise" role="status" aria-label="L'assistant écrit" style="align-self: flex-start; background: #FBF8F1; border-radius: 20px 20px 20px 6px; padding: 16px 18px; display: flex; gap: 5px">
+              <span class="dot" style="width: 8px; height: 8px; border-radius: 4px; background: #55604F"></span>
+              <span class="dot dot2" style="width: 8px; height: 8px; border-radius: 4px; background: #55604F"></span>
+              <span class="dot dot3" style="width: 8px; height: 8px; border-radius: 4px; background: #55604F"></span>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+
+      <div class="chips" style="padding: 0 18px 10px; display: flex; gap: 8px; overflow-x: auto">
+        <sc-for list="{{chips}}" as="c" hint-placeholder-count="3">
+          <button class="press" onClick="{{c.ask}}" style="flex-shrink: 0; height: 40px; padding: 0 14px; border-radius: 20px; border: none; background: #F6E3A6; color: #1F3D2B; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer">{{c.label}}</button>
+        </sc-for>
+      </div>
+
+      <form onSubmit="{{send}}" style="margin: 0; padding: 8px 14px 30px; display: flex; align-items: center; gap: 8px">
+        <button type="button" class="press" onClick="{{sendPhoto}}" aria-label="Prendre une photo" style="width: 48px; height: 48px; flex-shrink: 0; border-radius: 24px; border: none; background: #DCE8CF; display: flex; align-items: center; justify-content: center; cursor: pointer">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1F3D2B" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"></path><circle cx="12" cy="13" r="3.5"></circle></svg>
+        </button>
+        <label for="msg" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Message</label>
+        <input id="msg" value="{{draft}}" onChange="{{onDraft}}" placeholder="Pose ta question…" autocomplete="off" style="flex-grow: 1; min-width: 0; height: 48px; box-sizing: border-box; border-radius: 24px; border: 1.5px solid #D8CFBB; background: #FBF8F1; padding: 0 16px; font-family: inherit; font-size: 15px; color: #1C2A21">
+        <button type="submit" class="press" aria-label="Envoyer" style="width: 48px; height: 48px; flex-shrink: 0; border-radius: 24px; border: none; background: #1F3D2B; display: flex; align-items: center; justify-content: center; cursor: pointer">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F3EEE3" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+        </button>
+      </form>
+    </div>
+  </sc-if>
+
+  <!-- ============ RÉGLAGES ============ -->
+  <sc-if value="{{isSettings}}" hint-placeholder-val="{{false}}">
+    <div class="{{anim}}" style="position: absolute; inset: 0; display: flex; flex-direction: column">
+      <div style="padding: 60px 22px 120px; display: flex; flex-direction: column; gap: 20px; flex-grow: 1; overflow-y: auto">
+        <h1 style="margin: 0; font-family: 'Bricolage Grotesque', 'Figtree', sans-serif; font-weight: 700; font-size: 32px; letter-spacing: -0.02em; color: #1F3D2B">Réglages</h1>
+
+        <section class="rise d1" style="background: #FBF8F1; border-radius: 24px; padding: 16px; display: flex; align-items: center; gap: 14px">
+          <span aria-hidden="true" style="width: 56px; height: 56px; flex-shrink: 0; border-radius: 28px; background: #DCE8CF; color: #1F3D2B; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', 'Figtree', sans-serif; font-weight: 700; font-size: 22px">C</span>
+          <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px">
+            <span style="font-weight: 700; font-size: 17px">Camille</span>
+            <span style="font-size: 14px; color: #55604F">{{shownEmail}}</span>
+            <span style="align-self: flex-start; margin-top: 4px; display: flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px; border-radius: 12px; background: #EDE5D4; font-size: 12px; font-weight: 600; color: #3A453C">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#2F5A3A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+              Connecté avec {{providerName}}
+            </span>
+          </span>
+        </section>
+
+        <section class="rise d2" style="background: #FBF8F1; border-radius: 24px; display: flex; flex-direction: column; overflow: hidden">
+          <div style="min-height: 64px; padding: 10px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #ECE4D3">
+            <span style="flex-grow: 1; display: flex; flex-direction: column">
+              <span style="font-weight: 600; font-size: 15px">Rappels d'arrosage</span>
+              <span style="font-size: 13px; color: #55604F">Quand une plante a soif</span>
+            </span>
+            <button onClick="{{toggleNotif}}" aria-pressed="{{notifPressed}}" aria-label="Rappels d'arrosage" style="width: 56px; height: 34px; flex-shrink: 0; border-radius: 17px; border: none; background: {{switchBg}}; padding: 3px; display: flex; justify-content: {{switchJustify}}; cursor: pointer; transition: background .25s ease">
+              <span style="width: 28px; height: 28px; border-radius: 14px; background: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,0.2)"></span>
+            </button>
+          </div>
+          <div style="min-height: 56px; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #ECE4D3">
+            <span style="font-weight: 600; font-size: 15px">Heure du rappel</span>
+            <span style="font-size: 15px; color: #55604F">9 h 00</span>
+          </div>
+          <div style="min-height: 56px; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between">
+            <span style="font-weight: 600; font-size: 15px">Mes pièces</span>
+            <span style="font-size: 15px; color: #55604F">5</span>
+          </div>
+        </section>
+
+        <section class="rise d3" style="background: #FBF8F1; border-radius: 24px; display: flex; flex-direction: column; overflow: hidden">
+          <div style="min-height: 56px; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #ECE4D3">
+            <span style="font-weight: 600; font-size: 15px">Confidentialité</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#55604F" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
+          </div>
+          <button onClick="{{logout}}" style="min-height: 56px; padding: 10px 16px; border: none; background: transparent; text-align: left; font-family: inherit; font-weight: 700; font-size: 15px; color: #A23B1F; cursor: pointer">Se déconnecter</button>
+        </section>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ NOUVELLE PLANTE ============ -->
+  <sc-if value="{{isCreate}}" hint-placeholder-val="{{false}}">
+    <div class="{{anim}}" style="position: absolute; inset: 0; display: flex; flex-direction: column">
+      <div style="padding: 54px 18px 0; display: flex; align-items: center; gap: 12px">
+        <button class="press" onClick="{{closeCreate}}" aria-label="Retour au jardin" style="width: 44px; height: 44px; border-radius: 22px; border: none; background: #FBF8F1; display: flex; align-items: center; justify-content: center; cursor: pointer">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1F3D2B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+        </button>
+        <h1 style="margin: 0; font-family: 'Bricolage Grotesque', 'Figtree', sans-serif; font-weight: 700; font-size: 24px; color: #1F3D2B">Nouvelle plante</h1>
+      </div>
+
+      <div style="flex-grow: 1; padding: 20px 18px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto">
+        <sc-if value="{{speciesNone}}" hint-placeholder-val="{{true}}">
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <span style="font-size: 13px; font-weight: 600; color: #55604F">Quelle est son espèce ?</span>
+            <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+              <button class="press rise" onClick="{{takePhoto}}" style="height: 140px; border-radius: 22px; border: 1.5px dashed #A9B79A; background: #E9EFDF; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 0 10px; font-family: inherit; cursor: pointer; color: #1F3D2B; text-align: center">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1F3D2B" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"></path><circle cx="12" cy="13" r="3.5"></circle></svg>
+                <span style="font-weight: 700; font-size: 15px">Prendre une photo</span>
+                <span style="font-size: 12px; color: #3F5A45">Reconnaissance automatique</span>
+              </button>
+              <button class="press rise d1" onClick="{{openSpecies}}" style="height: 140px; border-radius: 22px; border: 1.5px solid #D8CFBB; background: #FBF8F1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 0 10px; font-family: inherit; cursor: pointer; color: #1F3D2B; text-align: center">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1F3D2B" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6"></circle><path d="M20 20l-4.5-4.5"></path></svg>
+                <span style="font-weight: 700; font-size: 15px">Choisir dans la liste</span>
+                <span style="font-size: 12px; color: #55604F">{{speciesCount}} espèces</span>
+              </button>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{photoBusy}}" hint-placeholder-val="{{false}}">
+          <div role="status" style="height: 140px; flex-shrink: 0; border-radius: 22px; background: #CFE0C3; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: #1F3D2B">
+            <svg class="spin" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1F3D2B" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 3a9 9 0 1 1-9 9"></path></svg>
+            <span style="font-weight: 600; font-size: 15px">Reconnaissance de l'espèce…</span>
+          </div>
+        </sc-if>
+        <sc-if value="{{speciesSet}}" hint-placeholder-val="{{false}}">
+          <div class="pop" style="display: flex; flex-direction: column; gap: 8px">
+            <span style="font-size: 13px; font-weight: 600; color: #55604F">{{speciesLabel}}</span>
+            <div style="background: #FBF8F1; border-radius: 20px; padding: 10px 10px 10px 10px; display: flex; align-items: center; gap: 12px">
+              <span style="width: 72px; height: 76px; flex-shrink: 0; border-radius: 16px; background: #EDE5D4; display: flex; align-items: flex-end; justify-content: center; overflow: hidden">
+                <svg width="66" height="73" viewBox="0 0 100 110" aria-hidden="true">
+                  <g transform="{{chosen.g.scale}}"><g class="sway">
+                    <sc-for list="{{chosen.g.shapes}}" as="sh" hint-placeholder-count="6"><path d="{{sh.d}}" transform="{{sh.t}}" fill="{{sh.f}}" stroke="{{sh.st}}" stroke-width="{{sh.sw}}" stroke-linecap="round" stroke-linejoin="round"></path></sc-for>
+                  </g></g>
+                  <rect x="23" y="62" width="54" height="10" rx="4" fill="#E8B931"></rect>
+                  <path d="M27 72 H73 L66 106 H34 Z" fill="#D6A132"></path>
+                  <circle cx="43" cy="84" r="2.6" fill="#1F3D2B"></circle>
+                  <circle cx="57" cy="84" r="2.6" fill="#1F3D2B"></circle>
+                  <path d="M44 91 Q50 96 56 91" stroke="#1F3D2B" stroke-width="2" fill="none" stroke-linecap="round"></path>
+                </svg>
+              </span>
+              <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+                <span style="font-weight: 700; font-size: 16px">{{chosen.name}}</span>
+                <span style="font-size: 13px; color: #55604F; font-style: italic">{{chosen.latin}}</span>
+                <span style="font-size: 12px; color: #3F5A45">{{chosen.typeLabel}}</span>
+              </span>
+              <button onClick="{{openSpecies}}" style="height: 44px; padding: 0 12px; flex-shrink: 0; border-radius: 22px; border: 1.5px solid #CFC6B2; background: transparent; color: #1F3D2B; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer">Changer</button>
+            </div>
+          </div>
+        </sc-if>
+
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <label for="nom" style="font-size: 13px; font-weight: 600; color: #55604F">Son petit nom</label>
+          <input id="nom" value="{{newName}}" onChange="{{onName}}" placeholder="{{namePlaceholder}}" style="height: 50px; box-sizing: border-box; border-radius: 16px; border: 1.5px solid #D8CFBB; background: #FBF8F1; padding: 0 16px; font-family: inherit; font-size: 16px; color: #1C2A21">
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <span style="font-size: 13px; font-weight: 600; color: #55604F">Pièce</span>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px">
+            <sc-for list="{{rooms}}" as="r" hint-placeholder-count="5">
+              <button onClick="{{r.pick}}" aria-pressed="{{r.on}}" style="height: 44px; padding: 0 16px; border-radius: 22px; border: 1.5px solid {{r.border}}; background: {{r.bg}}; color: {{r.fg}}; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: background .2s ease, color .2s ease">{{r.label}}</button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <span style="font-size: 13px; font-weight: 600; color: #55604F">Lumière à cet endroit</span>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+            <sc-for list="{{lights}}" as="l" hint-placeholder-count="3">
+              <button onClick="{{l.pick}}" aria-pressed="{{l.on}}" style="height: 64px; border-radius: 16px; border: 1.5px solid {{l.border}}; background: {{l.bg}}; color: #1C2A21; font-family: inherit; font-size: 13px; font-weight: 600; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; transition: background .2s ease">
+                <span>{{l.label}}</span>
+                <span style="font-size: 12px; font-weight: 500; color: #55604F">{{l.hint}}</span>
+              </button>
+            </sc-for>
+          </div>
+          <sc-if value="{{lightTip}}" hint-placeholder-val="{{false}}">
+            <span class="rise" style="font-size: 13px; color: #8A5A00">{{lightTipText}}</span>
+          </sc-if>
+        </div>
+      </div>
+
+      <div style="padding: 10px 18px 34px; display: flex; flex-direction: column; gap: 8px">
+        <button class="press" onClick="{{addPlant}}" disabled="{{addDisabled}}" style="height: 56px; border-radius: 28px; border: none; background: {{addBg}}; color: {{addFg}}; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 700; font-size: 16px; cursor: pointer; transition: background .3s ease">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{addFg}}" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+          {{addLabel}}
+        </button>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ LISTE DES ESPÈCES ============ -->
+  <sc-if value="{{isSpecies}}" hint-placeholder-val="{{false}}">
+    <div class="{{anim}}" style="position: absolute; inset: 0; display: flex; flex-direction: column; background: #F3EEE3">
+      <div style="padding: 54px 18px 12px; display: flex; flex-direction: column; gap: 14px; border-bottom: 1px solid #E2D9C6">
+        <div style="display: flex; align-items: center; gap: 12px">
+          <button class="press" onClick="{{closeSpecies}}" aria-label="Retour" style="width: 44px; height: 44px; flex-shrink: 0; border-radius: 22px; border: none; background: #FBF8F1; display: flex; align-items: center; justify-content: center; cursor: pointer">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1F3D2B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+          </button>
+          <div style="display: flex; flex-direction: column">
+            <h1 style="margin: 0; font-family: 'Bricolage Grotesque', 'Figtree', sans-serif; font-weight: 700; font-size: 24px; color: #1F3D2B">Choisir une espèce</h1>
+            <span style="font-size: 13px; color: #55604F">{{resultLine}}</span>
+          </div>
+        </div>
+        <div style="position: relative">
+          <label for="q" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Rechercher une espèce</label>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#55604F" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="position: absolute; left: 16px; top: 15px"><circle cx="11" cy="11" r="6"></circle><path d="M20 20l-4.5-4.5"></path></svg>
+          <input id="q" value="{{q}}" onChange="{{onQ}}" placeholder="Monstera, basilic, cactus…" autocomplete="off" style="width: 100%; height: 48px; box-sizing: border-box; border-radius: 24px; border: 1.5px solid #D8CFBB; background: #FBF8F1; padding: 0 16px 0 44px; font-family: inherit; font-size: 15px; color: #1C2A21">
+        </div>
+        <div class="chips" style="display: flex; gap: 8px; overflow-x: auto; margin: 0 -18px; padding: 0 18px">
+          <sc-for list="{{cats}}" as="c" hint-placeholder-count="5">
+            <button onClick="{{c.pick}}" aria-pressed="{{c.on}}" style="flex-shrink: 0; height: 38px; padding: 0 14px; border-radius: 19px; border: 1.5px solid {{c.border}}; background: {{c.bg}}; color: {{c.fg}}; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; transition: background .2s ease">{{c.label}}</button>
+          </sc-for>
+        </div>
+      </div>
+      <div style="flex-grow: 1; overflow-y: auto; padding: 8px 12px 30px; display: flex; flex-direction: column">
+        <sc-for list="{{speciesRows}}" as="row" hint-placeholder-count="8">
+          <button class="press" onClick="{{row.pick}}" aria-pressed="{{row.on}}" style="min-height: 72px; padding: 6px 10px; border: none; border-radius: 18px; background: {{row.bg}}; display: flex; align-items: center; gap: 12px; font-family: inherit; text-align: left; color: #1C2A21; cursor: pointer">
+            <span style="width: 54px; height: 58px; flex-shrink: 0; border-radius: 14px; background: #EDE5D4; display: flex; align-items: flex-end; justify-content: center; overflow: hidden">
+              <svg width="50" height="55" viewBox="0 0 100 110" aria-hidden="true">
+                <g transform="{{row.g.scale}}">
+                  <sc-for list="{{row.g.shapes}}" as="sh" hint-placeholder-count="5"><path d="{{sh.d}}" transform="{{sh.t}}" fill="{{sh.f}}" stroke="{{sh.st}}" stroke-width="{{sh.sw}}" stroke-linecap="round" stroke-linejoin="round"></path></sc-for>
+                </g>
+                <rect x="23" y="62" width="54" height="10" rx="4" fill="#E8B931"></rect>
+                <path d="M27 72 H73 L66 106 H34 Z" fill="#D6A132"></path>
+              </svg>
+            </span>
+            <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px">
+              <span style="font-weight: 700; font-size: 15px">{{row.name}}</span>
+              <span style="font-size: 13px; color: #55604F; font-style: italic">{{row.latin}}</span>
+              <span style="font-size: 12px; color: #3F5A45">{{row.typeLabel}}</span>
+            </span>
+            <sc-if value="{{row.isOn}}" hint-placeholder-val="{{false}}">
+              <span style="width: 28px; height: 28px; flex-shrink: 0; border-radius: 14px; background: #1F3D2B; display: flex; align-items: center; justify-content: center">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F3EEE3" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+              </span>
+            </sc-if>
+          </button>
+        </sc-for>
+        <sc-if value="{{noResult}}" hint-placeholder-val="{{false}}">
+          <div style="padding: 40px 20px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center">
+            <span style="font-weight: 700; font-size: 16px; color: #1F3D2B">Aucune espèce trouvée</span>
+            <span style="font-size: 14px; color: #55604F">Essaie un autre nom, ou prends-la en photo.</span>
+            <button class="press" onClick="{{photoFromList}}" style="height: 48px; padding: 0 20px; border-radius: 24px; border: none; background: #1F3D2B; color: #F3EEE3; font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer">Prendre une photo</button>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ PLANTE AJOUTÉE ============ -->
+  <sc-if value="{{isAdded}}" hint-placeholder-val="{{false}}">
+    <div class="{{anim}}" style="position: absolute; inset: 0; background: #1F3D2B; color: #F3EEE3; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 30px; padding: 0 28px">
+      <span class="pop" style="width: 170px; height: 170px; box-sizing: border-box; border-radius: 85px; border: 6px solid #E8B931; background: #F3EEE3; display: flex; align-items: flex-end; justify-content: center; overflow: hidden">
+        <svg width="130" height="143" viewBox="0 0 100 110" aria-hidden="true">
+          <g transform="{{chosenBaby.scale}}"><g class="sway">
+            <sc-for list="{{chosenBaby.shapes}}" as="sh" hint-placeholder-count="6"><path d="{{sh.d}}" transform="{{sh.t}}" fill="{{sh.f}}" stroke="{{sh.st}}" stroke-width="{{sh.sw}}" stroke-linecap="round" stroke-linejoin="round"></path></sc-for>
+          </g></g>
+          <rect x="23" y="62" width="54" height="10" rx="4" fill="#E8B931"></rect>
+          <path d="M27 72 H73 L66 106 H34 Z" fill="#D6A132"></path>
+          <circle cx="43" cy="84" r="2.6" fill="#1F3D2B"></circle>
+          <circle cx="57" cy="84" r="2.6" fill="#1F3D2B"></circle>
+          <path d="M44 91 Q50 96 56 91" stroke="#1F3D2B" stroke-width="2" fill="none" stroke-linecap="round"></path>
+        </svg>
+      </span>
+      <div class="rise d1" style="display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center">
+        <h1 style="margin: 0; font-family: 'Bricolage Grotesque', 'Figtree', sans-serif; font-weight: 700; font-size: 28px">{{plantName}} est chez elle !</h1>
+        <p style="margin: 0; font-size: 15px; line-height: 1.45; color: #C9D6C0; max-width: 290px">Elle commence petite : elle grandira dans l'app au fil des mois.</p>
+      </div>
+      <div class="rise d2" style="align-self: stretch; display: flex; flex-direction: column; gap: 8px">
+        <button class="press" onClick="{{openNew}}" style="height: 56px; border-radius: 28px; border: none; background: #E8B931; color: #1F3D2B; font-family: inherit; font-size: 16px; font-weight: 700; cursor: pointer">Voir sa fiche</button>
+        <button onClick="{{addAnother}}" style="height: 48px; border: none; background: transparent; color: #F3EEE3; font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer">Ajouter une autre plante</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ PLANCHE DES DESSINS (vue d'ensemble) ============ -->
+  <sc-if value="{{isCatalog}}" hint-placeholder-val="{{false}}">
+    <div style="position: absolute; inset: 0; padding: 48px 48px; box-sizing: border-box; display: flex; flex-direction: column; gap: 28px">
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap">
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <h1 style="margin: 0; font-family: 'Bricolage Grotesque', 'Figtree', sans-serif; font-weight: 700; font-size: 40px; letter-spacing: -0.02em; color: #1F3D2B">Les dessins de Zeve</h1>
+          <p style="margin: 0; font-size: 16px; color: #55604F">{{formCount}} types de plantes · {{speciesCount}} espèces · chaque dessin existe en 3 tailles selon l'ancienneté dans l'app</p>
+        </div>
+        <div style="display: flex; gap: 16px; font-size: 14px; color: #3A453C">
+          <span><strong>Pousse</strong> · moins de 3 mois</span>
+          <span><strong>Jeune</strong> · moins d'un an</span>
+          <span><strong>Adulte</strong> · 1 an et +</span>
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px">
+        <sc-for list="{{catalog}}" as="k" hint-placeholder-count="19">
+          <div style="background: #FBF8F1; border-radius: 22px; padding: 14px 14px 16px; display: flex; flex-direction: column; gap: 10px">
+            <div style="height: 104px; border-radius: 14px; background: #EDE5D4; display: flex; align-items: flex-end; justify-content: center; gap: 2px; padding: 0 4px">
+              <sc-for list="{{k.sizes}}" as="z" hint-placeholder-count="3">
+                <svg width="60" height="66" viewBox="0 0 100 110" aria-hidden="true">
+                  <g transform="{{z.scale}}">
+                    <sc-for list="{{z.shapes}}" as="sh" hint-placeholder-count="5"><path d="{{sh.d}}" transform="{{sh.t}}" fill="{{sh.f}}" stroke="{{sh.st}}" stroke-width="{{sh.sw}}" stroke-linecap="round" stroke-linejoin="round"></path></sc-for>
+                  </g>
+                  <rect x="23" y="62" width="54" height="10" rx="4" fill="#E8B931"></rect>
+                  <path d="M27 72 H73 L66 106 H34 Z" fill="#D6A132"></path>
+                  <circle cx="43" cy="84" r="2.6" fill="#1F3D2B"></circle>
+                  <circle cx="57" cy="84" r="2.6" fill="#1F3D2B"></circle>
+                  <path d="M44 91 Q50 96 56 91" stroke="#1F3D2B" stroke-width="2" fill="none" stroke-linecap="round"></path>
+                </svg>
+              </sc-for>
+            </div>
+            <span style="font-weight: 700; font-size: 15px; color: #1F3D2B">{{k.label}}</span>
+            <span style="font-size: 12px; line-height: 1.4; color: #55604F">{{k.examples}}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ BARRE DE NAVIGATION ============ -->
+  <sc-if value="{{showNav}}" hint-placeholder-val="{{true}}">
+    <nav aria-label="Navigation principale" style="position: absolute; left: 50%; margin-left: -120px; width: 240px; bottom: 24px; height: 64px; box-sizing: border-box; background: #1F3D2B; border-radius: 32px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; padding: 6px; box-shadow: 0 10px 30px rgba(31,61,43,0.25)">
+      <button onClick="{{tabGarden}}" aria-current="{{gardenCurrent}}" style="height: 52px; border-radius: 26px; border: none; background: {{gardenTabBg}}; color: {{gardenTabFg}}; font-family: inherit; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: background .25s ease, color .25s ease">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{gardenTabFg}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21V11"></path><path d="M12 13c-4 0-7-3-7-7 4 0 7 3 7 7z"></path><path d="M12 11c0-4 3-7 7-7 0 4-3 7-7 7z"></path></svg>
+        Jardin
+      </button>
+      <button onClick="{{tabSettings}}" aria-current="{{settingsCurrent}}" style="height: 52px; border-radius: 26px; border: none; background: {{settingsTabBg}}; color: {{settingsTabFg}}; font-family: inherit; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: background .25s ease, color .25s ease">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{settingsTabFg}}" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M4 12h2M18 12h2M12 4v2M12 18v2M6.3 6.3l1.4 1.4M16.3 16.3l1.4 1.4M6.3 17.7l1.4-1.4M16.3 7.7l1.4-1.4"></path></svg>
+        Réglages
+      </button>
+    </nav>
+  </sc-if>
+
+  <!-- ============ TOAST ============ -->
+  <sc-if value="{{hasToast}}" hint-placeholder-val="{{false}}">
+    <div class="toast" role="status" style="position: absolute; top: 54px; left: 22px; right: 22px; min-height: 48px; box-sizing: border-box; padding: 12px 16px; border-radius: 24px; background: #1C2A21; color: #F3EEE3; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.2)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E8B931" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+      {{toast}}
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#F6E3A6","options":["#F6E3A6","#DCE8CF","#EADFC8"]},"startScreen":{"editor":"enum","default":"splash","options":["splash","login","consent","account","connecting","notif","garden","plant","chat","settings","create","species","picked","added","catalog"]},"still":{"editor":"boolean","default":false},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.timers = [];
+    this.cache = {};
+    this.FORMS = this.buildForms();
+    this.INFO = this.buildInfo();
+    this.SPECIES = this.buildSpecies();
+    this.SP = {};
+    this.SPECIES.forEach((s) => { this.SP[s.id] = s; });
+
+    const plants = [
+      { id: 'gaston', name: 'Gaston', sp: 'monstera', room: 'Salon', added: 430, thirsty: true, since: '9 j sans eau', next: 'dans 8 j', tip: 'Arrose quand les 3 premiers cm de terre sont secs. Toxique pour les chats et les chiens.' },
+      { id: 'basil', name: 'Basilic', sp: 'basilic', room: 'Cuisine', added: 35, thirsty: true, since: '3 j sans eau', next: 'dans 2 j' },
+      { id: 'pepite', name: 'Pépite', sp: 'pilea', room: 'Chambre', added: 160, thirsty: false, next: 'dans 3 j' },
+      { id: 'frida', name: 'Frida', sp: 'calathea', room: 'Salle de bain', added: 290, thirsty: false, next: 'demain' },
+      { id: 'olivia', name: 'Olivia', sp: 'olivier', room: 'Balcon', added: 820, thirsty: false, next: 'dans 5 j' },
+      { id: 'piquant', name: 'Piquant', sp: 'echinopsis', room: 'Bureau', added: 60, thirsty: false, next: 'dans 12 j' }
+    ];
+    const base = {
+      screen: 'splash', anim: 'fade', sheet: null, provider: 'google', hideEmail: false,
+      emailOpen: false, email: '', plants, done: {}, plantId: 'gaston', dropOn: false,
+      chats: {}, draft: '', typing: false, photo: 'none', newName: '', newId: null,
+      speciesId: null, speciesSource: null, q: '', cat: 'all',
+      room: 'Salon', light: 'indirect', notif: true, toast: null
+    };
+    const start = props.startScreen || 'splash';
+    const map = {
+      splash: { screen: 'splash' }, login: { screen: 'login' }, consent: { screen: 'login', sheet: 'ask' },
+      account: { screen: 'login', sheet: 'pick' }, connecting: { screen: 'connecting' }, notif: { screen: 'notif' },
+      garden: { screen: 'garden' }, plant: { screen: 'plant' }, chat: { screen: 'chat' },
+      settings: { screen: 'settings' },
+      create: { screen: 'create' }, species: { screen: 'species', speciesId: 'pothos' },
+      picked: { screen: 'create', speciesId: 'pothos', speciesSource: 'list', light: 'ombre', room: 'Chambre' },
+      added: { screen: 'added', newName: 'Lianne', speciesId: 'pothos' },
+      catalog: { screen: 'catalog' }
+    };
+    this.state = { ...base, ...(map[start] || map.splash) };
+  }
+
+  /* ---------- Dessins : un par type de plante, éléments tagués par taille (1 pousse, 2 jeune, 3 adulte) ---------- */
+  buildForms() {
+    const r = (n) => Math.round(n * 10) / 10;
+    const q = (a, b, c, t) => (1 - t) * (1 - t) * a + 2 * (1 - t) * t * b + t * t * c;
+    const P = (d, f, s) => ({ d, f, s: s || 1 });
+    const L = (d, c, w, s) => ({ d, f: 'none', st: c, sw: w, s: s || 1 });
+    const E = (cx, cy, rx, ry, a, f, s) => ({ d: 'M' + r(cx - rx) + ' ' + cy + 'a' + rx + ' ' + ry + ' 0 1 0 ' + r(2 * rx) + ' 0a' + rx + ' ' + ry + ' 0 1 0 ' + r(-2 * rx) + ' 0Z', t: 'rotate(' + a + ' ' + cx + ' ' + cy + ')', f, s: s || 1 });
+    const Lf = (x, y, len, w, a, f, s) => ({ d: 'M0 0C' + w + ' ' + r(-len * 0.3) + ' ' + w + ' ' + r(-len * 0.75) + ' 0 ' + (-len) + 'C' + (-w) + ' ' + r(-len * 0.75) + ' ' + (-w) + ' ' + r(-len * 0.3) + ' 0 0Z', t: 'translate(' + x + ' ' + y + ') rotate(' + a + ')', f, s: s || 1 });
+    const H = (x, y, k, a, f, s) => ({ d: 'M0 0C-6 -3 -8 -9 -4 -12C-2 -13 0 -12 0 -10C0 -12 2 -13 4 -12C8 -9 6 -3 0 0Z', t: 'translate(' + x + ' ' + y + ') rotate(' + a + ') scale(' + k + ')', f, s: s || 1 });
+    const frond = (x0, y0, cx, cy, x1, y1, n, ll, lw, f1, f2, s, sw) => {
+      const out = [L('M' + x0 + ' ' + y0 + 'Q' + cx + ' ' + cy + ' ' + x1 + ' ' + y1, 'S', sw || 1.4, s)];
+      for (let i = 1; i <= n; i++) {
+        const t = (i / (n + 1)) * 0.92 + 0.08;
+        const x = r(q(x0, cx, x1, t)), y = r(q(y0, cy, y1, t));
+        const dx = 2 * (1 - t) * (cx - x0) + 2 * t * (x1 - cx);
+        const dy = 2 * (1 - t) * (cy - y0) + 2 * t * (y1 - cy);
+        const ang = Math.atan2(dy, dx) * 180 / Math.PI;
+        const len = r(ll * (1 - t * 0.5));
+        out.push(Lf(x, y, len, lw, r(ang + 28), f1, s));
+        out.push(Lf(x, y, len, lw, r(ang + 152), f2, s));
+      }
+      return out;
+    };
+    const F = {};
+
+    const mon = (x, y, k, a, f, s) => {
+      const t = 'translate(' + x + ' ' + y + ') rotate(' + a + ') scale(' + k + ')';
+      return [
+        { d: 'M0 0C-14 2 -20 -10 -18 -20C-16 -30 -6 -34 0 -30C6 -34 16 -30 18 -20C20 -10 14 2 0 0Z', t, f, s },
+        { d: 'M0 -3L0 -28M-3 -10L-17 -14M-3 -18L-17 -24M3 -10L17 -14M3 -18L17 -24', t, f: 'none', st: 'V', sw: 2.6, s }
+      ];
+    };
+    F.monstera = [
+      L('M50 64C54 60 62 57 70 55', 'S', 2.2, 3), L('M50 64C46 60 38 58 30 57', 'S', 2.2, 3),
+      ...mon(70, 55, 0.55, 72, 'B', 3), ...mon(30, 57, 0.55, -72, 'A', 3),
+      L('M50 64C49 54 45 46 38 38', 'S', 2.4, 1), L('M50 64C51 52 56 42 63 33', 'S', 2.4, 1),
+      L('M50 64C50 52 50 40 51 26', 'S', 2.4, 2),
+      ...mon(38, 38, 0.72, -38, 'A', 1), ...mon(63, 33, 0.72, 36, 'B', 1), ...mon(51, 26, 0.66, 2, 'A', 2)
+    ];
+
+    F.herb = [
+      L('M50 64V30', 'S', 2.6, 1),
+      L('M50 54L36 46', 'S', 2, 3), L('M50 52L64 44', 'S', 2, 3),
+      Lf(36, 46, 11, 6, -75, 'A', 3), Lf(36, 46, 11, 6, -15, 'B', 3), Lf(64, 44, 11, 6, 75, 'B', 3), Lf(64, 44, 11, 6, 15, 'A', 3),
+      Lf(50, 58, 14, 8, -62, 'A', 1), Lf(50, 58, 14, 8, 62, 'B', 1),
+      Lf(50, 47, 14, 8, -50, 'B', 1), Lf(50, 47, 14, 8, 50, 'A', 1),
+      Lf(50, 37, 12, 7, -36, 'A', 2), Lf(50, 37, 12, 7, 36, 'B', 2),
+      Lf(50, 31, 11, 6, 0, 'B', 1)
+    ];
+
+    const spike = (cx, cy, x1, y1, s) => {
+      const out = [L('M50 60Q' + cx + ' ' + cy + ' ' + x1 + ' ' + y1, 'B', 1.4, s)];
+      for (let i = 0; i < 5; i++) { const t = 0.62 + i * 0.09; out.push(E(r(q(50, cx, x1, t)), r(q(60, cy, y1, t)), 2, 2.8, 0, 'F', s)); }
+      return out;
+    };
+    F.lavender = [
+      ...spike(40, 44, 28, 24, 3), ...spike(60, 44, 72, 26, 3),
+      ...spike(46, 40, 40, 14, 2), ...spike(56, 40, 62, 16, 2),
+      ...spike(50, 40, 51, 10, 1),
+      Lf(50, 63, 16, 2.2, -70, 'B', 2), Lf(50, 63, 16, 2.2, 70, 'A', 2),
+      Lf(50, 63, 18, 2.4, -50, 'A', 1), Lf(50, 63, 20, 2.4, -25, 'B', 1), Lf(50, 63, 18, 2.4, 0, 'A', 1), Lf(50, 63, 20, 2.4, 25, 'B', 1), Lf(50, 63, 18, 2.4, 50, 'A', 1)
+    ];
+
+    const coin = (cx, cy, fy, f, s) => [L('M50 ' + fy + 'L' + cx + ' ' + cy, 'S', 1.3, s), E(cx, cy, 8, 7.5, 0, f, s), E(cx, cy, 1.2, 1.2, 0, 'V', s)];
+    F.pilea = [
+      L('M50 64V44', 'S', 2.6, 1), L('M50 44V34', 'S', 2.4, 2),
+      ...coin(20, 52, 58, 'B', 3), ...coin(80, 52, 58, 'A', 3), ...coin(42, 16, 36, 'B', 3), ...coin(60, 14, 36, 'A', 3),
+      ...coin(24, 34, 50, 'A', 2), ...coin(76, 34, 50, 'B', 2), ...coin(50, 22, 36, 'A', 2),
+      ...coin(30, 46, 56, 'A', 1), ...coin(70, 46, 56, 'B', 1), ...coin(37, 31, 46, 'B', 1), ...coin(63, 31, 46, 'A', 1)
+    ];
+
+    const cal = (a, len, w, f, s) => {
+      const rad = a * Math.PI / 180;
+      const x = r(50 + Math.sin(rad) * 10), y = r(63 - Math.cos(rad) * 10);
+      const t = 'translate(' + x + ' ' + y + ') rotate(' + a + ')';
+      const seg = (k, ww) => 'M0 ' + r(-len * k) + 'l' + r(w * ww) + ' ' + r(-len * 0.07) + 'M0 ' + r(-len * k) + 'l' + r(-w * ww) + ' ' + r(-len * 0.07);
+      return [L('M50 63L' + x + ' ' + y, 'S', 1.6, s), Lf(x, y, len, w, a, f, s), { d: 'M0 -2L0 ' + r(-len + 3) + seg(0.3, 0.5) + seg(0.5, 0.52) + seg(0.7, 0.4), t, f: 'none', st: 'V', sw: 1.1, s }];
+    };
+    F.calathea = [...cal(-62, 22, 13, 'B', 3), ...cal(62, 22, 13, 'A', 3), ...cal(-36, 28, 16, 'A', 1), ...cal(36, 28, 16, 'B', 1), ...cal(12, 30, 16, 'A', 2), ...cal(-10, 32, 17, 'B', 1)];
+
+    const ol = (pts, s) => pts.map((p, i) => Lf(p[0], p[1], 9, 2.6, p[2], i % 2 ? 'B' : 'A', s));
+    F.olive = [
+      L('M50 64C48 56 52 48 50 40', 'T', 4, 1),
+      L('M50 48C44 42 38 38 32 36', 'T', 2.2, 2), L('M50 46C56 40 62 36 68 34', 'T', 2.2, 2),
+      L('M50 42C50 34 48 28 48 20', 'T', 2, 3),
+      ...ol([[32, 36, -70], [32, 36, -20], [30, 36, -110], [36, 38, -40], [28, 34, -60]], 2),
+      ...ol([[68, 34, 70], [68, 34, 20], [70, 34, 110], [64, 36, 40], [72, 32, 60]], 2),
+      ...ol([[48, 20, -30], [48, 20, 30], [46, 24, -70], [50, 24, 70], [48, 20, 0]], 3),
+      ...ol([[50, 40, -30], [50, 40, 30], [50, 40, 0], [46, 42, -70], [54, 42, 70], [50, 38, -55], [50, 38, 55]], 1),
+      E(40, 38, 1.8, 2.2, 0, 'F', 3), E(62, 36, 1.8, 2.2, 0, 'F', 3), E(52, 26, 1.8, 2.2, 0, 'F', 3)
+    ];
+
+    F.cactus = [
+      P('M42 50C36 50 33 47 33 42V34a4.5 4.5 0 0 1 9 0V44Z', 'B', 2),
+      P('M58 44C64 44 67 41 67 36V28a4.5 4.5 0 0 0-9 0V40Z', 'B', 3),
+      P('M42 64V26a8 8 0 0 1 16 0V64Z', 'A', 1),
+      L('M46.5 62V22M53.5 62V22', 'D', 1, 1),
+      L('M42 34l-2.5-1M42 44l-2.5-1M42 56l-2.5-1M58 30l2.5-1M58 40l2.5-1M58 52l2.5-1', 'D', 0.9, 1),
+      E(50, 16, 4.5, 3.2, 0, 'F', 3), E(50, 16, 1.6, 1.2, 0, '#E8B931', 3)
+    ];
+
+    F.echeveria = [
+      ...[-80, -52, -26, 0, 26, 52, 80].map((a) => Lf(50, 62, 17, 9, a, 'B', 3)),
+      Lf(50, 62, 17, 9, -90, 'A', 2), Lf(50, 62, 17, 9, 90, 'A', 2),
+      ...[-62, -31, 0, 31, 62].map((a) => Lf(50, 62, 14, 8, a, 'A', 1)),
+      ...[-40, 0, 40].map((a) => Lf(50, 62, 9, 5.5, a, 'B', 1)),
+      E(50, 59, 3, 2.4, 0, 'A', 1)
+    ];
+
+    const al = (a, len, f, s) => Lf(50, 63, len, 5.5, a, f, s);
+    F.aloe = [
+      al(-62, 26, 'B', 2), al(62, 26, 'A', 2), al(-16, 36, 'B', 3), al(16, 36, 'A', 3),
+      al(-38, 32, 'A', 1), al(38, 32, 'B', 1), al(0, 38, 'A', 1),
+      E(50, 50, 0.9, 0.9, 0, 'V', 1), E(49, 43, 0.9, 0.9, 0, 'V', 1), E(51, 37, 0.9, 0.9, 0, 'V', 1), E(50, 31, 0.8, 0.8, 0, 'V', 1)
+    ];
+
+    const sw = (x, len, w, a, f, s) => {
+      const t = 'translate(' + x + ' 64) rotate(' + a + ')';
+      const band = (k, ww) => 'M' + r(-w * ww / 2) + ' ' + r(-len * k) + 'l' + r(w * ww) + ' -2.5';
+      return [{ ...Lf(x, 64, len, w, a, f, s), st: 'F', sw: 1.2 }, { d: band(0.2, 0.9) + band(0.38, 1) + band(0.56, 1) + band(0.72, 0.8), t, f: 'none', st: 'D', sw: 1, s }];
+    };
+    F.sansevieria = [...sw(40, 34, 5.5, -14, 'B', 3), ...sw(60, 38, 5.5, 13, 'A', 3), ...sw(50, 54, 6.5, 0, 'A', 2), ...sw(45, 42, 6, -6, 'A', 1), ...sw(55, 46, 6, 5, 'B', 1)];
+
+    F.pothos = [
+      L('M70 62C80 66 84 76 82 88', 'S', 1.3, 2), H(83, 74, 1.05, -110, 'A', 2), H(82, 88, 1.15, 185, 'B', 2),
+      L('M82 88C80 96 82 102 86 108', 'S', 1.3, 3), H(80, 98, 1, 160, 'A', 3), H(86, 108, 1.1, 190, 'B', 3),
+      L('M30 62C22 64 18 70 19 78', 'S', 1.3, 1), H(19, 78, 1.15, 175, 'B', 1),
+      L('M19 78C17 88 18 96 16 104', 'S', 1.3, 3), H(18, 90, 1, 200, 'A', 3), H(16, 104, 1.1, 175, 'B', 3),
+      H(36, 52, 1.25, -55, 'B', 2), H(64, 52, 1.25, 55, 'A', 2),
+      H(42, 58, 1.45, -28, 'A', 1), H(58, 58, 1.45, 28, 'B', 1), H(50, 54, 1.55, 0, 'A', 1)
+    ];
+
+    const fr = (x1, y1, cx, cy, n, s, f1, f2) => frond(50, 62, cx, cy, x1, y1, n, 7, 2.4, f1 || 'A', f2 || 'B', s, 1.3);
+    F.fern = [...fr(10, 66, 28, 54, 7, 3), ...fr(90, 66, 72, 54, 7, 3), ...fr(14, 40, 30, 44, 7, 2), ...fr(86, 40, 70, 44, 7, 2), ...fr(28, 18, 40, 36, 7, 1), ...fr(72, 18, 60, 36, 7, 1), ...fr(50, 10, 50, 34, 7, 1), ...fr(38, 12, 44, 30, 6, 3, 'B', 'A')];
+
+    const pm = (x1, y1, cx, cy, n, s) => frond(50, 62, cx, cy, x1, y1, n, 13, 1.8, 'A', 'B', s, 1.5);
+    F.palm = [...pm(10, 50, 24, 26, 6, 3), ...pm(90, 50, 76, 26, 6, 3), ...pm(16, 26, 34, 16, 6, 2), ...pm(84, 26, 66, 16, 6, 2), ...pm(30, 8, 46, 14, 5, 1), ...pm(70, 8, 54, 14, 5, 1)];
+
+    const fl = (y, len, w, a, f, s) => [Lf(50, y, len, w, a, f, s), { d: 'M0 -2L0 ' + r(-len + 3), t: 'translate(50 ' + y + ') rotate(' + a + ')', f: 'none', st: 'V', sw: 1, s }];
+    F.ficus = [
+      L('M50 64V42', 'S', 2.8, 1), L('M50 42V30', 'S', 2.6, 2), L('M50 30V18', 'S', 2.4, 3),
+      ...fl(58, 22, 12, -62, 'A', 1), ...fl(50, 22, 12, 60, 'B', 1), ...fl(43, 21, 11.5, -52, 'B', 1),
+      ...fl(36, 20, 11, 52, 'A', 2), ...fl(30, 19, 10.5, -45, 'B', 2),
+      ...fl(24, 17, 9, 42, 'A', 3), ...fl(19, 14, 7, -12, 'B', 3), Lf(50, 18, 9, 2.4, 6, 'F', 3)
+    ];
+
+    const flw = (x, y, s) => [E(x, y - 3.4, 2.8, 3.4, 0, 'F', s), E(x - 3.4, y, 3.4, 2.6, 0, 'F', s), E(x + 3.4, y, 3.4, 2.6, 0, 'F', s), E(x - 2, y + 3, 2.4, 2, 0, 'F', s), E(x + 2, y + 3, 2.4, 2, 0, 'F', s), E(x, y + 0.4, 1.5, 1.3, 0, '#E8B931', s)];
+    F.orchid = [
+      L('M52 60C53 46 57 34 66 27', 'S', 1.3, 2), L('M66 27C70 24 74 25 77 29', 'S', 1.3, 3),
+      Lf(50, 63, 24, 10, -80, 'A', 1), Lf(50, 63, 24, 10, 80, 'B', 1), Lf(50, 63, 20, 9, -58, 'B', 2), Lf(50, 63, 20, 9, 62, 'A', 3),
+      ...flw(56, 44, 3), ...flw(60, 35, 2), ...flw(67, 27, 2), ...flw(77, 30, 3)
+    ];
+
+    const spa = (x0, cx, cy, x, y, a, s) => {
+      const rad = a * Math.PI / 180;
+      return [L('M' + x0 + ' 62Q' + cx + ' ' + cy + ' ' + x + ' ' + y, 'S', 1.3, s), Lf(x, y, 13, 5.5, a, 'F', s), E(r(x + Math.sin(rad) * 5), r(y - Math.cos(rad) * 5), 1.3, 3.2, a, '#F1E3A0', s)];
+    };
+    F.lily = [
+      Lf(50, 63, 26, 6.5, -62, 'B', 3), Lf(50, 63, 26, 6.5, 62, 'A', 3),
+      Lf(50, 63, 30, 7, -34, 'A', 1), Lf(50, 63, 32, 7, 30, 'B', 1), Lf(50, 63, 34, 7, -8, 'B', 1), Lf(50, 63, 30, 7, 12, 'A', 2),
+      ...spa(50, 46, 36, 42, 22, -10, 2), ...spa(52, 60, 34, 64, 20, 12, 3)
+    ];
+
+    const zf = (x1, y1, cx, cy, s, f1, f2) => frond(50, 62, cx, cy, x1, y1, 5, 9, 4.6, f1, f2, s, 1.8);
+    F.zz = [...zf(20, 36, 30, 50, 3, 'B', 'A'), ...zf(80, 36, 70, 50, 3, 'A', 'B'), ...zf(30, 20, 40, 40, 2, 'A', 'B'), ...zf(68, 20, 60, 40, 1, 'B', 'A'), ...zf(46, 12, 46, 36, 1, 'A', 'B')];
+
+    const gl = (x, y, f, s) => [E(x, y, 9, 8, 0, f, s), { ...E(x, y, 5, 4.4, 0, 'none', s), st: 'D', sw: 1.4 }];
+    const cl = (x, y, s) => [[0, -4], [-4, -1], [4, -1], [-2.5, 3], [2.5, 3], [0, 0]].map((o) => E(r(x + o[0]), r(y + o[1]), 2.8, 2.8, 0, 'F', s));
+    F.geranium = [
+      L('M50 52C50 42 48 32 46 24', 'S', 1.4, 2), L('M54 54C58 44 62 38 66 32', 'S', 1.4, 3),
+      ...gl(28, 56, 'B', 3), ...gl(72, 56, 'A', 3),
+      ...gl(38, 54, 'A', 1), ...gl(62, 54, 'B', 1), ...gl(50, 46, 'A', 1), ...gl(44, 38, 'B', 2),
+      ...cl(46, 22, 2), ...cl(66, 30, 3)
+    ];
+
+    const sl = (d, s) => [L(d, 'A', 4, s), L(d, 'V', 1.1, s)];
+    F.spider = [
+      ...sl('M50 62Q30 50 14 64', 2), ...sl('M50 62Q70 50 86 64', 2),
+      L('M56 60Q80 64 86 90', 'S', 1, 3), ...[-50, 0, 50].map((a) => Lf(86, 90, 8, 2, a, 'A', 3)),
+      ...sl('M50 62Q36 40 22 46', 1), ...sl('M50 62Q64 40 78 46', 1), ...sl('M50 62Q44 34 38 24', 1), ...sl('M50 62Q58 32 64 22', 1), ...sl('M50 62Q50 40 50 30', 3)
+    ];
+    return F;
+  }
+
+  buildInfo() {
+    return {
+      monstera: { label: 'Feuilles découpées', cat: 'feuillage', light: 'indirect', lightLabel: 'Vive, indirecte', air: 'Humide', every: 8, tip: 'Arrose quand les 3 premiers cm de terre sont secs. Essuie ses grandes feuilles de temps en temps.' },
+      herb: { label: 'Aromatiques', cat: 'aromatiques', light: 'soleil', lightLabel: 'Plein soleil', air: 'Normal', every: 2, tip: 'Garde la terre légèrement humide et pince les tiges pour qu’elle reste touffue.' },
+      lavender: { label: 'Lavande & romarin', cat: 'aromatiques', light: 'soleil', lightLabel: 'Plein soleil', air: 'Sec', every: 10, tip: 'Peu d’eau, beaucoup de soleil. Taille légèrement après la floraison.' },
+      pilea: { label: 'Feuilles rondes', cat: 'feuillage', light: 'indirect', lightLabel: 'Lumineux', air: 'Normal', every: 6, tip: 'Tourne le pot d’un quart de tour chaque semaine pour qu’elle pousse droite.' },
+      calathea: { label: 'Calathéas & marantas', cat: 'feuillage', light: 'ombre', lightLabel: 'Mi-ombre', air: 'Très humide', every: 5, tip: 'Préfère une eau peu calcaire. Ses feuilles se replient le soir, c’est normal.' },
+      olive: { label: 'Petits arbres', cat: 'arbres', light: 'soleil', lightLabel: 'Plein soleil', air: 'Sec', every: 7, tip: 'Supporte bien la sécheresse. À rentrer s’il gèle.' },
+      cactus: { label: 'Cactus colonnaires', cat: 'succulentes', light: 'soleil', lightLabel: 'Plein soleil', air: 'Sec', every: 14, tip: 'Très peu d’eau en hiver : une fois par mois suffit.' },
+      echeveria: { label: 'Rosettes succulentes', cat: 'succulentes', light: 'soleil', lightLabel: 'Plein soleil', air: 'Sec', every: 12, tip: 'Arrose seulement quand la terre est sèche, sans mouiller le cœur de la rosette.' },
+      aloe: { label: 'Aloès & agaves', cat: 'succulentes', light: 'soleil', lightLabel: 'Plein soleil', air: 'Sec', every: 14, tip: 'Laisse bien sécher la terre entre deux arrosages.' },
+      sansevieria: { label: 'Sansevierias', cat: 'feuillage', light: 'ombre', lightLabel: 'Peu exigeante', air: 'Sec', every: 18, tip: 'Supporte l’oubli : un arrosage toutes les 2 à 3 semaines suffit.' },
+      pothos: { label: 'Lianes retombantes', cat: 'retombantes', light: 'ombre', lightLabel: 'Mi-ombre', air: 'Normal', every: 7, tip: 'Laisse sécher la surface entre deux arrosages. Ses tiges se bouturent dans l’eau.' },
+      fern: { label: 'Fougères', cat: 'retombantes', light: 'ombre', lightLabel: 'Mi-ombre', air: 'Très humide', every: 3, tip: 'Terre toujours fraîche et air humide : brumise ses frondes.' },
+      palm: { label: 'Palmiers', cat: 'arbres', light: 'indirect', lightLabel: 'Lumineux', air: 'Humide', every: 7, tip: 'Arrose quand le dessus de la terre est sec. Pas de soleil direct.' },
+      ficus: { label: 'Ficus à grandes feuilles', cat: 'feuillage', light: 'indirect', lightLabel: 'Vive, indirecte', air: 'Normal', every: 9, tip: 'Essuie ses feuilles pour qu’elles restent brillantes. Évite les courants d’air.' },
+      orchid: { label: 'Orchidées', cat: 'fleurs', light: 'indirect', lightLabel: 'Lumineux', air: 'Humide', every: 9, tip: 'Trempe le pot 10 minutes quand les racines deviennent argentées.' },
+      lily: { label: 'Fleurs-spathes', cat: 'fleurs', light: 'ombre', lightLabel: 'Mi-ombre', air: 'Humide', every: 5, tip: 'Ses feuilles s’affaissent quand elle a soif ; elle se redresse vite après arrosage.' },
+      zz: { label: 'Tiges charnues', cat: 'feuillage', light: 'ombre', lightLabel: 'Peu exigeante', air: 'Sec', every: 16, tip: 'Elle stocke l’eau dans ses tiges : arrose seulement quand la terre est sèche.' },
+      geranium: { label: 'Fleurs de balcon', cat: 'fleurs', light: 'soleil', lightLabel: 'Plein soleil', air: 'Normal', every: 4, tip: 'Retire les fleurs fanées pour qu’elle refleurisse.' },
+      spider: { label: 'Plantes araignées', cat: 'retombantes', light: 'indirect', lightLabel: 'Lumineux', air: 'Normal', every: 6, tip: 'Ses bébés se replantent facilement dans un petit pot.' }
+    };
+  }
+
+  buildSpecies() {
+    const rows = [
+      ['monstera', 'Monstera', 'Monstera deliciosa', 'monstera', '#3F7A4E', '#4F8350'],
+      ['adansonii', 'Monstera à trous', 'Monstera adansonii', 'monstera', '#4E8A52', '#62995E'],
+      ['selloum', 'Philodendron selloum', 'Thaumatophyllum bipinnatifidum', 'monstera', '#3E7448', '#568A55'],
+      ['basilic', 'Basilic', 'Ocimum basilicum', 'herb', '#6E9F4E', '#8DB46A'],
+      ['menthe', 'Menthe', 'Mentha spicata', 'herb', '#5E9A56', '#7DB06E'],
+      ['persil', 'Persil', 'Petroselinum crispum', 'herb', '#4F8A3E', '#6EA052'],
+      ['coriandre', 'Coriandre', 'Coriandrum sativum', 'herb', '#68A04E', '#88B868'],
+      ['origan', 'Origan', 'Origanum vulgare', 'herb', '#6E9468', '#8AAA7E'],
+      ['lavande', 'Lavande', 'Lavandula angustifolia', 'lavender', '#8FA28A', '#A9B7A2', '#8C6BB8'],
+      ['romarin', 'Romarin', 'Salvia rosmarinus', 'lavender', '#5E7E5E', '#7A957A', '#6E8FCB'],
+      ['pilea', 'Pilea', 'Pilea peperomioides', 'pilea', '#5E9A62', '#86B47F'],
+      ['peperomia', 'Peperomia', 'Peperomia obtusifolia', 'pilea', '#4F8A4A', '#6EA05E'],
+      ['calathea', 'Calathea orbifolia', 'Goeppertia orbifolia', 'calathea', '#5E9468', '#7AA882'],
+      ['makoyana', 'Calathea paon', 'Goeppertia makoyana', 'calathea', '#4F7F52', '#6E9A68'],
+      ['maranta', 'Maranta', 'Maranta leuconeura', 'calathea', '#3F7048', '#5A8A5E'],
+      ['aglaonema', 'Aglaonema', 'Aglaonema commutatum', 'calathea', '#4E7F5A', '#8AAE88'],
+      ['olivier', 'Olivier', 'Olea europaea', 'olive', '#7E9A6A', '#A2B48A', '#4A4A3A'],
+      ['citronnier', 'Citronnier', 'Citrus × meyeri', 'olive', '#4F8350', '#6E9468', '#E8C431'],
+      ['benjamina', 'Ficus benjamina', 'Ficus benjamina', 'olive', '#4E8A4E', '#6EA066', '#4E8A4E'],
+      ['echinopsis', 'Cactus oursin', 'Echinopsis', 'cactus', '#4E7F5A', '#6E9A72', '#E98BA6'],
+      ['cierge', 'Cierge du Pérou', 'Cereus repandus', 'cactus', '#5E8E7A', '#78A592', '#F2F0E6'],
+      ['echeveria', 'Echeveria', 'Echeveria elegans', 'echeveria', '#8DB0A4', '#A9C4B8'],
+      ['joubarbe', 'Joubarbe', 'Sempervivum tectorum', 'echeveria', '#7FA06E', '#B07A70'],
+      ['grapto', 'Graptopetalum', 'Graptopetalum paraguayense', 'echeveria', '#A8A9B8', '#C2C0CC'],
+      ['aloe', 'Aloe vera', 'Aloe vera', 'aloe', '#6E9A72', '#8AAE88'],
+      ['haworthia', 'Haworthia', 'Haworthiopsis attenuata', 'aloe', '#3F6B48', '#5A8462'],
+      ['agave', 'Agave', 'Agave americana', 'aloe', '#7E9EA0', '#9CB6B6'],
+      ['sansevieria', 'Langue de belle-mère', 'Dracaena trifasciata', 'sansevieria', '#3F6B48', '#4F7F52', '#D8C25A'],
+      ['cylindrica', 'Sansevieria cylindrica', 'Dracaena angolensis', 'sansevieria', '#4E7058', '#62846A', '#4E7058'],
+      ['pothos', 'Pothos', 'Epipremnum aureum', 'pothos', '#4F8A3E', '#8DB46A'],
+      ['scandens', 'Philodendron grimpant', 'Philodendron hederaceum', 'pothos', '#3F7A3E', '#5A9450'],
+      ['lierre', 'Lierre', 'Hedera helix', 'pothos', '#3E6B48', '#5E8A5E'],
+      ['tradescantia', 'Misère', 'Tradescantia zebrina', 'pothos', '#6E8FA0', '#9A7AB0'],
+      ['boston', 'Fougère de Boston', 'Nephrolepis exaltata', 'fern', '#5E9A46', '#78B05A'],
+      ['capillaire', 'Capillaire', 'Adiantum raddianum', 'fern', '#6EA65A', '#8EBE72'],
+      ['kentia', 'Kentia', 'Howea forsteriana', 'palm', '#3F7A4E', '#5A9460'],
+      ['areca', 'Areca', 'Dypsis lutescens', 'palm', '#6E9F4E', '#8DB46A'],
+      ['chamaedorea', 'Palmier nain', 'Chamaedorea elegans', 'palm', '#4F8A50', '#6AA068'],
+      ['caoutchouc', 'Caoutchouc', 'Ficus elastica', 'ficus', '#2F5A3A', '#3F6B48', '#B5545C'],
+      ['lyrata', 'Figuier lyre', 'Ficus lyrata', 'ficus', '#3F7A3E', '#4F8A4A', '#8DB46A'],
+      ['schefflera', 'Schefflera', 'Heptapleurum arboricola', 'ficus', '#4F8350', '#6E9468', '#8DB46A'],
+      ['avocatier', 'Avocatier', 'Persea americana', 'ficus', '#4E7F42', '#6A9452', '#9AB06A'],
+      ['phalaenopsis', 'Orchidée papillon', 'Phalaenopsis', 'orchid', '#3F6B48', '#4F7F52', '#EBC4DA'],
+      ['cymbidium', 'Cymbidium', 'Cymbidium', 'orchid', '#4E7F42', '#5E9050', '#F0D27A'],
+      ['spathiphyllum', 'Fleur de lune', 'Spathiphyllum wallisii', 'lily', '#2F5A3A', '#3F6B48', '#FBF8F1'],
+      ['anthurium', 'Anthurium', 'Anthurium andraeanum', 'lily', '#2F5A3A', '#3F6B48', '#C8463E'],
+      ['zamioculcas', 'Plante ZZ', 'Zamioculcas zamiifolia', 'zz', '#2F5A3A', '#3F6B48'],
+      ['jade', 'Arbre de jade', 'Crassula ovata', 'zz', '#5E8E52', '#7AA868'],
+      ['geranium', 'Géranium', 'Pelargonium zonale', 'geranium', '#5E9046', '#78A85A', '#D9534F'],
+      ['begonia', 'Bégonia', 'Begonia semperflorens', 'geranium', '#4E7F42', '#6A9452', '#F08A8A'],
+      ['saintpaulia', 'Violette africaine', 'Saintpaulia ionantha', 'geranium', '#3F6B48', '#557F5A', '#8C6BB8'],
+      ['chlorophytum', 'Plante araignée', 'Chlorophytum comosum', 'spider', '#6E9F4E', '#9CC07A']
+    ];
+    return rows.map((x) => ({ id: x[0], name: x[1], latin: x[2], form: x[3], a: x[4], b: x[5], f: x[6] || '#E8B931' }));
+  }
+
+  mix(hex, to, t) {
+    const p = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+    const a = p(hex), b = p(to);
+    return '#' + a.map((v, i) => Math.round(v + (b[i] - v) * t).toString(16).padStart(2, '0')).join('');
+  }
+
+  stageOf(days) { return days < 90 ? 1 : (days < 365 ? 2 : 3); }
+
+  sinceText(d) {
+    if (d <= 0) return 'aujourd’hui';
+    if (d < 14) return d + (d > 1 ? ' jours' : ' jour');
+    if (d < 60) return Math.round(d / 7) + ' semaines';
+    if (d < 365) return Math.round(d / 30) + ' mois';
+    const y = Math.floor(d / 365), m = Math.round((d % 365) / 30);
+    return y + (y > 1 ? ' ans' : ' an') + (m ? ' et ' + m + ' mois' : '');
+  }
+
+  draw(spId, stage, thirsty) {
+    const key = spId + '|' + stage + '|' + (thirsty ? 1 : 0);
+    if (this.cache[key]) return this.cache[key];
+    const sp = this.SP[spId] || this.SP.monstera;
+    const dry = '#B5A85E';
+    const col = {
+      A: thirsty ? this.mix(sp.a, dry, 0.5) : sp.a,
+      B: thirsty ? this.mix(sp.b, dry, 0.5) : sp.b,
+      F: sp.f, S: thirsty ? '#6E7A4A' : '#3F6B45', V: '#EAF0DE', D: '#2F5A3A', T: '#7A5A3A'
+    };
+    const c = (k) => (!k ? 'none' : (col[k] || k));
+    const shapes = (this.FORMS[sp.form] || []).filter((sh) => sh.s <= stage).map((sh) => ({
+      d: sh.d, t: sh.t || '', f: c(sh.f), st: sh.st ? c(sh.st) : 'none', sw: sh.sw || 0
+    }));
+    const k = stage === 1 ? 0.62 : (stage === 2 ? 0.82 : 1);
+    const out = {
+      shapes,
+      scale: 'translate(50 64) scale(' + k + ') translate(-50 -64)',
+      tilt: thirsty ? 'rotate(-9 50 64)' : '',
+      mouth: thirsty ? 'M44 94 Q50 89 56 94' : 'M44 91 Q50 96 56 91'
+    };
+    this.cache[key] = out;
+    return out;
+  }
+
+  componentDidMount() { this.schedule(this.state.screen); }
+  componentWillUnmount() { this.timers.forEach((t) => clearTimeout(t)); clearTimeout(this.tt); }
+
+  still() { const v = this.props.still; return v === true || v === 'true'; }
+  later(fn, ms) { this.timers.push(setTimeout(fn, ms)); }
+
+  schedule(screen) {
+    if (this.still()) return;
+    if (screen === 'splash') this.later(() => { if (this.state.screen === 'splash') this.go('login', 'fade'); }, 2600);
+    if (screen === 'connecting') this.later(() => { if (this.state.screen === 'connecting') this.go('notif', 'fwd'); }, 1800);
+  }
+
+  go(screen, anim, extra) {
+    this.setState({ screen, anim, ...(extra || {}) });
+    this.schedule(screen);
+  }
+
+  showToast(msg) {
+    this.setState({ toast: msg });
+    clearTimeout(this.tt);
+    this.tt = setTimeout(() => this.setState({ toast: null }), 2600);
+  }
+
+  findPlant(id) {
+    const ps = this.state.plants;
+    return ps.find((p) => p.id === id) || ps[0];
+  }
+
+  infoFor(p) {
+    const sp = this.SP[p.sp] || this.SP.monstera;
+    const info = this.INFO[sp.form];
+    return { sp, info, tip: p.tip || info.tip, next: p.next || ('dans ' + info.every + ' j') };
+  }
+
+  water(id) {
+    const done = { ...this.state.done, [id]: !this.state.done[id] };
+    this.setState({ done, dropOn: !!done[id] });
+    if (done[id]) {
+      this.later(() => this.setState({ dropOn: false }), 1400);
+      return this.findPlant(id);
+    }
+    return null;
+  }
+
+  replyFor(text, p) {
+    const canned = {
+      'Faut-il rempoter ?': 'Regarde sous le pot : si des racines sortent par les trous, oui. Le printemps est le meilleur moment, dans un pot 2 à 3 cm plus large.',
+      'Meilleur emplacement': 'Pour moi : ' + this.infoFor(p).info.lightLabel.toLowerCase() + '. ' + p.room + ' me convient si je reste loin du radiateur.',
+      'Engrais ?': 'Une fois par mois du printemps à la fin de l’été, dosé à moitié. Rien en hiver, je me repose.'
+    };
+    return canned[text] || '[Réponse de l’assistant à : « ' + text + ' »]';
+  }
+
+  ask(text, isPhoto) {
+    const p = this.findPlant(this.state.plantId);
+    const cur = this.chatFor(p);
+    const add = isPhoto ? [{ from: 'photo' }] : [{ from: 'me', text }];
+    this.setState({ chats: { ...this.state.chats, [p.id]: cur.concat(add) }, draft: '', typing: true });
+    this.later(() => {
+      const now = this.chatFor(p);
+      const reply = isPhoto ? 'Merci pour la photo ! [Analyse de la photo par l’assistant]' : this.replyFor(text, p);
+      this.setState({ typing: false, chats: { ...this.state.chats, [p.id]: now.concat([{ from: 'bot', text: reply }]) } });
+    }, 1400);
+  }
+
+  chatFor(p) {
+    const saved = this.state.chats[p.id];
+    if (saved) return saved;
+    if (p.id === 'gaston') {
+      return [
+        { from: 'photo' },
+        { from: 'me', text: 'Des taches brunes apparaissent sur le bord des feuilles, c’est grave ?' },
+        { from: 'bot', cta: true, text: 'Pas d’inquiétude. Des bords bruns et secs viennent le plus souvent d’un air trop sec ou d’arrosages irréguliers — et Gaston a attendu 9 jours cette fois.\n\nCe que je te conseille : arrose bien aujourd’hui, puis garde un rythme régulier. Éloigne-la du radiateur et coupe les parties sèches avec des ciseaux propres.' }
+      ];
+    }
+    return [{ from: 'bot', text: 'Salut ! Je suis ' + p.name + '. Pose-moi une question ou envoie-moi une photo.' }];
+  }
+
+  renderVals() {
+    const s = this.state;
+    const accent = this.props.accent ?? '#F6E3A6';
+    const delays = ['d1', 'd2', 'd3', 'd4', 'd4', 'd4'];
+    const isThirsty = (p) => p.thirsty && !s.done[p.id];
+    const stageLabels = ['', 'Pousse', 'Jeune', 'Adulte'];
+    const norm = (x) => (x || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+    const plants = s.plants.map((p, i) => {
+      const t = isThirsty(p);
+      const inf = this.infoFor(p);
+      const stage = this.stageOf(p.added);
+      return {
+        ...p,
+        common: inf.sp.name,
+        g: this.draw(p.sp, stage, t),
+        stageLabel: stageLabels[stage],
+        dot: t ? '#D99A12' : '#4F8350',
+        status: t ? 'A soif' : (s.done[p.id] ? 'Arrosée · eau ' + inf.next : 'Eau ' + inf.next),
+        delay: delays[i] || 'd4',
+        open: () => this.go('plant', 'zoom', { plantId: p.id, dropOn: false })
+      };
+    });
+    const todo = s.plants.filter((p) => p.thirsty).map((p) => ({
+      ...p,
+      done: !!s.done[p.id],
+      todo: !s.done[p.id],
+      water: () => { this.water(p.id); this.showToast(p.name + ' te dit merci !'); }
+    }));
+    const remaining = todo.filter((t) => t.todo).length;
+
+    const pc = this.findPlant(s.plantId);
+    const pinf = this.infoFor(pc);
+    const t = isThirsty(pc);
+    const watered = !!s.done[pc.id];
+    const stage = this.stageOf(pc.added);
+    const cur = {
+      ...pc,
+      latin: pinf.sp.latin,
+      lightLabel: pinf.info.lightLabel,
+      air: pinf.info.air,
+      tip: pinf.tip,
+      g: this.draw(pc.sp, stage, t),
+      halo: t ? '#F6E3A6' : '#DCE8CF',
+      blush: t ? '0' : '0.55',
+      moodLabel: t ? pc.name + ' a soif' : pc.name + ' est en forme',
+      bubble: t ? 'J’ai un peu soif… ' + (pc.since ? '(' + pc.since + ')' : '') : (watered ? 'Merci ! Prochain arrosage ' + pinf.next + '.' : 'Tout va bien, prochain arrosage ' + pinf.next + '.'),
+      water: t ? '18%' : '92%',
+      waterText: t ? 'Sèche' : 'Parfait',
+      btnBg: watered ? '#DCE8CF' : '#E8B931',
+      btnText: watered ? 'Arrosé aujourd’hui · annuler' : 'J’ai arrosé',
+      btnAnim: watered ? 'pop' : '',
+      sinceText: this.sinceText(pc.added),
+      steps: [
+        { label: 'Pousse', hint: '< 3 mois', icon: 16 },
+        { label: 'Jeune', hint: '< 1 an', icon: 20 },
+        { label: 'Adulte', hint: '1 an et +', icon: 24 }
+      ].map((x, i) => {
+        const on = i + 1 === stage, past = i + 1 < stage;
+        return { ...x, bg: on ? '#1F3D2B' : (past ? '#DCE8CF' : '#F3EEE3'), fg: on ? '#F3EEE3' : '#1F3D2B', border: on ? '#1F3D2B' : (past ? '#DCE8CF' : '#E2D9C6') };
+      })
+    };
+
+    const messages = this.chatFor(pc).map((m) => ({
+      ...m, isPhoto: m.from === 'photo', isMe: m.from === 'me', isBot: m.from === 'bot', hasCta: !!m.cta
+    }));
+    const chips = ['Faut-il rempoter ?', 'Meilleur emplacement', 'Engrais ?'].map((label) => ({ label, ask: () => this.ask(label) }));
+
+    /* espèces */
+    const chosenSp = s.speciesId ? this.SP[s.speciesId] : null;
+    const chosenInfo = chosenSp ? this.INFO[chosenSp.form] : null;
+    const catsDef = [
+      { id: 'all', label: 'Toutes' }, { id: 'feuillage', label: 'Feuillage' }, { id: 'succulentes', label: 'Cactus & succulentes' },
+      { id: 'aromatiques', label: 'Aromatiques' }, { id: 'fleurs', label: 'Fleuries' }, { id: 'arbres', label: 'Arbres & palmiers' }, { id: 'retombantes', label: 'Retombantes' }
+    ];
+    const cats = catsDef.map((c) => {
+      const on = s.cat === c.id;
+      return { ...c, on: on ? 'true' : 'false', bg: on ? '#1F3D2B' : '#FBF8F1', fg: on ? '#F3EEE3' : '#1C2A21', border: on ? '#1F3D2B' : '#D8CFBB', pick: () => this.setState({ cat: c.id }) };
+    });
+    const qn = norm(s.q).trim();
+    const list = s.screen === 'species' ? this.SPECIES
+      .filter((sp) => s.cat === 'all' || this.INFO[sp.form].cat === s.cat)
+      .filter((sp) => !qn || norm(sp.name).includes(qn) || norm(sp.latin).includes(qn) || norm(this.INFO[sp.form].label).includes(qn))
+      .sort((a, b) => a.name.localeCompare(b.name, 'fr')) : [];
+    const speciesRows = list.map((sp) => {
+      const on = s.speciesId === sp.id;
+      return {
+        id: sp.id, name: sp.name, latin: sp.latin, typeLabel: this.INFO[sp.form].label,
+        g: this.draw(sp.id, 2, false), isOn: on, on: on ? 'true' : 'false', bg: on ? '#DCE8CF' : 'transparent',
+        pick: () => this.go('create', 'back', { speciesId: sp.id, speciesSource: 'list' })
+      };
+    });
+
+    const rooms = ['Salon', 'Chambre', 'Cuisine', 'Salle de bain', 'Balcon'].map((label) => {
+      const on = s.room === label;
+      return { label, on: on ? 'true' : 'false', bg: on ? '#1F3D2B' : '#FBF8F1', fg: on ? '#F3EEE3' : '#1C2A21', border: on ? '#1F3D2B' : '#D8CFBB', pick: () => this.setState({ room: label }) };
+    });
+    const lights = [
+      { id: 'ombre', label: 'Ombre', hint: 'loin des fenêtres' },
+      { id: 'indirect', label: 'Lumineux', hint: 'sans soleil direct' },
+      { id: 'soleil', label: 'Plein soleil', hint: 'derrière la vitre' }
+    ].map((l) => {
+      const on = s.light === l.id;
+      return { ...l, on: on ? 'true' : 'false', bg: on ? '#F6E3A6' : '#FBF8F1', border: on ? '#C48A0E' : '#D8CFBB', pick: () => this.setState({ light: l.id }) };
+    });
+    const tipsBy = {
+      'ombre>soleil': 'Le soleil direct risque de brûler ses feuilles.',
+      'indirect>soleil': 'Le soleil direct peut brûler ses feuilles. Un voilage aide.',
+      'indirect>ombre': 'Un peu sombre pour elle : sa croissance va ralentir.',
+      'soleil>ombre': 'Trop sombre : elle a besoin de soleil pour bien pousser.',
+      'soleil>indirect': 'Elle sera plus belle avec un peu de soleil direct.'
+    };
+    const lightTipText = chosenInfo ? (tipsBy[chosenInfo.light + '>' + s.light] || '') : '';
+    const plantName = (s.newName || '').trim() || (chosenSp ? chosenSp.name : 'Ma plante');
+
+    const trio = [
+      { g: this.draw('pilea', 2, false), size: 80, h: 88, cls: 'bob bob2' },
+      { g: this.draw('monstera', 3, false), size: 120, h: 132, cls: 'bob' },
+      { g: this.draw('echinopsis', 3, false), size: 80, h: 88, cls: 'bob bob3' }
+    ];
+
+    const catalog = s.screen === 'catalog' ? Object.keys(this.FORMS).map((form) => {
+      const sps = this.SPECIES.filter((sp) => sp.form === form);
+      return {
+        label: this.INFO[form].label,
+        examples: sps.map((sp) => sp.name).join(', '),
+        sizes: [1, 2, 3].map((st) => this.draw(sps[0].id, st, false))
+      };
+    }) : [];
+
+    const prov = s.provider;
+    const providerName = prov === 'apple' ? 'Apple' : (prov === 'email' ? 'e-mail' : 'Google');
+    const tab = s.screen;
+    const isCatalog = s.screen === 'catalog';
+
+    return {
+      accent,
+      anim: s.anim,
+      rootW: isCatalog ? '1200px' : '390px',
+      rootH: isCatalog ? '1120px' : '844px',
+      isSplash: s.screen === 'splash', isLogin: s.screen === 'login', isConnecting: s.screen === 'connecting',
+      isNotif: s.screen === 'notif', isGarden: s.screen === 'garden',
+      isPlant: s.screen === 'plant', isChat: s.screen === 'chat', isSettings: s.screen === 'settings',
+      isCreate: s.screen === 'create', isAdded: s.screen === 'added',
+      isSpecies: s.screen === 'species', isCatalog,
+      showNav: s.screen === 'garden' || s.screen === 'settings',
+      gardenTabBg: tab === 'garden' ? '#E8B931' : 'transparent',
+      settingsTabBg: tab === 'settings' ? '#E8B931' : 'transparent',
+      gardenTabFg: tab === 'garden' ? '#1F3D2B' : '#F3EEE3',
+      settingsTabFg: tab === 'settings' ? '#1F3D2B' : '#F3EEE3',
+      gardenCurrent: tab === 'garden' ? 'page' : 'false',
+      settingsCurrent: tab === 'settings' ? 'page' : 'false',
+      hasToast: !!s.toast, toast: s.toast || '',
+
+      trio, hero: this.draw('monstera', 3, false),
+      sheetAsk: s.sheet === 'ask', sheetPick: s.sheet === 'pick',
+      providerName, providerInitial: prov === 'apple' ? 'A' : 'G',
+      domain: prov === 'apple' ? 'apple.com' : 'google.com',
+      isApple: prov === 'apple',
+      shareOn: s.hideEmail ? 'false' : 'true', hideOn: s.hideEmail ? 'true' : 'false',
+      shareBg: s.hideEmail ? '#FFFFFF' : '#DCE8CF', hideBg: s.hideEmail ? '#DCE8CF' : '#FFFFFF',
+      shareBorder: s.hideEmail ? '#D8CFBB' : '#2F5A3A', hideBorder: s.hideEmail ? '#2F5A3A' : '#D8CFBB',
+      shareMail: () => this.setState({ hideEmail: false }),
+      hideMail: () => this.setState({ hideEmail: true }),
+      emailOpen: s.emailOpen, emailClosed: !s.emailOpen, email: s.email,
+      onEmail: (e) => this.setState({ email: e.target.value }),
+      openEmail: () => this.setState({ emailOpen: true }),
+      sendMagic: (e) => {
+        if (e && e.preventDefault) e.preventDefault();
+        this.showToast('Lien envoyé ! Ouvre-le sur ce téléphone.');
+        this.later(() => { if (this.state.screen === 'login') this.go('connecting', 'fade', { provider: 'email' }); }, 1600);
+      },
+      pickGoogle: () => this.setState({ provider: 'google', sheet: 'ask' }),
+      pickApple: () => this.setState({ provider: 'apple', sheet: 'ask' }),
+      cancelSheet: () => { this.setState({ sheet: null }); this.showToast('Connexion annulée'); },
+      continueAsk: () => this.setState({ sheet: 'pick' }),
+      chooseAccount: () => this.go('connecting', 'fade', { sheet: null }),
+      firstName: 'Camille',
+      shownEmail: (prov === 'apple' && s.hideEmail) ? 'xk7…@privaterelay.appleid.com' : 'camille@exemple.fr',
+
+      allowNotif: () => { this.go('garden', 'up', { notif: true }); this.showToast('Rappels activés'); },
+      skipNotif: () => this.go('garden', 'up', { notif: false }),
+
+      count: s.plants.length,
+      thirstLine: remaining > 0 ? remaining + (remaining > 1 ? ' ont soif aujourd’hui' : ' a soif aujourd’hui') : 'tout le monde est hydraté',
+      hasTodo: todo.length > 0,
+      todo, plants,
+      openCreate: () => this.go('create', 'up', { photo: 'none', newName: '', speciesId: null, speciesSource: null }),
+      tabGarden: () => { if (this.state.screen !== 'garden') this.go('garden', 'fade'); },
+      tabSettings: () => { if (this.state.screen !== 'settings') this.go('settings', 'fade'); },
+
+      cur, dropOn: s.dropOn,
+      backToGarden: () => this.go('garden', 'back'),
+      toggleWater: () => { const p = this.water(pc.id); if (p) this.showToast(p.name + ' te dit merci !'); },
+      toChat: () => this.go('chat', 'fwd'),
+
+      messages, chips, typing: s.typing, draft: s.draft,
+      backToPlant: () => this.go('plant', 'back'),
+      onDraft: (e) => this.setState({ draft: e.target.value }),
+      send: (e) => { if (e && e.preventDefault) e.preventDefault(); const v = (this.state.draft || '').trim(); if (v) this.ask(v); },
+      sendPhoto: () => this.ask('', true),
+      remind: () => this.showToast('Rappel prévu dans 3 jours'),
+
+      notifPressed: s.notif ? 'true' : 'false',
+      switchBg: s.notif ? '#2F5A3A' : '#CFC6B2',
+      switchJustify: s.notif ? 'flex-end' : 'flex-start',
+      toggleNotif: () => this.setState({ notif: !this.state.notif }),
+      logout: () => this.go('login', 'back', { sheet: null, emailOpen: false }),
+
+      speciesCount: this.SPECIES.length, formCount: Object.keys(this.FORMS).length,
+      speciesNone: !chosenSp && s.photo !== 'busy', photoBusy: s.photo === 'busy', speciesSet: !!chosenSp,
+      speciesLabel: s.speciesSource === 'photo' ? 'Espèce reconnue sur ta photo' : 'Espèce choisie',
+      chosen: chosenSp ? { name: chosenSp.name, latin: chosenSp.latin, typeLabel: chosenInfo.label, g: this.draw(chosenSp.id, 3, false) } : { name: '', latin: '', typeLabel: '', g: { shapes: [], scale: '' } },
+      chosenBaby: this.draw(s.speciesId || 'monstera', 1, false),
+      takePhoto: () => { this.setState({ photo: 'busy' }); this.later(() => this.setState({ photo: 'none', speciesId: 'monstera', speciesSource: 'photo' }), 1300); },
+      openSpecies: () => this.go('species', 'fwd', { q: '', cat: 'all' }),
+      closeSpecies: () => this.go('create', 'back'),
+      photoFromList: () => { this.go('create', 'back'); this.setState({ photo: 'busy' }); this.later(() => this.setState({ photo: 'none', speciesId: 'monstera', speciesSource: 'photo' }), 1300); },
+      q: s.q, onQ: (e) => this.setState({ q: e.target.value }),
+      cats, speciesRows, noResult: s.screen === 'species' && speciesRows.length === 0,
+      resultLine: speciesRows.length + (speciesRows.length > 1 ? ' espèces' : ' espèce') + (s.cat === 'all' && !qn ? ' · ' + Object.keys(this.FORMS).length + ' types' : ''),
+      newName: s.newName, namePlaceholder: chosenSp ? 'Ex. : ' + chosenSp.name : 'Ex. : Monty',
+      onName: (e) => this.setState({ newName: e.target.value }),
+      rooms, lights,
+      lightTip: !!lightTipText, lightTipText,
+      closeCreate: () => this.go('garden', 'back'),
+      addDisabled: !chosenSp,
+      addBg: chosenSp ? '#1F3D2B' : '#B9B4A6',
+      addFg: chosenSp ? '#F3EEE3' : '#2E3530',
+      addLabel: chosenSp ? 'Ajouter au jardin' : 'Choisis d’abord son espèce',
+      addPlant: () => {
+        const id = 'n' + this.state.plants.length;
+        const np = { id, name: plantName, sp: this.state.speciesId || 'monstera', room: this.state.room, added: 0, thirsty: false };
+        this.go('added', 'up', { plants: this.state.plants.concat([np]), newId: id });
+      },
+      plantName,
+      openNew: () => {
+        const ps = this.state.plants;
+        this.go('plant', 'zoom', { plantId: this.state.newId || ps[ps.length - 1].id });
+        this.showToast(plantName + ' a rejoint ton jardin');
+      },
+      addAnother: () => this.go('create', 'up', { photo: 'none', newName: '', speciesId: null, speciesSource: null }),
+
+      catalog
+    };
+  }
+}
+</script>
+</body>
+</html>

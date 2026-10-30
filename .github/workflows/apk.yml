@@ -1,0 +1,77 @@
+# APK Android : à la main seulement, depuis l'onglet Actions (Run workflow) ; une fusion sur
+# main n'en construit pas. Construit l'APK « preview » sur le runner (`eas build --local` :
+# gratuit, hors quota EAS ; clé de signature téléchargée depuis EAS), puis le publie
+# dans une release GitHub.
+name: APK Android
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: apk
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    name: Build local et release
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      # Dépendances Gradle et caches de compilation, réutilisés d'un build à l'autre.
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: gradle-${{ runner.os }}-
+
+      - name: Build local (preview, Android)
+        env:
+          # Téléphone en arm64 seulement : environ deux fois moins de code natif à compiler
+          # (cet APK ne s'installe plus dans un émulateur x86_64).
+          ORG_GRADLE_PROJECT_reactNativeArchitectures: arm64-v8a
+        run: eas build --profile preview --platform android --local --non-interactive --output zeve-${{ github.run_number }}.apk
+
+      - name: Publier la release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="apk-${{ github.run_number }}"
+          gh release create "$tag" "zeve-${{ github.run_number }}.apk" \
+            --target "${{ github.sha }}" \
+            --title "APK Zeve #${{ github.run_number }}" \
+            --notes "APK Android (profil preview), commit ${GITHUB_SHA::7}."
+
+      - name: Garder les 2 releases APK les plus récentes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release list --limit 100 --json tagName,createdAt \
+            --jq '[.[] | select(.tagName | startswith("apk-"))] | sort_by(.createdAt) | reverse | .[2:] | .[].tagName' |
+          while read -r tag; do
+            gh release delete "$tag" --yes --cleanup-tag
+          done
