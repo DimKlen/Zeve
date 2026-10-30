@@ -113,7 +113,11 @@ function SpeciesCard({
     <View style={styles.block}>
       <Text style={styles.label}>{title}</Text>
       <Animated.View style={[styles.card, pop]}>
-        <View style={styles.thumb} importantForAccessibility="no-hide-descendants">
+        <View
+          style={styles.thumb}
+          importantForAccessibility="no-hide-descendants"
+          accessibilityElementsHidden
+        >
           <PlantAvatar speciesId={species.id} stage={3} size={66} />
         </View>
         <View style={styles.cardTexts} accessible>

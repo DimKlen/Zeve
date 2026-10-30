@@ -6,7 +6,7 @@ import { IconCheck, IconDrop } from '@/components/icons';
 import { Rise } from '@/components/Rise';
 import { t } from '@/i18n';
 import { usePop } from '@/motion/useEnter';
-import { colors, control, radius, space, type } from '@/theme';
+import { a11y, colors, control, radius, space, type } from '@/theme';
 
 import type { GardenPlant, TodoItem } from './gardenRules';
 
@@ -24,7 +24,11 @@ export function TodoCard({ items, onWater, accent = colors.butter }: Props) {
       <View style={[styles.card, { backgroundColor: accent }]}>
         <View style={styles.header}>
           <IconDrop size={18} color={colors.forest} strokeWidth={2} />
-          <Text style={styles.title} accessibilityRole="header">
+          <Text
+            style={styles.title}
+            accessibilityRole="header"
+            maxFontSizeMultiplier={a11y.maxTitleScale}
+          >
             {t('garden.todoTitle')}
           </Text>
         </View>

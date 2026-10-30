@@ -18,12 +18,12 @@ import { PlantOptionsSheet } from '@/features/plant/PlantOptionsSheet';
 import { t } from '@/i18n';
 import { go, goBack } from '@/motion/transitions';
 import { moodBubble, sinceText } from '@/plants/plantStatus';
-import { colors, control, layout, radius, space, type } from '@/theme';
+import { a11y, colors, control, layout, radius, space, type } from '@/theme';
 
 /** Fiche plante (docs/04 §8). */
 export default function PlantScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { data: plant, isPending } = usePlant(id);
+  const { data: plant, isSuccess } = usePlant(id);
   const { water, undo } = useWatering();
   const [drops, setDrops] = useState(0);
   const [justWatered, setJustWatered] = useState(false);
@@ -39,7 +39,8 @@ export default function PlantScreen() {
             icon={(c) => <IconBack color={c} />}
           />
         </View>
-        {!isPending && <Text style={styles.notFound}>{t('plant.notFound')}</Text>}
+        {/* Seulement si la liste est chargée : hors ligne sans cache, on n'affirme rien. */}
+        {isSuccess && <Text style={styles.notFound}>{t('plant.notFound')}</Text>}
       </Screen>
     );
   }
@@ -68,7 +69,12 @@ export default function PlantScreen() {
             icon={(c) => <IconBack color={c} />}
           />
           <View style={styles.titles}>
-            <Text style={styles.name} accessibilityRole="header" numberOfLines={1}>
+            <Text
+              style={styles.name}
+              accessibilityRole="header"
+              maxFontSizeMultiplier={a11y.maxTitleScale}
+              numberOfLines={1}
+            >
               {plant.nickname}
             </Text>
             <Text style={styles.latin} numberOfLines={1}>

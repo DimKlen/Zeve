@@ -1,9 +1,10 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { IconPlus } from '@/components/icons';
 import { IconButton } from '@/components/IconButton';
 import { Screen } from '@/components/Screen';
+import { showToast } from '@/components/Toast';
 import { useProfile } from '@/features/auth/profile';
 import { usePlants, useWatering } from '@/features/garden/api';
 import { EmptyGarden } from '@/features/garden/EmptyGarden';
@@ -21,17 +22,22 @@ import { useNewPlantDraft } from '@/features/newPlant/draftStore';
 import { t } from '@/i18n';
 import type { riseDelay } from '@/motion';
 import { go } from '@/motion/transitions';
-import { colors, layout, space, type } from '@/theme';
+import { a11y, colors, layout, space, type } from '@/theme';
 
 const DELAYS: (keyof typeof riseDelay)[] = ['d1', 'd2', 'd3', 'd4'];
 
 /** Mon jardin (docs/04 §7). */
 export default function GardenScreen() {
   const { data: profile } = useProfile();
-  const { data: plants, isPending, refetch, isRefetching } = usePlants();
+  const { data: plants, isError, refetch, isRefetching } = usePlants();
   const { water } = useWatering();
   const [pulled, setPulled] = useState(false);
   useGrowthToasts(plants);
+
+  // Échec sans cache (non maquetté) : squelettes + toast ; ne jamais montrer un faux « jardin vide ».
+  useEffect(() => {
+    if (isError && !plants) showToast(t('toast.offline'));
+  }, [isError, plants]);
 
   // Une seule date par rendu : toutes les cartes calculent leur état au même instant.
   const now = new Date();
@@ -67,7 +73,11 @@ export default function GardenScreen() {
             <Text style={styles.hello}>
               {name ? t('garden.hello', { name }) : t('garden.helloNoName')}
             </Text>
-            <Text style={styles.title} accessibilityRole="header">
+            <Text
+              style={styles.title}
+              accessibilityRole="header"
+              maxFontSizeMultiplier={a11y.maxTitleScale}
+            >
               {t('garden.title')}
             </Text>
             {!!plants?.length && <Text style={styles.subtitle}>{gardenSubtitle(plants, now)}</Text>}
@@ -80,14 +90,18 @@ export default function GardenScreen() {
           />
         </View>
 
-        {isPending && !plants ? (
+        {!plants ? (
           <GardenSkeleton />
         ) : !sorted.length ? (
           <EmptyGarden onAdd={addPlant} />
         ) : (
           <>
             {todo.length > 0 && <TodoCard items={todo} onWater={water} />}
-            <Text style={styles.section} accessibilityRole="header">
+            <Text
+              style={styles.section}
+              accessibilityRole="header"
+              maxFontSizeMultiplier={a11y.maxTitleScale}
+            >
               {t('garden.allPlants')}
             </Text>
             <View style={styles.grid}>

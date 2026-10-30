@@ -24,7 +24,7 @@ import { isValidEmail } from '@/features/auth/rules';
 import { t } from '@/i18n';
 import { PRIVACY_URL, TERMS_URL } from '@/lib/config';
 import { go } from '@/motion/transitions';
-import { colors, control, layout, space, type } from '@/theme';
+import { a11y, colors, control, layout, space, type } from '@/theme';
 
 /** Connexion (docs/04 §2) : Google, Apple, e-mail par lien magique. */
 export default function LoginScreen() {
@@ -59,7 +59,11 @@ export default function LoginScreen() {
           <MascotTrio />
           <View style={styles.titleBlock}>
             <Rise delay="d1">
-              <Text style={styles.title} accessibilityRole="header">
+              <Text
+                style={styles.title}
+                accessibilityRole="header"
+                maxFontSizeMultiplier={a11y.maxTitleScale}
+              >
                 {t('login.title')}
               </Text>
             </Rise>

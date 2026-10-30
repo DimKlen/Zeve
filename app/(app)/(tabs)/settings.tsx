@@ -18,7 +18,7 @@ import { TimePickerSheet } from '@/features/settings/TimePickerSheet';
 import { t } from '@/i18n';
 import { confirm } from '@/lib/confirm';
 import { go } from '@/motion/transitions';
-import { colors, layout, radius, space, type } from '@/theme';
+import { a11y, colors, layout, radius, space, type } from '@/theme';
 
 const PROVIDER_NAME: Record<string, string> = {
   google: 'Google',
@@ -74,13 +74,21 @@ export default function SettingsScreen() {
   return (
     <Screen name="settings" refocusEnter="fade" edges={['top']}>
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.title} accessibilityRole="header">
+        <Text
+          style={styles.title}
+          accessibilityRole="header"
+          maxFontSizeMultiplier={a11y.maxTitleScale}
+        >
           {t('settings.title')}
         </Text>
 
         <Rise delay="d1">
           <View style={styles.profile}>
-            <View style={styles.avatar} importantForAccessibility="no-hide-descendants">
+            <View
+              style={styles.avatar}
+              importantForAccessibility="no-hide-descendants"
+              accessibilityElementsHidden
+            >
               <Text style={styles.initial}>{initial}</Text>
             </View>
             <View style={styles.profileTexts}>

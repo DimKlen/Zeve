@@ -35,7 +35,7 @@ import { pickPlantPhoto } from '@/features/newPlant/api';
 import { t, tList } from '@/i18n';
 import { goBack } from '@/motion/transitions';
 import { PlantAvatar } from '@/plants/PlantAvatar';
-import { colors, control, layout, space, type } from '@/theme';
+import { a11y, colors, control, layout, space, type } from '@/theme';
 
 type Pending = SendInput & { localUri?: string };
 type Failure = { kind: 'quota' | 'failed'; input: Pending };
@@ -107,7 +107,11 @@ export default function ChatScreen() {
             onPress={goBack}
             icon={(c) => <IconBack color={c} />}
           />
-          <View style={styles.avatar} importantForAccessibility="no-hide-descendants">
+          <View
+            style={styles.avatar}
+            importantForAccessibility="no-hide-descendants"
+            accessibilityElementsHidden
+          >
             {plant && (
               <PlantAvatar
                 speciesId={plant.speciesId}
@@ -119,7 +123,12 @@ export default function ChatScreen() {
             )}
           </View>
           <View style={styles.titles}>
-            <Text style={styles.name} accessibilityRole="header" numberOfLines={1}>
+            <Text
+              style={styles.name}
+              accessibilityRole="header"
+              maxFontSizeMultiplier={a11y.maxTitleScale}
+              numberOfLines={1}
+            >
               {name}
             </Text>
             <Text style={styles.subtitle}>{t('chat.subtitle')}</Text>

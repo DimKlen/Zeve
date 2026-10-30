@@ -26,7 +26,7 @@ describe('buildThread', () => {
     expect(buildThread([], 'Gaston', NOW).map((i) => i.kind)).toEqual(['date', 'greeting']);
     const greeting = buildThread([], 'Gaston', NOW)[1];
     expect(greeting).toMatchObject({
-      text: 'Salut ! Je suis Gaston. Pose-moi une question ou envoie-moi une photo.',
+      text: 'Salut ! Je suis Gaston. Pose-moi une question ou envoie-moi une photo.',
     });
   });
 

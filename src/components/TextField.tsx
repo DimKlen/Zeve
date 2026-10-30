@@ -1,5 +1,13 @@
 import { useId, type ComponentRef, type Ref } from 'react';
-import { Platform, StyleSheet, Text, TextInput, View, type TextInputProps } from 'react-native';
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  type TextInputProps,
+  type TextStyle,
+} from 'react-native';
 
 import { colors, control, fonts, radius, space, type } from '@/theme';
 
@@ -74,6 +82,9 @@ export function TextField({
   );
 }
 
+// « none » n'existe que pour React Native Web : absent des types de React Native.
+const WEB_NO_OUTLINE = { outlineWidth: 0, outlineStyle: 'none' } as unknown as TextStyle;
+
 const styles = StyleSheet.create({
   wrap: { gap: space.s },
   label: { ...type.label, color: colors.inkMuted },
@@ -86,7 +97,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.ink,
     // Web : pas de contour de focus du navigateur par-dessus la bordure du champ.
-    ...Platform.select({ web: { outlineWidth: 0 }, default: {} }),
+    ...Platform.select({ web: WEB_NO_OUTLINE, default: {} }),
   },
   email: { borderColor: colors.strongBorder, paddingHorizontal: space.l },
   small: { fontSize: 15 },

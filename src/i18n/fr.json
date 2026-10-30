@@ -32,8 +32,8 @@
     "failed": "La connexion a échoué. Réessaie."
   },
   "onboarding": {
-    "remindersTitle": "Bienvenue, {name} !",
-    "remindersTitleNoName": "Bienvenue !",
+    "remindersTitle": "Bienvenue, {name} !",
+    "remindersTitleNoName": "Bienvenue !",
     "remindersText": "Tes plantes t'enverront un petit mot quand elles auront soif. Rien de plus, promis.",
     "remindersEnable": "Activer les rappels",
     "later": "Plus tard",
@@ -58,7 +58,7 @@
     "statusNext": "Eau {next}",
     "statusWatered": "Arrosée · eau {next}",
     "emptyTitle": "Ton jardin est vide",
-    "emptyText": "Ajoute ta première plante : une photo suffit.",
+    "emptyText": "Ajoute ta première plante : une photo suffit.",
     "emptyCta": "Ajouter ma première plante"
   },
   "stage": {
@@ -75,7 +75,7 @@
     "moodThirstyA11y": "{name} a soif",
     "moodOkA11y": "{name} est en forme",
     "bubbleThirsty": "J’ai un peu soif… ({since})",
-    "bubbleThanks": "Merci ! Prochain arrosage {next}.",
+    "bubbleThanks": "Merci ! Prochain arrosage {next}.",
     "bubbleOk": "Tout va bien, prochain arrosage {next}.",
     "water": "Eau",
     "light": "Lumière",
@@ -88,10 +88,10 @@
     "growth": "Croissance",
     "since": "avec toi depuis {since}",
     "tip": "Bon à savoir",
-    "chatTitle": "Une question sur {name} ?",
+    "chatTitle": "Une question sur {name} ?",
     "chatText": "Décris ou prends une photo",
-    "thanksToast": "{name} te dit merci !",
-    "grownToast": "{name} a grandi ! Elle est maintenant {stage}.",
+    "thanksToast": "{name} te dit merci !",
+    "grownToast": "{name} a grandi ! Elle est maintenant {stage}.",
     "menuRename": "Renommer",
     "menuRoom": "Changer de pièce",
     "menuInterval": "Rythme d'arrosage",
@@ -103,9 +103,9 @@
     "intervalLess": "Arroser plus souvent",
     "intervalMore": "Arroser moins souvent",
     "historyEmpty": "Pas encore d’arrosage.",
-    "deleteConfirm": "Supprimer {name} ? Son historique d’arrosage et ses messages disparaîtront.",
+    "deleteConfirm": "Supprimer {name} ? Son historique d’arrosage et ses messages disparaîtront.",
     "deletedToast": "{name} a quitté ton jardin",
-    "savedToast": "C’est noté !",
+    "savedToast": "C’est noté !",
     "noRoom": "Sans pièce",
     "notFound": "Cette plante n’est plus dans ton jardin."
   },
@@ -114,21 +114,21 @@
     "subtitle": "Assistant plantes · connaît son historique",
     "today": "Aujourd'hui",
     "yesterday": "Hier",
-    "greeting": "Salut ! Je suis {name}. Pose-moi une question ou envoie-moi une photo.",
-    "suggestions": ["Faut-il rempoter ?", "Meilleur emplacement", "Engrais ?"],
+    "greeting": "Salut ! Je suis {name}. Pose-moi une question ou envoie-moi une photo.",
+    "suggestions": ["Faut-il rempoter ?", "Meilleur emplacement", "Engrais ?"],
     "placeholder": "Pose ta question…",
     "photoA11y": "Prendre une photo",
     "sendA11y": "Envoyer",
     "typingA11y": "L'assistant écrit",
     "error": "Je n'arrive pas à répondre pour l'instant.",
     "retry": "Réessayer",
-    "quota": "On se repose un peu, reviens demain !",
+    "quota": "On se repose un peu, reviens demain !",
     "remindToast": "Rappel prévu dans {days} jours",
     "photoSentA11y": "Photo envoyée",
     "remindAction": "Me rappeler dans {days} jours",
     "galleryA11y": "Choisir une photo",
     "remindNotifTitle": "{name}",
-    "remindNotifBody": "Tu te souviens ? Tu voulais prendre de mes nouvelles.",
+    "remindNotifBody": "Tu te souviens ? Tu voulais prendre de mes nouvelles.",
     "inputA11y": "Message"
   },
   "settings": {
@@ -140,7 +140,7 @@
     "rooms": "Mes pièces",
     "privacy": "Confidentialité",
     "logout": "Se déconnecter",
-    "logoutConfirm": "Se déconnecter de Zeve ?",
+    "logoutConfirm": "Se déconnecter de Zeve ?",
     "deleteAccount": "Supprimer mon compte",
     "exportData": "Exporter mes données",
     "version": "Version {version}",
@@ -148,15 +148,15 @@
     "openSettings": "Ouvrir les réglages",
     "privacyPolicy": "Politique de confidentialité",
     "exportReady": "Tes données sont prêtes.",
-    "deleteConfirm": "Supprimer ton compte ? Tes plantes, photos et messages seront effacés définitivement.",
+    "deleteConfirm": "Supprimer ton compte ? Tes plantes, photos et messages seront effacés définitivement.",
     "deletedToast": "Ton compte a été supprimé.",
-    "privacyText": "Zeve garde seulement ce qu’il faut pour tes plantes : ton e-mail, ton prénom, tes plantes, leurs photos et tes messages. Rien n’est vendu ni partagé.",
-    "devLongPressA11y": "Appui long : pages de développement"
+    "privacyText": "Zeve garde seulement ce qu’il faut pour tes plantes : ton e-mail, ton prénom, tes plantes, leurs photos et tes messages. Rien n’est vendu ni partagé.",
+    "devLongPressA11y": "Appui long : pages de développement"
   },
   "newPlant": {
     "title": "Nouvelle plante",
     "backA11y": "Retour au jardin",
-    "speciesQuestion": "Quelle est son espèce ?",
+    "speciesQuestion": "Quelle est son espèce ?",
     "photo": "Prendre une photo",
     "photoHint": "Reconnaissance automatique",
     "list": "Choisir dans la liste",
@@ -168,7 +168,7 @@
     "notRecognized": "On n'a pas reconnu cette plante. Choisis-la dans la liste.",
     "change": "Changer",
     "nameLabel": "Son petit nom",
-    "namePlaceholder": "Ex. : {species}",
+    "namePlaceholder": "Ex. : {species}",
     "room": "Pièce",
     "light": "Lumière à cet endroit",
     "lightShade": "Ombre",
@@ -183,11 +183,11 @@
     "addRoom": "Pièce",
     "addRoomA11y": "Ajouter une pièce",
     "newRoomTitle": "Nouvelle pièce",
-    "newRoomPlaceholder": "Ex. : Bureau",
+    "newRoomPlaceholder": "Ex. : Bureau",
     "identifyTimeout": "La reconnaissance prend trop de temps. Choisis-la dans la liste.",
     "addingA11y": "Ajout en cours",
     "changeA11y": "Changer d’espèce",
-    "namePlaceholderDefault": "Ex. : Monty"
+    "namePlaceholderDefault": "Ex. : Monty"
   },
   "species": {
     "title": "Choisir une espèce",
@@ -204,7 +204,7 @@
   "toast": {
     "remindersOn": "Rappels activés",
     "loginCancelled": "Connexion annulée",
-    "magicSent": "Lien envoyé ! Ouvre-le sur ce téléphone.",
+    "magicSent": "Lien envoyé ! Ouvre-le sur ce téléphone.",
     "offline": "Pas de connexion internet. Réessaie dans un instant."
   },
   "nav": {
@@ -214,7 +214,7 @@
   "notifications": {
     "manyTitle": "Zeve",
     "oneBody": "J’ai un peu soif… ça fait {days} jours.",
-    "oneBodyToday": "J’ai un peu soif… c’est le jour !",
+    "oneBodyToday": "J’ai un peu soif… c’est le jour !",
     "manyBodyOne": "{name} et 1 autre plante ont soif.",
     "manyBody": "{name} et {n} autres plantes ont soif."
   },
@@ -223,8 +223,8 @@
     "photos": "Zeve accède à tes photos pour reconnaître tes plantes."
   },
   "added": {
-    "title": "{name} est chez elle !",
-    "text": "Elle commence petite : elle grandira dans l'app au fil des mois.",
+    "title": "{name} est chez elle !",
+    "text": "Elle commence petite : elle grandira dans l'app au fil des mois.",
     "seePlant": "Voir sa fiche",
     "addAnother": "Ajouter une autre plante",
     "toast": "{name} a rejoint ton jardin"
@@ -245,7 +245,7 @@
     "sectionChat": "Chat",
     "sectionMascot": "Mascotte",
     "reducedMotion": "Mouvement réduit actif",
-    "toastDemo": "Gaston te dit merci !",
+    "toastDemo": "Gaston te dit merci !",
     "showToast": "Afficher un toast",
     "openSheet": "Ouvrir la feuille",
     "thirsty": "A soif",
@@ -256,7 +256,7 @@
     "add": "Ajouter une pièce",
     "rename": "Renommer",
     "delete": "Supprimer la pièce",
-    "deleteConfirm": "Supprimer « {name} » ? Ses plantes restent dans ton jardin, sans pièce.",
+    "deleteConfirm": "Supprimer « {name} » ? Ses plantes restent dans ton jardin, sans pièce.",
     "plantsNone": "Aucune plante",
     "plantsOne": "1 plante",
     "plantsMany": "{n} plantes",
