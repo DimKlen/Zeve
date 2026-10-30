@@ -76,7 +76,7 @@ export const FORM_INFO: Record<PlantForm, FormInfo> = {
     lightLabel: 'Plein soleil',
     air: 'Sec',
     every: 14,
-    tip: 'Très peu d’eau en hiver : une fois par mois suffit.',
+    tip: 'Très peu d’eau en hiver : une fois par mois suffit.',
   },
   echeveria: {
     label: 'Rosettes succulentes',
@@ -103,7 +103,7 @@ export const FORM_INFO: Record<PlantForm, FormInfo> = {
     lightLabel: 'Peu exigeante',
     air: 'Sec',
     every: 18,
-    tip: 'Supporte l’oubli : un arrosage toutes les 2 à 3 semaines suffit.',
+    tip: 'Supporte l’oubli : un arrosage toutes les 2 à 3 semaines suffit.',
   },
   pothos: {
     label: 'Lianes retombantes',
@@ -121,7 +121,7 @@ export const FORM_INFO: Record<PlantForm, FormInfo> = {
     lightLabel: 'Mi-ombre',
     air: 'Très humide',
     every: 3,
-    tip: 'Terre toujours fraîche et air humide : brumise ses frondes.',
+    tip: 'Terre toujours fraîche et air humide : brumise ses frondes.',
   },
   palm: {
     label: 'Palmiers',
@@ -157,7 +157,7 @@ export const FORM_INFO: Record<PlantForm, FormInfo> = {
     lightLabel: 'Mi-ombre',
     air: 'Humide',
     every: 5,
-    tip: 'Ses feuilles s’affaissent quand elle a soif ; elle se redresse vite après arrosage.',
+    tip: 'Ses feuilles s’affaissent quand elle a soif ; elle se redresse vite après arrosage.',
   },
   zz: {
     label: 'Tiges charnues',
@@ -166,7 +166,7 @@ export const FORM_INFO: Record<PlantForm, FormInfo> = {
     lightLabel: 'Peu exigeante',
     air: 'Sec',
     every: 16,
-    tip: 'Elle stocke l’eau dans ses tiges : arrose seulement quand la terre est sèche.',
+    tip: 'Elle stocke l’eau dans ses tiges : arrose seulement quand la terre est sèche.',
   },
   geranium: {
     label: 'Fleurs de balcon',
@@ -203,7 +203,7 @@ export const CATEGORIES: { id: Category | 'all'; label: string }[] = [
 export const LIGHT_TIPS: Record<string, string> = {
   'ombre>soleil': 'Le soleil direct risque de brûler ses feuilles.',
   'indirect>soleil': 'Le soleil direct peut brûler ses feuilles. Un voilage aide.',
-  'indirect>ombre': 'Un peu sombre pour elle : sa croissance va ralentir.',
-  'soleil>ombre': 'Trop sombre : elle a besoin de soleil pour bien pousser.',
+  'indirect>ombre': 'Un peu sombre pour elle : sa croissance va ralentir.',
+  'soleil>ombre': 'Trop sombre : elle a besoin de soleil pour bien pousser.',
   'soleil>indirect': 'Elle sera plus belle avec un peu de soleil direct.',
 };

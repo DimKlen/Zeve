@@ -12,7 +12,7 @@ import { t } from '@/i18n';
 import { queryClient } from '@/lib/queryClient';
 import { splashTimings } from '@/motion';
 import { go } from '@/motion/transitions';
-import { colors, space, type } from '@/theme';
+import { a11y, colors, space, type } from '@/theme';
 
 /**
  * Lancement (docs/04 §1) : séquence animée de 2.6 s pendant la restauration de session,
@@ -58,7 +58,11 @@ export default function LaunchScreen() {
       <View style={styles.center}>
         <LaunchArt />
         <Rise delay="d5">
-          <Text style={styles.word} accessibilityRole="header">
+          <Text
+            style={styles.word}
+            accessibilityRole="header"
+            maxFontSizeMultiplier={a11y.maxTitleScale}
+          >
             {t('app.name')}
           </Text>
         </Rise>

@@ -1,5 +1,5 @@
 // Données du jardin (docs/07 : vue plant_overview) et arrosage optimiste (docs/06 F4).
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import * as Haptics from 'expo-haptics';
 
 import { showToast } from '@/components/Toast';
@@ -68,7 +68,38 @@ const startOfToday = () => {
   return new Date(now.getFullYear(), now.getMonth(), now.getDate());
 };
 
-type Vars = { plant: GardenPlant };
+// Arrosage hors ligne (docs/06 F12) : les mutations ont une clé et une fonction enregistrées une
+// fois pour toutes ; sans réseau elles sont mises en pause, persistées avec le cache et rejouées
+// au retour du réseau, même après un redémarrage. Les variables sont donc de simples valeurs JSON.
+type WaterVars = { plantId: string; userId: string; nickname: string; wateredAt: string };
+type UndoVars = { plantId: string; since: string };
+const WATER_KEY = ['water'] as const;
+const UNDO_KEY = ['unwater'] as const;
+
+/** À appeler au démarrage, avant la reprise des mutations en pause. */
+export function registerWateringMutations(client: QueryClient) {
+  client.setMutationDefaults(WATER_KEY, {
+    mutationFn: async ({ plantId, userId, wateredAt }: WaterVars) => {
+      // L'heure du tap, pas celle de l'envoi : l'arrosage compte pour le bon jour.
+      const { error } = await supabase
+        .from('watering_events')
+        .insert({ plant_id: plantId, user_id: userId, watered_at: wateredAt });
+      if (error) throw error;
+    },
+  });
+  client.setMutationDefaults(UNDO_KEY, {
+    mutationFn: async ({ plantId, since }: UndoVars) => {
+      // Un seul arrosage compté par jour : on retire ceux du jour du tap (docs/06 F4).
+      const { error } = await supabase
+        .from('watering_events')
+        .delete()
+        .eq('plant_id', plantId)
+        .gte('watered_at', since);
+      if (error) throw error;
+    },
+  });
+}
+
 type Context = { previous: OverviewRow[] | undefined };
 
 /** Arroser / annuler l'arrosage du jour, avec mise à jour immédiate et retour arrière si échec. */
@@ -85,7 +116,7 @@ export function useWatering() {
     );
     return { previous };
   };
-  const rollback = (_e: unknown, _v: Vars, context: Context | undefined) => {
+  const rollback = (_e: unknown, _v: unknown, context: Context | undefined) => {
     if (context?.previous) queryClient.setQueryData(key, context.previous);
     showToast(t('toast.offline'));
   };
@@ -94,50 +125,46 @@ export function useWatering() {
     void rescheduleReminders();
   };
 
-  const water = useMutation<void, Error, Vars, Context>({
-    mutationFn: async ({ plant }) => {
-      const { error } = await supabase
-        .from('watering_events')
-        .insert({ plant_id: plant.id, user_id: userId! });
-      if (error) throw error;
-    },
-    onMutate: ({ plant }) => {
+  const water = useMutation<void, Error, WaterVars, Context>({
+    mutationKey: WATER_KEY,
+    onMutate: (vars) => {
       void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      showToast(t('plant.thanksToast', { name: plant.nickname }));
+      showToast(t('plant.thanksToast', { name: vars.nickname }));
       return optimistic(
         (row) => ({
           ...row,
           previous_watered_at: row.last_watered_at,
-          last_watered_at: new Date().toISOString(),
+          last_watered_at: vars.wateredAt,
         }),
-        plant.id,
+        vars.plantId,
       );
     },
     onError: rollback,
     onSettled: settle,
   });
 
-  const undo = useMutation<void, Error, Vars, Context>({
-    mutationFn: async ({ plant }) => {
-      // Un seul arrosage compté par jour : on retire ceux d'aujourd'hui (docs/06 F4).
-      const { error } = await supabase
-        .from('watering_events')
-        .delete()
-        .eq('plant_id', plant.id)
-        .gte('watered_at', startOfToday().toISOString());
-      if (error) throw error;
-    },
-    onMutate: ({ plant }) =>
+  const undo = useMutation<void, Error, UndoVars, Context>({
+    mutationKey: UNDO_KEY,
+    onMutate: (vars) =>
       optimistic(
         (row) => ({ ...row, last_watered_at: row.previous_watered_at, previous_watered_at: null }),
-        plant.id,
+        vars.plantId,
       ),
     onError: rollback,
     onSettled: settle,
   });
 
   return {
-    water: (plant: GardenPlant) => water.mutate({ plant }),
-    undo: (plant: GardenPlant) => undo.mutate({ plant }),
+    water: (plant: GardenPlant) => {
+      if (!userId) return;
+      water.mutate({
+        plantId: plant.id,
+        userId,
+        nickname: plant.nickname,
+        wateredAt: new Date().toISOString(),
+      });
+    },
+    undo: (plant: GardenPlant) =>
+      undo.mutate({ plantId: plant.id, since: startOfToday().toISOString() }),
   };
 }

@@ -72,7 +72,7 @@ export function sinceText(d: number): string {
 /** Bulle de la mascotte sur la fiche. */
 export function moodBubble(s: PlantStatus, justWatered: boolean): string {
   if (s.thirsty) return `J’ai un peu soif… (${s.sinceLabel})`;
-  if (justWatered || s.wateredToday) return `Merci ! Prochain arrosage ${s.nextLabel}.`;
+  if (justWatered || s.wateredToday) return `Merci ! Prochain arrosage ${s.nextLabel}.`;
   return `Tout va bien, prochain arrosage ${s.nextLabel}.`;
 }
 

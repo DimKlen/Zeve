@@ -12,7 +12,7 @@ import { showToast } from '@/components/Toast';
 import { useNewPlantDraft } from '@/features/newPlant/draftStore';
 import { t } from '@/i18n';
 import { go } from '@/motion/transitions';
-import { colors, space, type } from '@/theme';
+import { a11y, colors, space, type } from '@/theme';
 
 /** Plante ajoutée (docs/04 §13). Le retour système ramène au jardin (pile de la modale vidée). */
 export default function PlantAddedScreen() {
@@ -29,7 +29,11 @@ export default function PlantAddedScreen() {
       <View style={styles.center}>
         <AddedBadge speciesId={created.speciesId} name={created.name} />
         <Rise delay="d1" style={styles.texts}>
-          <Text style={styles.title} accessibilityRole="header">
+          <Text
+            style={styles.title}
+            accessibilityRole="header"
+            maxFontSizeMultiplier={a11y.maxTitleScale}
+          >
             {t('added.title', { name: created.name })}
           </Text>
           <Text style={styles.text}>{t('added.text')}</Text>

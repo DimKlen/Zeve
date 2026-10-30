@@ -36,3 +36,22 @@
 - Images compressées ≤ 1280 px ; URLs signées en cache.
 - Aucune clé secrète dans le bundle (vérifier avec une recherche dans le build).
 - Gestion des erreurs réseau partout (toasts), arrosage hors-ligne mis en file.
+
+## État après la Phase 7 (30/10/2026)
+Vérifié sur le web (Playwright, 390×844, Supabase local + seed) ; les points « appareil » restent à faire sur téléphone.
+
+| Point | État |
+|---|---|
+| Parité visuelle 01, 02, 02b, 05, 06, 07, 07b, 07c, 08, 08b, 08c, 08d, 09, 09b, 10, 11, 11c, 12, 12b, 12d, 14, 15 | ✅ conformes (écarts restants : retours à la ligne dus à la police de secours des captures ; haut d'écran calé sur les zones sûres, nulles sur le web) |
+| Tokens, polices, rayons, marges, icônes, pas d'emoji ni de dégradé | ✅ (règle ESLint : aucune couleur hex hors du thème) |
+| Typographie : espaces insécables avant ? ! : ; » | ✅ fr.json, bulles d'humeur, conseils |
+| Transitions (table docs/03 §2) et cascades rise | ✅ table centralisée + tests ; geste retour = back |
+| Réduction des mouvements | ✅ toutes les boucles, entrées et transitions |
+| Cibles ≥ 44, libellés, états (selected, checked, disabled) | ✅ |
+| Annonces (toasts : live region Android + annonce VoiceOver iOS) | ✅ |
+| Police dynamique : titres plafonnés à 130 % | ✅ (à vérifier visuellement sur appareil) |
+| Hors-ligne : cache persisté, arrosage en file rejoué au retour du réseau | ✅ testé (coupure réseau navigateur) |
+| Erreur sans cache : squelettes + toast (plus de faux « jardin vide ») | ✅ |
+| Aucune clé secrète dans le bundle | ✅ (Gemini, Pl@ntNet, clé secrète Supabase absentes) |
+| 60 fps Android milieu de gamme, démarrage < 2.5 s | ⏳ appareil |
+| VoiceOver / TalkBack complets, notifications, caméra, OAuth réels | ⏳ appareil (Phase 8) |

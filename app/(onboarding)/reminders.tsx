@@ -18,7 +18,7 @@ import { t } from '@/i18n';
 import { useNotifEnter } from '@/motion/useEnter';
 import { go } from '@/motion/transitions';
 import { PlantAvatar } from '@/plants/PlantAvatar';
-import { colors, layout, radius, shadow, space, type } from '@/theme';
+import { a11y, colors, layout, radius, shadow, space, type } from '@/theme';
 
 /** Bienvenue · rappels (docs/04 §6) : la seule étape d'onboarding. */
 export default function RemindersScreen() {
@@ -65,7 +65,11 @@ export default function RemindersScreen() {
           <NotificationCard />
           <PlantAvatar speciesId="monstera" stage={3} size={200} face="full" bob />
           <Rise delay="d1">
-            <Text style={styles.title} accessibilityRole="header">
+            <Text
+              style={styles.title}
+              accessibilityRole="header"
+              maxFontSizeMultiplier={a11y.maxTitleScale}
+            >
               {name
                 ? t('onboarding.remindersTitle', { name })
                 : t('onboarding.remindersTitleNoName')}

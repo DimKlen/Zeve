@@ -214,5 +214,8 @@ export const control = {
   toggle: { w: 56, h: 34, knob: 28 },
 } as const;
 
-export const theme = { colors, fonts, type, space, layout, radius, shadow, control };
+/** Accessibilité (docs/11) : titres limités à 130 % de la taille de police du système. */
+export const a11y = { maxTitleScale: 1.3 } as const;
+
+export const theme = { colors, fonts, type, space, layout, radius, shadow, control, a11y };
 export type Theme = typeof theme;

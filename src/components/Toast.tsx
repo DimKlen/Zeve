@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { AccessibilityInfo, Platform, StyleSheet, Text } from 'react-native';
 import Animated, { FadeOut, useReducedMotion } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { create } from 'zustand';
@@ -35,6 +35,8 @@ export function ToastHost() {
 
   useEffect(() => {
     if (!message) return;
+    // VoiceOver n'annonce pas les régions « live » : annonce explicite (docs/11).
+    if (Platform.OS === 'ios') AccessibilityInfo.announceForAccessibility(message);
     const timer = setTimeout(hide, duration.toastVisible);
     return () => clearTimeout(timer);
   }, [message, key, hide]);

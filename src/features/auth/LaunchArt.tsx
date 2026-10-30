@@ -57,7 +57,12 @@ export function LaunchArt() {
   const budStyle = useAnimatedStyle(() => ({ transform: [{ scale: bud.value }] }));
 
   return (
-    <View style={styles.box} accessible={false} importantForAccessibility="no-hide-descendants">
+    <View
+      style={styles.box}
+      accessible={false}
+      importantForAccessibility="no-hide-descendants"
+      accessibilityElementsHidden
+    >
       <Svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={StyleSheet.absoluteFill}>
         <APath
           d={STEM}

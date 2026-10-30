@@ -31,7 +31,7 @@ describe('daysBetween', () => {
 });
 
 describe('plantStatus — soif et jauge', () => {
-  it('Gaston (9 j sans eau, rythme 8) a soif : jauge 18 %, « Sèche »', () => {
+  it('Gaston (9 j sans eau, rythme 8) a soif : jauge 18 %, « Sèche »', () => {
     const s = plantStatus(plant(), NOW);
     expect(s.thirsty).toBe(true);
     expect(s.daysSinceWater).toBe(9);
@@ -47,7 +47,7 @@ describe('plantStatus — soif et jauge', () => {
     expect(plantStatus(plant({ lastWateredAt: daysAgo(7) }), NOW).thirsty).toBe(false);
   });
 
-  it('arrosée aujourd’hui : jauge 92 %, « Parfait », prochain arrosage dans 8 j', () => {
+  it('arrosée aujourd’hui : jauge 92 %, « Parfait », prochain arrosage dans 8 j', () => {
     const s = plantStatus(plant({ lastWateredAt: daysAgo(0, 8) }), NOW);
     expect(s.thirsty).toBe(false);
     expect(s.wateredToday).toBe(true);
@@ -56,14 +56,14 @@ describe('plantStatus — soif et jauge', () => {
     expect(s.nextLabel).toBe('dans 8 j');
   });
 
-  it('« Bientôt » sous la moitié, « demain » la veille', () => {
+  it('« Bientôt » sous la moitié, « demain » la veille', () => {
     const s = plantStatus(plant({ waterEveryDays: 5, lastWateredAt: daysAgo(4) }), NOW);
     expect(s.waterText).toBe('Bientôt');
     expect(s.nextLabel).toBe('demain');
     expect(s.waterLevel).toBeCloseTo(0.2);
   });
 
-  it('jamais arrosée : la création sert de référence', () => {
+  it('jamais arrosée : la création sert de référence', () => {
     const s = plantStatus(plant({ createdAt: daysAgo(3), lastWateredAt: null }), NOW);
     expect(s.daysSinceWater).toBe(3);
     expect(s.wateredToday).toBe(false);
@@ -96,7 +96,7 @@ describe('textes', () => {
   it('moodBubble', () => {
     expect(moodBubble(plantStatus(plant(), NOW), false)).toBe('J’ai un peu soif… (9 j sans eau)');
     const watered = plantStatus(plant({ lastWateredAt: daysAgo(0) }), NOW);
-    expect(moodBubble(watered, true)).toBe('Merci ! Prochain arrosage dans 8 j.');
+    expect(moodBubble(watered, true)).toBe('Merci ! Prochain arrosage dans 8 j.');
     const ok = plantStatus(plant({ lastWateredAt: daysAgo(5) }), NOW);
     expect(moodBubble(ok, false)).toBe('Tout va bien, prochain arrosage dans 3 j.');
   });

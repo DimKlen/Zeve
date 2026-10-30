@@ -10,7 +10,12 @@ const DISC = { w: 220, h: 190 };
 
 export function MascotTrio() {
   return (
-    <View style={styles.block} accessible={false} importantForAccessibility="no-hide-descendants">
+    <View
+      style={styles.block}
+      accessible={false}
+      importantForAccessibility="no-hide-descendants"
+      accessibilityElementsHidden
+    >
       <View style={styles.disc} />
       <PlantAvatar speciesId="pilea" stage={2} size={80} face="simple" bob bobDelayMs={1100} />
       <PlantAvatar speciesId="monstera" stage={3} size={120} face="simple" bob />
