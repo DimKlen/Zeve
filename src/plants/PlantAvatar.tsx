@@ -1,25 +1,26 @@
-// Composant React Native de référence : la plante-mascotte (feuillage + pot à visage).
-// Reproduit le prototype : feuillage qui se balance (sway), pot fixe, yeux qui clignent (blink),
-// joues (blush), bouche selon l'humeur, gouttes à l'arrosage, flottement (bob) optionnel.
-// Dépendances : react-native-svg, react-native-reanimated (v3+).
-import React, { useEffect } from 'react';
-import { View } from 'react-native';
-import Svg, { G, Path, Rect, Circle, Ellipse } from 'react-native-svg';
+// La plante-mascotte : feuillage + pot à visage (docs/10).
+// Feuillage qui se balance (sway) dans une vue animée séparée du pot (alternative de docs/10 :
+// rendu identique, rotation fluide sur toutes les plateformes), inclinaison de soif animée en 600 ms,
+// yeux qui clignent (blink), joues, bouche selon l'humeur, gouttes à l'arrosage, flottement (bob).
+import { memo, useEffect } from 'react';
+import { StyleSheet, View } from 'react-native';
 import Animated, {
+  cancelAnimation,
   Easing,
   useAnimatedProps,
   useAnimatedStyle,
+  useReducedMotion,
   useSharedValue,
   withDelay,
   withRepeat,
   withSequence,
   withTiming,
-  useReducedMotion,
 } from 'react-native-reanimated';
+import Svg, { Circle, Ellipse, G, Path, Rect } from 'react-native-svg';
+
 import { drawPlant, type Stage } from './drawPlant';
 
 const AEllipse = Animated.createAnimatedComponent(Ellipse);
-const AG = Animated.createAnimatedComponent(G);
 
 type Props = {
   speciesId: string;
@@ -29,14 +30,23 @@ type Props = {
   size: number;
   face?: 'none' | 'simple' | 'full'; // simple = yeux ronds + bouche ; full = + clignement + joues
   sway?: boolean; // balancement du feuillage (désactivé dans les listes longues)
-  bob?: boolean; // flottement vertical 6px
+  bob?: boolean; // flottement vertical 6 px
+  /** Décalage du flottement (trio de connexion : -1.1 s / -2.2 s, passés en positif). */
   bobDelayMs?: number;
   showDrops?: boolean; // déclenche l'animation des gouttes (arrosage)
 };
 
 const EASE_IN_OUT = Easing.inOut(Easing.ease);
+const SWAY_DEG = 2.5;
+const THIRSTY_TILT_DEG = -9;
+const MOOD_MS = 600;
+const EYE_RY = 3.2;
 
-export function PlantAvatar({
+// Origines des rotations dans le repère 100×110 : sway (50,62), inclinaison (50,64).
+const SWAY_ORIGIN = '50% 56.36%';
+const TILT_ORIGIN = '50% 58.18%';
+
+function PlantAvatarBase({
   speciesId,
   stage,
   thirsty = false,
@@ -51,47 +61,70 @@ export function PlantAvatar({
   const g = drawPlant(speciesId, stage, thirsty);
   const h = size * 1.1;
 
-  // sway : rotation -2.5° ↔ +2.5°, 4.5 s aller-retour, origine (50,62) du repère plante
-  const rot = useSharedValue(-2.5);
+  // sway : rotation -2.5° ↔ +2.5°, 4.5 s aller-retour
+  const rot = useSharedValue(0);
   useEffect(() => {
-    if (!sway || reduced) return;
-    rot.value = withRepeat(withTiming(2.5, { duration: 2250, easing: EASE_IN_OUT }), -1, true);
-  }, [sway, reduced]);
-  const swayProps = useAnimatedProps(
-    () => ({ rotation: rot.value, originX: 50, originY: 62 }) as any,
-  );
+    if (!sway || reduced) {
+      cancelAnimation(rot);
+      rot.value = 0;
+      return;
+    }
+    rot.value = -SWAY_DEG;
+    rot.value = withRepeat(withTiming(SWAY_DEG, { duration: 2250, easing: EASE_IN_OUT }), -1, true);
+    return () => cancelAnimation(rot);
+  }, [sway, reduced, rot]);
+  const swayStyle = useAnimatedStyle(() => ({ transform: [{ rotate: `${rot.value}deg` }] }));
+
+  // changement d'humeur : inclinaison −9° ↔ 0°, 600 ms
+  const tilt = useSharedValue(thirsty ? THIRSTY_TILT_DEG : 0);
+  useEffect(() => {
+    const to = thirsty ? THIRSTY_TILT_DEG : 0;
+    tilt.value = reduced ? to : withTiming(to, { duration: MOOD_MS, easing: EASE_IN_OUT });
+  }, [thirsty, reduced, tilt]);
+  const tiltStyle = useAnimatedStyle(() => ({ transform: [{ rotate: `${tilt.value}deg` }] }));
 
   // bob : translateY 0 → -6 → 0 sur 3.2 s
   const y = useSharedValue(0);
   useEffect(() => {
-    if (!bob || reduced) return;
+    if (!bob || reduced) {
+      cancelAnimation(y);
+      y.value = 0;
+      return;
+    }
     y.value = withDelay(
       bobDelayMs,
       withRepeat(withTiming(-6, { duration: 1600, easing: EASE_IN_OUT }), -1, true),
     );
-  }, [bob, reduced]);
+    return () => cancelAnimation(y);
+  }, [bob, bobDelayMs, reduced, y]);
   const bobStyle = useAnimatedStyle(() => ({ transform: [{ translateY: y.value }] }));
 
-  // blink : toutes les 5 s, l'œil s'écrase à 10 % pendant ~150 ms
-  const ry = useSharedValue(3.2);
+  // blink : cycle de 5 s, l'œil s'écrase à 10 % vers 93–96 %
+  const ry = useSharedValue(EYE_RY);
   useEffect(() => {
-    if (face !== 'full' || reduced) return;
+    if (face !== 'full' || reduced) {
+      cancelAnimation(ry);
+      ry.value = EYE_RY;
+      return;
+    }
     ry.value = withRepeat(
       withSequence(
-        withDelay(4650, withTiming(0.32, { duration: 150 })),
-        withTiming(3.2, { duration: 200 }),
+        withDelay(4650, withTiming(EYE_RY * 0.1, { duration: 150 })),
+        withTiming(EYE_RY, { duration: 200 }),
       ),
       -1,
     );
-  }, [face, reduced]);
+    return () => cancelAnimation(ry);
+  }, [face, reduced, ry]);
   const eyeProps = useAnimatedProps(() => ({ ry: ry.value }));
 
   return (
     <Animated.View style={[{ width: size, height: h }, bobStyle]}>
-      <Svg width={size} height={h} viewBox="0 0 100 110">
-        <G transform={g.tilt}>
-          <G transform={g.scale}>
-            <AG animatedProps={swayProps}>
+      {/* Feuillage : inclinaison (soif) puis balancement, chacun autour de son origine. */}
+      <Animated.View style={[StyleSheet.absoluteFill, styles.tilt, tiltStyle]}>
+        <Animated.View style={[StyleSheet.absoluteFill, styles.sway, swayStyle]}>
+          <Svg width={size} height={h} viewBox="0 0 100 110">
+            <G transform={g.scale}>
               {g.shapes.map((s, i) => (
                 <Path
                   key={i}
@@ -104,10 +137,12 @@ export function PlantAvatar({
                   strokeLinejoin="round"
                 />
               ))}
-            </AG>
-          </G>
-        </G>
-        {/* Pot : bord + corps (identiques pour toutes les espèces) */}
+            </G>
+          </Svg>
+        </Animated.View>
+      </Animated.View>
+      {/* Pot et visage, fixes, au-dessus du feuillage. */}
+      <Svg width={size} height={h} viewBox="0 0 100 110" style={StyleSheet.absoluteFill}>
         <Rect x={23} y={62} width={54} height={10} rx={4} fill="#E8B931" />
         <Path d="M27 72 H73 L66 106 H34 Z" fill="#D6A132" />
         {face === 'full' && (
@@ -131,10 +166,13 @@ export function PlantAvatar({
           <Path d={g.mouth} stroke="#1F3D2B" strokeWidth={2} fill="none" strokeLinecap="round" />
         )}
       </Svg>
-      {showDrops && <WaterDrops size={size} />}
+      {showDrops && !reduced && <WaterDrops size={size} />}
     </Animated.View>
   );
 }
+
+/** Mémoïsé : la grille du jardin redessine souvent ses cartes (docs/03 §8). */
+export const PlantAvatar = memo(PlantAvatarBase);
 
 /** 3 gouttes qui tombent (1.1 s ease-in, délais 0 / 250 / 400 ms) au-dessus de la plante. */
 function WaterDrops({ size }: { size: number }) {
@@ -145,7 +183,7 @@ function WaterDrops({ size }: { size: number }) {
     { x: 61, y: 10, r: 3, delay: 400 },
   ];
   return (
-    <View pointerEvents="none" style={{ position: 'absolute', inset: 0 }}>
+    <View pointerEvents="none" style={StyleSheet.absoluteFill}>
       {drops.map((d, i) => (
         <Drop key={i} left={d.x * k} top={d.y * k} r={d.r * k} delay={d.delay} />
       ))}
@@ -157,7 +195,7 @@ function Drop({ left, top, r, delay }: { left: number; top: number; r: number; d
   const t = useSharedValue(0);
   useEffect(() => {
     t.value = withDelay(delay, withTiming(1, { duration: 1100, easing: Easing.in(Easing.ease) }));
-  }, []);
+  }, [delay, t]);
   const style = useAnimatedStyle(() => ({
     opacity: t.value < 0.3 ? t.value / 0.3 : 1 - (t.value - 0.3) / 0.7,
     transform: [{ translateY: -16 * (r / 4) + t.value * 46 * (r / 4) }],
@@ -170,3 +208,8 @@ function Drop({ left, top, r, delay }: { left: number; top: number; r: number; d
     </Animated.View>
   );
 }
+
+const styles = StyleSheet.create({
+  tilt: { transformOrigin: TILT_ORIGIN },
+  sway: { transformOrigin: SWAY_ORIGIN },
+});

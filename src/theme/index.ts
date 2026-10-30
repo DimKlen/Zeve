@@ -101,6 +101,14 @@ export const type = {
   label: { fontFamily: fonts.bodySemi, fontSize: 13 }, // libellés de champs
   cardTitle: { fontFamily: fonts.bodySemi, fontSize: 16 },
   sectionTitle: { fontFamily: fonts.bodyBold, fontSize: 15 },
+  // Compléments relevés dans le prototype (composants de la Phase 1).
+  buttonS: { fontFamily: fonts.bodySemi, fontSize: 14 }, // « J'ai arrosé » (ligne), chips pièce/suggestion, toast, valeur de tuile
+  textButton: { fontFamily: fonts.bodySemi, fontSize: 15 }, // « Continuer avec un e-mail »
+  stepLabel: { fontFamily: fonts.bodyBold, fontSize: 13 }, // étapes de croissance
+  lightHint: { fontFamily: fonts.bodyMedium, fontSize: 12 }, // indice des choix de lumière
+  tab: { fontFamily: fonts.bodyBold, fontSize: 14 }, // libellés de la barre de nav
+  badge: { fontFamily: fonts.bodyBold, fontSize: 11 }, // badges de stade
+  hint: { fontFamily: fonts.body, fontSize: 11 }, // indices des étapes de croissance
 } as const;
 
 export const space = {

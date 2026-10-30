@@ -18,6 +18,7 @@ import { StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { ToastHost } from '@/components/Toast';
 import { persistMaxAge, queryClient, queryPersister } from '@/lib/queryClient';
 import { colors } from '@/theme';
 
@@ -63,7 +64,9 @@ export default function RootLayout() {
             <Stack.Screen name="(onboarding)/reminders" />
             <Stack.Screen name="(app)" />
             <Stack.Screen name="dev/plants" />
+            <Stack.Screen name="dev/kitchen" />
           </Stack>
+          <ToastHost />
         </SafeAreaProvider>
       </GestureHandlerRootView>
     </PersistQueryClientProvider>
