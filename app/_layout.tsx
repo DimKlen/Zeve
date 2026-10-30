@@ -21,6 +21,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { ToastHost } from '@/components/Toast';
 import { initAuth } from '@/features/auth/auth';
+import { configureNotifications } from '@/features/notifications/schedule';
 import { persistMaxAge, queryClient, queryPersister } from '@/lib/queryClient';
 import { colors } from '@/theme';
 
@@ -28,6 +29,7 @@ import { colors } from '@/theme';
 void SplashScreen.preventAutoHideAsync();
 // Web : ferme la fenêtre de connexion OAuth et rend la main à l'app.
 WebBrowser.maybeCompleteAuthSession();
+configureNotifications();
 
 const persistOptions = { persister: queryPersister, maxAge: persistMaxAge, buster: 'v1' };
 

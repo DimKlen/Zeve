@@ -7,7 +7,8 @@
     "loading": "Chargement…",
     "close": "Fermer",
     "cancel": "Annuler",
-    "save": "Enregistrer"
+    "save": "Enregistrer",
+    "back": "Retour"
   },
   "login": {
     "title": "Zeve",
@@ -141,7 +142,16 @@
     "logout": "Se déconnecter",
     "logoutConfirm": "Se déconnecter de Zeve ?",
     "deleteAccount": "Supprimer mon compte",
-    "exportData": "Exporter mes données"
+    "exportData": "Exporter mes données",
+    "version": "Version {version}",
+    "remindersDenied": "Les notifications sont bloquées pour Zeve. Autorise-les dans les réglages du téléphone.",
+    "openSettings": "Ouvrir les réglages",
+    "privacyPolicy": "Politique de confidentialité",
+    "exportReady": "Tes données sont prêtes.",
+    "deleteConfirm": "Supprimer ton compte ? Tes plantes, photos et messages seront effacés définitivement.",
+    "deletedToast": "Ton compte a été supprimé.",
+    "privacyText": "Zeve garde seulement ce qu’il faut pour tes plantes : ton e-mail, ton prénom, tes plantes, leurs photos et tes messages. Rien n’est vendu ni partagé.",
+    "devLongPressA11y": "Appui long : pages de développement"
   },
   "newPlant": {
     "title": "Nouvelle plante",
@@ -203,8 +213,10 @@
   },
   "notifications": {
     "manyTitle": "Zeve",
-    "oneBody": "J'ai un peu soif… ça fait {days} jours.",
-    "manyBody": "{name} et {n} autre(s) plante(s) ont soif."
+    "oneBody": "J’ai un peu soif… ça fait {days} jours.",
+    "oneBodyToday": "J’ai un peu soif… c’est le jour !",
+    "manyBodyOne": "{name} et 1 autre plante ont soif.",
+    "manyBody": "{name} et {n} autres plantes ont soif."
   },
   "permissions": {
     "camera": "Zeve utilise l'appareil photo pour reconnaître tes plantes et les montrer à l'assistant.",
@@ -238,5 +250,18 @@
     "openSheet": "Ouvrir la feuille",
     "thirsty": "A soif",
     "water": "Arroser"
+  },
+  "rooms": {
+    "title": "Mes pièces",
+    "add": "Ajouter une pièce",
+    "rename": "Renommer",
+    "delete": "Supprimer la pièce",
+    "deleteConfirm": "Supprimer « {name} » ? Ses plantes restent dans ton jardin, sans pièce.",
+    "plantsNone": "Aucune plante",
+    "plantsOne": "1 plante",
+    "plantsMany": "{n} plantes",
+    "nameLabel": "Nom de la pièce",
+    "empty": "Pas encore de pièce.",
+    "exists": "Cette pièce existe déjà."
   }
 }

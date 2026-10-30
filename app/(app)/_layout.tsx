@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { useAuthStore } from '@/features/auth/authStore';
 import { useProfile } from '@/features/auth/profile';
+import { useNotificationTaps } from '@/features/notifications/useNotificationTaps';
 import { colors } from '@/theme';
 
 /** Garde (docs/05) : session obligatoire, onboarding fait. */
@@ -15,6 +16,13 @@ export default function AppLayout() {
   if (!session) return <Redirect href="/login" />;
   if (isPending) return <View style={styles.blank} />;
   if (!profile?.onboarded_at) return <Redirect href="/reminders" />;
+
+  return <ConnectedApp />;
+}
+
+/** App connectée et onboardée : rappels recalculés, taps sur les notifications. */
+function ConnectedApp() {
+  useNotificationTaps();
 
   return (
     <Stack screenOptions={{ headerShown: false, animation: 'none' }}>
