@@ -16,7 +16,6 @@ import { colors, radius, space, type } from '@/theme';
 
 /** Indicateur « l'assistant écrit » (docs/03 §5) : 3 points, décalés de 0.2 s. Mouvement réduit : « … ». */
 export function TypingDots() {
-  const reduced = useReducedMotion();
   return (
     <View
       style={styles.bubble}
@@ -24,21 +23,32 @@ export function TypingDots() {
       accessibilityLabel={t('chat.typingA11y')}
       accessibilityLiveRegion="polite"
     >
-      {reduced ? (
-        <Text style={styles.static}>…</Text>
-      ) : (
-        [0, 1, 2].map((i) => <Dot key={i} index={i} />)
-      )}
+      <Dots />
     </View>
   );
 }
 
-function Dot({ index }: { index: number }) {
+/** Les 3 points animés seuls (aussi dans un bouton en cours d'enregistrement). */
+export function Dots({ color = colors.inkMuted }: { color?: string }) {
+  const reduced = useReducedMotion();
+  if (reduced) return <Text style={[styles.static, { color }]}>…</Text>;
+  return (
+    <View style={styles.dots}>
+      {[0, 1, 2].map((i) => (
+        <Dot key={i} index={i} color={color} />
+      ))}
+    </View>
+  );
+}
+
+function Dot({ index, color }: { index: number; color: string }) {
   const progress = useSharedValue(0);
   useEffect(() => {
-    progress.value = withDelay(
-      index * duration.typingStagger,
-      withRepeat(withTiming(1, { duration: duration.typingDot, easing: ease.linear }), -1, false),
+    progress.set(
+      withDelay(
+        index * duration.typingStagger,
+        withRepeat(withTiming(1, { duration: duration.typingDot, easing: ease.linear }), -1, false),
+      ),
     );
     return () => cancelAnimation(progress);
   }, [index, progress]);
@@ -48,7 +58,7 @@ function Dot({ index }: { index: number }) {
     const k = p < 0.3 ? p / 0.3 : p < 0.6 ? 1 - (p - 0.3) / 0.3 : 0;
     return { opacity: 0.25 + 0.75 * k, transform: [{ translateY: -3 * k }] };
   });
-  return <Animated.View style={[styles.dot, style]} />;
+  return <Animated.View style={[styles.dot, { backgroundColor: color }, style]} />;
 }
 
 const styles = StyleSheet.create({
@@ -64,6 +74,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: radius.xl,
     borderBottomLeftRadius: 6,
   },
-  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.inkMuted },
+  dots: { flexDirection: 'row', gap: 5 },
+  dot: { width: 8, height: 8, borderRadius: 4 },
   static: { ...type.bodyS, color: colors.inkMuted },
 });

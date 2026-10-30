@@ -17,6 +17,7 @@ import {
 import { PlantCard } from '@/features/garden/PlantCard';
 import { TodoCard } from '@/features/garden/TodoCard';
 import { useGrowthToasts } from '@/features/garden/useGrowthToasts';
+import { useNewPlantDraft } from '@/features/newPlant/draftStore';
 import { t } from '@/i18n';
 import type { riseDelay } from '@/motion';
 import { go } from '@/motion/transitions';
@@ -38,7 +39,11 @@ export default function GardenScreen() {
   const todo = plants ? todoList(plants, now) : [];
 
   const openPlant = useCallback((plant: GardenPlant) => go('plant', { id: plant.id }), []);
-  const addPlant = () => go('newPlant');
+  // Brouillon vidé à chaque ouverture depuis le + (docs/05).
+  const addPlant = () => {
+    useNewPlantDraft.getState().reset();
+    go('newPlant');
+  };
   const name = profile?.first_name;
 
   return (

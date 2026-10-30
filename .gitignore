@@ -39,3 +39,6 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# Secrets locaux des Edge Functions
+supabase/functions/.env

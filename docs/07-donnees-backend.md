@@ -33,6 +33,8 @@ Le catalogue d'espèces existe **aussi** dans l'app (`reference/plants/species.t
 Secrets : `ANTHROPIC_API_KEY`, `CLAUDE_MODEL` (un modèle Claude récent avec vision, configurable), `SUPABASE_SERVICE_ROLE_KEY` (fonctions d'administration seulement).
 
 ### `identify-species` (POST, JWT requis)
+> **Décision (30/10/2026)** : la reconnaissance utilise l'**API Pl@ntNet** (gratuite en usage non commercial, compte sur my.plantnet.org) et non Claude, pour une app personnelle sans coût. Secret `PLANTNET_API_KEY` ; la correspondance noms latins → catalogue (nom exact, synonymes reclassés, puis genre avec confiance plafonnée à 0.5) est dans `supabase/functions/_shared/matchSpecies.ts`. En local sans clé : `IDENTIFY_MOCK_SPECIES=<id>` dans `supabase/functions/.env`. Le texte ci-dessous décrit la version Claude d'origine, conservée pour mémoire.
+
 Entrée `{ photoPath }`. Télécharge l'image depuis Storage (vérifie que le chemin commence par `auth.uid()`), appelle l'API Messages de Claude avec l'image (base64) et le prompt :
 ```
 Tu identifies une plante d'intérieur à partir d'une photo.

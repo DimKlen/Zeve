@@ -53,6 +53,7 @@ Règles implémentées dans `reference/plants/plantStatus.ts` (tests unitaires o
 - « Ajouter au jardin » : insert `plants` (+ `species_source`, `water_every_days` de l'espèce, photo éventuelle déplacée de `tmp/` vers `{user_id}/{plant_id}/`) → écran Plante ajoutée → « Voir sa fiche » + toast « {Nom} a rejoint ton jardin ». En cas d'échec : toast d'erreur, on reste sur le formulaire (rien n'est perdu).
 
 ## F7. Reconnaissance d'espèce par photo (IA)
+> Moteur : **Pl@ntNet** au lieu de Claude (décision du 30/10/2026, voir docs/07). Le comportement de l'app est inchangé.
 - `expo-image-picker` (caméra par défaut, galerie possible), compression JPEG ≤ 1280 px, qualité 0.7.
 - Upload dans `plant-photos/{uid}/tmp/{uuid}.jpg` puis Edge Function `identify-species` : envoie l'image à Claude (vision) avec **la liste fermée des 52 ids d'espèces** et demande un JSON `{ speciesId, confidence, alternatives: [id, id] }`. Si aucune ne correspond : `speciesId: null` → afficher la liste avec message « On n'a pas reconnu cette plante. Choisis-la dans la liste. »
 - UI : état « Reconnaissance de l'espèce… » (spinner) ; succès → carte « Espèce reconnue sur ta photo » ; confiance < 0.6 → bandeau de vérification.

@@ -9,7 +9,7 @@ type Props = { speciesId: string; name: string };
 
 const DISC = 170;
 
-/** Disque de « Plante ajoutée » (docs/02 §7) : Ø 170, bordure 6 sun, plante Pousse 130 px, entrée pop. */
+/** Disque de « Plante ajoutée » (docs/02 §7) : Ø 170, bordure 6 sun, plante Pousse 130 px (visage simple, sway), entrée pop. */
 export function AddedBadge({ speciesId, name }: Props) {
   const pop = usePop(speciesId, true);
   return (
@@ -20,7 +20,7 @@ export function AddedBadge({ speciesId, name }: Props) {
       accessibilityLabel={name}
     >
       <View style={styles.plant}>
-        <PlantAvatar speciesId={speciesId} stage={1} size={130} face="full" />
+        <PlantAvatar speciesId={speciesId} stage={1} size={130} face="simple" />
       </View>
     </Animated.View>
   );
