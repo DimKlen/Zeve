@@ -60,6 +60,7 @@ Règles implémentées dans `reference/plants/plantStatus.ts` (tests unitaires o
 - Timeout 20 s → toast + bascule liste.
 
 ## F8. Chat IA par plante
+> Moteur : **Gemini** (offre gratuite) au lieu de Claude (décision du 30/10/2026, voir docs/07). Le comportement de l'app est inchangé.
 - Un fil par plante (`chat_messages`). Edge Function `plant-chat` : reçoit `{ plantId, text?, photoPath? }`, charge le contexte (espèce, nom, pièce, lumière, intervalle, derniers arrosages, stade, 20 derniers messages), appelle Claude (vision si photo), stocke les deux messages, renvoie la réponse (streaming optionnel en phase polish).
 - Personnalité : la plante répond **à la première personne**, en français, tutoiement, 2 à 5 phrases, conseils concrets, aucune promesse médicale/vétérinaire ; signale la toxicité si pertinent ; propose au besoin une **action** structurée `{"type":"remind","days":3,"label":"Me rappeler dans 3 jours"}` rendue en bouton.
 - Suggestions fixes : « Faut-il rempoter ? », « Meilleur emplacement », « Engrais ? ».

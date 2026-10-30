@@ -20,7 +20,7 @@ Ne réinvente rien de visuel. Si un écran ou un état n'est pas maquetté (erre
 - Toutes les cibles tactiles ≥ 44 px. Textes ≥ 4.5:1 de contraste. `accessibilityLabel` sur tous les boutons-icônes.
 - Respecte `useReducedMotion()` : si actif, pas d'animations en boucle et transitions instantanées.
 - Textes de l'UI : uniquement via `src/i18n/fr.json` (copié de `reference/i18n/fr.json`), tutoiement, ton chaleureux.
-- Les clés API (Claude) ne sont **jamais** dans l'app : seulement dans les Edge Functions Supabase.
+- Les clés API (Pl@ntNet, Gemini) ne sont **jamais** dans l'app : seulement dans les Edge Functions Supabase.
 - TypeScript strict, pas de `any` hors des props animées Reanimated/SVG.
 - L'ajout d'une plante passe **uniquement** par le bouton + du jardin → Nouvelle plante (photo ou liste). N'ajoute aucune autre méthode (NFC, scan, QR…) : hors périmètre.
 
@@ -42,5 +42,6 @@ Ne réinvente rien de visuel. Si un écran ou un état n'est pas maquetté (erre
 - Supabase local sur les ports **553xx** (API 55321, DB 55322, Studio 55323, Mailpit 55324) : Windows réserve 54310–54409 (Hyper-V) et Zabava utilise les 543xx.
 - Compte de démo (seed `supabase/seed.dev.sql`, docs/06 F13) : « Continuer avec un e-mail » → `camille@zeve.test`, lien dans Mailpit (http://127.0.0.1:55324). Reproduit les captures 07 et 08.
 - Reconnaissance photo : Edge Function `identify-species` sur l'API **Pl@ntNet** (gratuite, pas Claude). Local : `supabase/functions/.env` (non versionné) avec `IDENTIFY_MOCK_SPECIES=monstera` ou `PLANTNET_API_KEY=…`.
+- Chat : Edge Function `plant-chat` sur l'API **Gemini** (offre gratuite, pas Claude). Local : `CHAT_MOCK=1` ou `GEMINI_API_KEY=…` (+ `GEMINI_MODEL`) dans `supabase/functions/.env`.
 - `.env.local` (non versionné) : `EXPO_PUBLIC_SUPABASE_URL` / `EXPO_PUBLIC_SUPABASE_ANON_KEY` — voir `.env.example`.
 - `reference/` reste la copie d'origine du kit ; le code vit dans `src/`.

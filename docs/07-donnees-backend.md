@@ -46,6 +46,8 @@ confidence entre 0 et 1. alternatives : jusqu'à 2 autres ids plausibles.
 Valide la sortie (id ∈ catalogue), renvoie `{ speciesId, confidence, alternatives }`. Timeout 20 s.
 
 ### `plant-chat` (POST, JWT requis)
+> **Décision (30/10/2026)** : le chat utilise l'**API Gemini** (offre gratuite de Google) et non Claude, pour une app personnelle sans coût. Secrets `GEMINI_API_KEY`, `GEMINI_MODEL` (défaut `gemini-3.5-flash-lite`). Prompt, extraction de l'action et conversion de l'historique : `supabase/functions/_shared/chatPrompt.ts`. Les deux messages ne sont enregistrés qu'après la réponse (« Réessayer » ne duplique rien). En local sans clé : `CHAT_MOCK=1`. Sur l'offre gratuite, Google peut utiliser les échanges pour améliorer ses modèles.
+
 Entrée `{ plantId, text?, photoPath? }`. Vérifie la propriété, quota (30/jour), charge le contexte depuis `plant_overview` + 20 derniers messages + 5 derniers arrosages, insère le message utilisateur, appelle Claude, insère et renvoie la réponse `{ id, content, actions }`.
 Prompt système :
 ```
