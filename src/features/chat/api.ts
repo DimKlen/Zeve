@@ -7,6 +7,7 @@ import { Platform } from 'react-native';
 
 import { useAuthStore } from '@/features/auth/authStore';
 import { uploadPhoto, type PickedPhoto } from '@/features/newPlant/api';
+import { REMIND_KIND } from '@/features/notifications/schedule';
 import { t } from '@/i18n';
 import type { Database } from '@/lib/database.types';
 import { supabase } from '@/lib/supabase';
@@ -125,7 +126,7 @@ export async function createReminder(plant: { id: string; nickname: string }, da
     content: {
       title: t('chat.remindNotifTitle', { name: plant.nickname }),
       body: message,
-      data: { plantId: plant.id },
+      data: { kind: REMIND_KIND, plantId: plant.id },
     },
     trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: dueAt },
   });

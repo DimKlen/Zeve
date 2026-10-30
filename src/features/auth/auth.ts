@@ -6,6 +6,7 @@ import * as Linking from 'expo-linking';
 import * as WebBrowser from 'expo-web-browser';
 import { Platform } from 'react-native';
 
+import { cancelAllReminders } from '@/features/notifications/schedule';
 import { queryClient } from '@/lib/queryClient';
 import { supabase } from '@/lib/supabase';
 
@@ -124,8 +125,9 @@ export async function sendMagicLink(email: string): Promise<void> {
   if (error) throw error;
 }
 
-/** Déconnexion : session, cache des requêtes (docs/06 F1 ; notifications annulées en Phase 6). */
+/** Déconnexion : session, cache des requêtes et notifications planifiées (docs/06 F1). */
 export async function signOut(): Promise<void> {
+  await cancelAllReminders();
   await supabase.auth.signOut();
   queryClient.clear();
 }

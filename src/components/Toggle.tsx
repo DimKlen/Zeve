@@ -43,6 +43,7 @@ export function Toggle({ value, onValueChange, accessibilityLabel, disabled = fa
       accessibilityRole="switch"
       accessibilityLabel={accessibilityLabel}
       accessibilityState={{ checked: value, disabled }}
+      aria-checked={value}
       hitSlop={(layout.touchMin - h) / 2}
     >
       <Animated.View style={[styles.track, track]}>
