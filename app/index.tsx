@@ -21,13 +21,14 @@ const DEV_ROUTES: Href[] = [
   '/settings/rooms',
   '/settings/privacy',
   '/dev/plants',
+  '/dev/kitchen',
 ];
 
 // Lancement : séquence animée et aiguillage session / onboarding en Phase 2 (docs/04 §1).
 // En attendant : le mot-symbole (Bricolage) et le slogan (Figtree) valident le chargement des polices.
 export default function LaunchScreen() {
   return (
-    <Screen tone="dark">
+    <Screen name="launch" tone="dark">
       <View style={styles.brand}>
         <Text style={styles.word}>{t('app.name')}</Text>
         <Text style={styles.tagline}>{t('app.tagline')}</Text>

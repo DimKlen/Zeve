@@ -37,7 +37,15 @@ export const duration = {
   pop: 500,
   spin: 1100,
   typingDot: 1200,
+  typingStagger: 200,
+  chip: 200, // fond des chips, pièces, choix de lumière
+  tab: 250, // fond et couleur de l'onglet
+  toastOut: 200,
+  fade: 200,
 } as const;
+
+/** Échelle au toucher (« press ») de tous les éléments tappables. */
+export const pressScale = 0.96;
 
 // ——— Transitions d'écran (entrée de l'écran qui arrive ; l'écran sortant disparaît sans animation) ———
 // fwd  : translateX 60 → 0 + opacité 0 → 1, 440 ms, ease.screen  (aller vers un écran « enfant »)

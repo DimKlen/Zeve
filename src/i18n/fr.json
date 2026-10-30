@@ -3,6 +3,10 @@
     "name": "Zeve",
     "tagline": "Tes plantes te parlent."
   },
+  "common": {
+    "loading": "Chargement…",
+    "close": "Fermer"
+  },
   "login": {
     "title": "Zeve",
     "subtitle": "Tes plantes te disent quand elles ont soif. Toi, tu n'as plus qu'à arroser.",
@@ -105,7 +109,9 @@
     "error": "Je n'arrive pas à répondre pour l'instant.",
     "retry": "Réessayer",
     "quota": "On se repose un peu, reviens demain !",
-    "remindToast": "Rappel prévu dans {days} jours"
+    "remindToast": "Rappel prévu dans {days} jours",
+    "photoSentA11y": "Photo envoyée",
+    "remindAction": "Me rappeler dans {days} jours"
   },
   "settings": {
     "title": "Réglages",
@@ -184,5 +190,27 @@
     "seePlant": "Voir sa fiche",
     "addAnother": "Ajouter une autre plante",
     "toast": "{name} a rejoint ton jardin"
+  },
+  "dev": {
+    "plantsTitle": "Les dessins de Zeve",
+    "plantsSubtitle": "{forms} types de plantes · {species} espèces · chaque dessin existe en 3 tailles selon l’ancienneté dans l’app",
+    "stageLegend1": "moins de 3 mois",
+    "stageLegend2": "moins d’un an",
+    "stageLegend3": "1 an et +",
+    "kitchenTitle": "Composants",
+    "kitchenLink": "Voir les composants",
+    "plantsLink": "Voir les dessins",
+    "sectionButtons": "Boutons",
+    "sectionInputs": "Champs & choix",
+    "sectionFeedback": "Retours",
+    "sectionPlant": "Fiche plante",
+    "sectionChat": "Chat",
+    "sectionMascot": "Mascotte",
+    "reducedMotion": "Mouvement réduit actif",
+    "toastDemo": "Gaston te dit merci !",
+    "showToast": "Afficher un toast",
+    "openSheet": "Ouvrir la feuille",
+    "thirsty": "A soif",
+    "water": "Arroser"
   }
 }
