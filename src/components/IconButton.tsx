@@ -16,6 +16,8 @@ type Props = {
   /** Icône ; reçoit la couleur adaptée à la variante. */
   icon: (color: string) => ReactElement;
   disabled?: boolean;
+  /** Diamètre forcé (52 pour l’envoi du lien magique). */
+  size?: number;
 };
 
 const BG: Record<Variant, string> = {
@@ -32,8 +34,9 @@ export function IconButton({
   variant = 'surface',
   icon,
   disabled = false,
+  size: forcedSize,
 }: Props) {
-  const size = variant === 'surface' ? control.roundIcon : control.roundIconL;
+  const size = forcedSize ?? (variant === 'surface' ? control.roundIcon : control.roundIconL);
   const fg = variant === 'forest' ? colors.bg : colors.forest;
   return (
     <PressableScale
