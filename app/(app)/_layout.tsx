@@ -1,7 +1,21 @@
-import { Stack } from 'expo-router';
+import { Redirect, Stack } from 'expo-router';
+import { StyleSheet, View } from 'react-native';
 
-// Garde « session obligatoire, onboarding fait » : Phase 2 (docs/05).
+import { useAuthStore } from '@/features/auth/authStore';
+import { useProfile } from '@/features/auth/profile';
+import { colors } from '@/theme';
+
+/** Garde (docs/05) : session obligatoire, onboarding fait. */
 export default function AppLayout() {
+  const ready = useAuthStore((s) => s.ready);
+  const session = useAuthStore((s) => s.session);
+  const { data: profile, isPending } = useProfile();
+
+  if (!ready) return <View style={styles.blank} />;
+  if (!session) return <Redirect href="/login" />;
+  if (isPending) return <View style={styles.blank} />;
+  if (!profile?.onboarded_at) return <Redirect href="/reminders" />;
+
   return (
     <Stack screenOptions={{ headerShown: false, animation: 'none' }}>
       <Stack.Screen name="(tabs)" />
@@ -9,3 +23,7 @@ export default function AppLayout() {
     </Stack>
   );
 }
+
+const styles = StyleSheet.create({
+  blank: { flex: 1, backgroundColor: colors.bg },
+});

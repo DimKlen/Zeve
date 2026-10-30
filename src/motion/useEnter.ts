@@ -53,3 +53,24 @@ export function usePop(trigger: unknown, onMount = false) {
   }, [trigger, onMount, reduced, scale]);
   return useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
 }
+
+const NOTIF = { delay: 500, duration: 600, fromY: -24, fromScale: 0.95 };
+
+/** notif : translateY −24 + scale .95 → 1 + opacité, 600 ms ease.sheet, délai 0.5 s (onboarding). */
+export function useNotifEnter() {
+  const reduced = useReducedMotion();
+  const progress = useSharedValue(reduced ? 1 : 0);
+  useEffect(() => {
+    if (reduced) return;
+    progress.set(
+      withDelay(NOTIF.delay, withTiming(1, { duration: NOTIF.duration, easing: ease.sheet })),
+    );
+  }, [reduced, progress]);
+  return useAnimatedStyle(() => ({
+    opacity: progress.value,
+    transform: [
+      { translateY: (1 - progress.value) * NOTIF.fromY },
+      { scale: NOTIF.fromScale + (1 - NOTIF.fromScale) * progress.value },
+    ],
+  }));
+}

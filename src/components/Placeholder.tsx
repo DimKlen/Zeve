@@ -1,19 +1,21 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import type { ScreenKey } from '@/motion/transitions';
 import { colors, type } from '@/theme';
 
 import { Screen } from './Screen';
 
 type Props = {
+  name?: ScreenKey;
   /** Route expo-router de l'écran : seul repère affiché pendant le développement. */
   route: string;
   tone?: 'light' | 'dark';
 };
 
 // Écran vide de la Phase 0 : remplacé écran par écran à partir de la Phase 2.
-export function Placeholder({ route, tone = 'light' }: Props) {
+export function Placeholder({ name, route, tone = 'light' }: Props) {
   return (
-    <Screen tone={tone}>
+    <Screen name={name} tone={tone} refocusEnter={name === 'garden' ? 'fade' : 'back'}>
       <View style={styles.center}>
         <Text style={[styles.route, tone === 'dark' && styles.routeDark]}>{route}</Text>
       </View>
