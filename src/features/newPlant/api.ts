@@ -40,8 +40,8 @@ export async function pickPlantPhoto(): Promise<PickedPhoto | null> {
   return { uri: asset.uri, width: asset.width, height: asset.height };
 }
 
-/** JPEG ≤ 1280 px, qualité 0.7 (docs/06 F7), puis envoi dans {uid}/tmp/. */
-export async function uploadTmpPhoto(photo: PickedPhoto, userId: string): Promise<string> {
+/** JPEG ≤ 1280 px, qualité 0.7 (docs/06 F7), envoyé dans Storage au chemin donné. */
+export async function uploadPhoto(photo: PickedPhoto, path: string): Promise<string> {
   // Plus grand côté ramené à 1280 px, sans jamais agrandir.
   const landscape = photo.width >= photo.height;
   const longest = landscape ? photo.width : photo.height;
@@ -51,7 +51,6 @@ export async function uploadTmpPhoto(photo: PickedPhoto, userId: string): Promis
     compress: QUALITY,
     format: ImageManipulator.SaveFormat.JPEG,
   });
-  const path = `${userId}/tmp/${Crypto.randomUUID()}.jpg`;
   const body = await (await fetch(image.uri)).arrayBuffer();
   const { error } = await supabase.storage
     .from(BUCKET)
@@ -59,6 +58,10 @@ export async function uploadTmpPhoto(photo: PickedPhoto, userId: string): Promis
   if (error) throw error;
   return path;
 }
+
+/** Photo de reconnaissance : {uid}/tmp/{uuid}.jpg, déplacée à la création de la plante. */
+export const uploadTmpPhoto = (photo: PickedPhoto, userId: string) =>
+  uploadPhoto(photo, `${userId}/tmp/${Crypto.randomUUID()}.jpg`);
 
 export type Identification = {
   speciesId: string | null;
