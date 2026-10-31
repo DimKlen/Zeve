@@ -20,6 +20,10 @@ name: 07 — Chat
     direction: DOWN
 - tapOn: "Poser une question sur Gaston"
 - assertVisible: "Salut.*Je suis Gaston.*"
+# Les suggestions défilent horizontalement : « Engrais ? » est hors de l'écran au départ.
+- swipe:
+    from: "Faut-il rempoter.*"
+    direction: LEFT
 - tapOn: "Engrais.*"
 - extendedWaitUntil:
     visible: "Merci de prendre soin de moi.*"
