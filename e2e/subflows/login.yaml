@@ -4,6 +4,17 @@ appId: com.zeve.app
 ---
 - launchApp:
     clearState: true
+# Sur l'émulateur, le lancement qui suit l'effacement des données échoue parfois sans erreur
+# (écran d'accueil d'Android) : une seconde tentative si l'écran de connexion n'apparaît pas.
+- extendedWaitUntil:
+    visible: "Continuer avec un e-mail"
+    timeout: 10000
+    optional: true
+- runFlow:
+    when:
+      notVisible: "Continuer avec un e-mail"
+    commands:
+      - launchApp
 - extendedWaitUntil:
     visible: "Continuer avec un e-mail"
     timeout: 15000
