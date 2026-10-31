@@ -13,9 +13,12 @@ appId: com.zeve.app
 - tapOn:
     id: "email-input"
 - inputText: ${EMAIL}
-# Envoi par la touche du clavier (action « send » → onSubmitEditing) : pendant que la vue
-# s'ajuste au clavier, la position du bouton bouge et un tap à coordonnées peut tomber à côté.
-- pressKey: Enter
+# Clavier fermé et mise en page stabilisée avant de toucher le bouton d'envoi : pendant que la
+# vue s'ajuste au clavier, le bouton se déplace et un tap peut tomber à côté. (La touche Entrée
+# matérielle ne déclenche pas l'action « Envoyer » du clavier virtuel.)
+- hideKeyboard
+- waitForAnimationToEnd
+- tapOn: "Recevoir un lien de connexion"
 - extendedWaitUntil:
     visible: "Lien envoyé.*"
     timeout: 10000
