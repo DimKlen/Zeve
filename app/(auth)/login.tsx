@@ -1,6 +1,6 @@
 import * as WebBrowser from 'expo-web-browser';
-import { useState } from 'react';
-import { KeyboardAvoidingView, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useRef, useState, type ComponentRef } from 'react';
+import { Keyboard, KeyboardAvoidingView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { IconSend } from '@/components/icons';
@@ -30,6 +30,15 @@ import { a11y, colors, control, layout, space, type } from '@/theme';
 export default function LoginScreen() {
   const insets = useSafeAreaInsets();
   const [busy, setBusy] = useState(false);
+  const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
+
+  // Clavier ouvert (formulaire e-mail) : le champ et son bouton remontent dans la vue.
+  useEffect(() => {
+    const sub = Keyboard.addListener('keyboardDidShow', () =>
+      scroll.current?.scrollToEnd({ animated: true }),
+    );
+    return () => sub.remove();
+  }, []);
 
   const start = async (signIn: () => Promise<StartResult>) => {
     if (busy) return;
@@ -51,48 +60,56 @@ export default function LoginScreen() {
 
   return (
     <Screen name="login" edges={['top']}>
-      <KeyboardAvoidingView
-        style={[styles.root, { paddingBottom: Math.max(insets.bottom, space.x5) }]}
-        behavior="padding"
-      >
-        <View style={styles.hero}>
-          <MascotTrio />
-          <View style={styles.titleBlock}>
-            <Rise delay="d1">
-              <Text
-                style={styles.title}
-                accessibilityRole="header"
-                maxFontSizeMultiplier={a11y.maxTitleScale}
-              >
-                {t('login.title')}
-              </Text>
-            </Rise>
+      <KeyboardAvoidingView style={styles.root} behavior="padding">
+        {/* Écran rétréci par le clavier : le contenu défile au lieu de se chevaucher. */}
+        <ScrollView
+          ref={scroll}
+          contentContainerStyle={[
+            styles.content,
+            { paddingBottom: Math.max(insets.bottom, space.x5) },
+          ]}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.hero}>
+            <MascotTrio />
+            <View style={styles.titleBlock}>
+              <Rise delay="d1">
+                <Text
+                  style={styles.title}
+                  accessibilityRole="header"
+                  maxFontSizeMultiplier={a11y.maxTitleScale}
+                >
+                  {t('login.title')}
+                </Text>
+              </Rise>
+              <Rise delay="d2">
+                <Text style={styles.subtitle}>{t('login.subtitle')}</Text>
+              </Rise>
+            </View>
+          </View>
+
+          <View style={styles.actions}>
             <Rise delay="d2">
-              <Text style={styles.subtitle}>{t('login.subtitle')}</Text>
+              <ProviderButton
+                provider="google"
+                disabled={busy}
+                onPress={() => start(signInWithGoogle)}
+              />
+            </Rise>
+            <Rise delay="d3">
+              <ProviderButton
+                provider="apple"
+                disabled={busy}
+                onPress={() => start(signInWithApple)}
+              />
+            </Rise>
+            <EmailSection />
+            <Rise delay="d4">
+              <Legal />
             </Rise>
           </View>
-        </View>
-
-        <View style={styles.actions}>
-          <Rise delay="d2">
-            <ProviderButton
-              provider="google"
-              disabled={busy}
-              onPress={() => start(signInWithGoogle)}
-            />
-          </Rise>
-          <Rise delay="d3">
-            <ProviderButton
-              provider="apple"
-              disabled={busy}
-              onPress={() => start(signInWithApple)}
-            />
-          </Rise>
-          <EmailSection />
-          <Rise delay="d4">
-            <Legal />
-          </Rise>
-        </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </Screen>
   );
@@ -198,7 +215,8 @@ function Legal() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, paddingHorizontal: layout.screenPadTabs },
+  root: { flex: 1 },
+  content: { flexGrow: 1, paddingHorizontal: layout.screenPadTabs },
   hero: {
     flex: 1,
     alignItems: 'center',
