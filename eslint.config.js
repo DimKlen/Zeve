@@ -21,6 +21,7 @@ module.exports = defineConfig([
       'reference/*',
       'design/*',
       'supabase/*',
+      'e2e/*',
     ],
   },
   {

@@ -1,0 +1,20 @@
+# docs/05 parcours 8 — déconnexion : Réglages → Se déconnecter → confirmer → Connexion.
+appId: com.zeve.app
+name: 08 — Déconnexion
+---
+- runFlow:
+    file: ../subflows/login.yaml
+    env:
+      EMAIL: camille@zeve.test
+- extendedWaitUntil:
+    visible: "Mon jardin"
+    timeout: 15000
+- tapOn: "Réglages"
+- assertVisible: "camille@zeve.test"
+- tapOn: "Se déconnecter"
+# Alerte native : le bouton de confirmation est le bouton « positif » de la boîte de dialogue.
+- tapOn:
+    id: "android:id/button1"
+- extendedWaitUntil:
+    visible: "Continuer avec Google"
+    timeout: 10000

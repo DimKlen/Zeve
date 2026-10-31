@@ -1,0 +1,93 @@
+# E2E Android : build de l'APK de test (profil e2e, sans EAS ni jeton), Supabase local avec réponses
+# d'IA simulées, émulateur Android et suite Maestro (docs/05, e2e/). Lancement manuel depuis l'onglet
+# Actions : la suite dure ~30 min et ne bloque pas les PR.
+name: E2E Android
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    name: APK de test + Maestro sur émulateur
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    env:
+      ZEVE_E2E: '1'
+      # Clé publique du Supabase local (identique pour tous les projets locaux de la CLI).
+      EXPO_PUBLIC_SUPABASE_URL: http://10.0.2.2:55321
+      EXPO_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      - name: Supabase local (réponses d'IA simulées, jardin de démo)
+        run: |
+          printf 'IDENTIFY_MOCK_SPECIES=monstera\nCHAT_MOCK=1\n' > supabase/functions/.env
+          npx supabase start -x studio,imgproxy,vector,logflare,supavisor,postgres-meta,realtime
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-e2e-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: gradle-e2e-${{ runner.os }}-
+
+      - name: Build de l'APK de test
+        run: |
+          npx expo prebuild --platform android --no-install
+          cd android
+          ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=x86_64
+
+      - name: Installer Maestro
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+
+      - name: Activer KVM (émulateur accéléré)
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Émulateur + suite Maestro
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back emulated
+          script: |
+            adb install -r android/app/build/outputs/apk/release/app-release.apk
+            maestro test e2e --format junit --output maestro-report.xml --debug-output maestro-debug
+
+      - name: Publier l'APK, le rapport et les captures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-android
+          path: |
+            android/app/build/outputs/apk/release/app-release.apk
+            maestro-report.xml
+            maestro-debug
+          if-no-files-found: warn

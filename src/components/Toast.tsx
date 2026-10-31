@@ -48,6 +48,7 @@ export function ToastHost() {
       entering={reduced ? undefined : toastEnter}
       exiting={reduced ? undefined : FadeOut.duration(duration.toastOut)}
       pointerEvents="none"
+      accessible
       accessibilityRole="alert"
       accessibilityLiveRegion="polite"
       style={[styles.toast, shadow.toast, { top: insets.top + space.s }]}

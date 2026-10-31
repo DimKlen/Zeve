@@ -19,6 +19,17 @@
     "production": {
       "environment": "production",
       "autoIncrement": true
+    },
+    "e2e": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "ZEVE_E2E": "1",
+        "EXPO_PUBLIC_SUPABASE_URL": "http://10.0.2.2:55321",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH"
+      }
     }
   },
   "submit": {

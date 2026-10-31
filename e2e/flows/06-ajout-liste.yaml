@@ -1,0 +1,44 @@
+# docs/05 parcours 6 — ajout par la liste : « fic » → Figuier lyre → Changer → Cactus & succulentes
+# → Echeveria → Ajouter au jardin → Plante ajoutée → fiche en Pousse.
+appId: com.zeve.app
+name: 06 — Ajout par la liste
+---
+- runFlow:
+    file: ../subflows/login.yaml
+    env:
+      EMAIL: camille@zeve.test
+- extendedWaitUntil:
+    visible: "Ajouter une plante"
+    timeout: 15000
+- tapOn: "Ajouter une plante"
+- assertVisible: "Nouvelle plante"
+- assertVisible: "Choisis d.abord son espèce"
+- tapOn: "Choisir dans la liste.*"
+- assertVisible: "52 espèces · 19 types"
+- tapOn: "Rechercher une espèce"
+- inputText: "fic"
+- extendedWaitUntil:
+    visible: "5 espèces"
+    timeout: 5000
+- assertVisible: "Ficus benjamina, .*"
+- tapOn: "Figuier lyre, .*"
+- assertVisible: "Espèce choisie"
+- assertVisible: "Figuier lyre"
+- tapOn: "Changer"
+- tapOn: "Cactus & succulentes"
+- tapOn: "Echeveria, .*"
+- assertVisible: "Echeveria"
+- tapOn: "Ex.*Echeveria"
+- inputText: "Lianne"
+- hideKeyboard
+- tapOn: "Ombre, loin des fenêtres"
+- tapOn: "Ajouter au jardin"
+- extendedWaitUntil:
+    visible: "Lianne est chez elle.*"
+    timeout: 15000
+- tapOn: "Voir sa fiche"
+- assertVisible: "Lianne a rejoint ton jardin"
+- extendedWaitUntil:
+    visible: "Lianne est en forme"
+    timeout: 10000
+- assertVisible: "Pousse, .*"

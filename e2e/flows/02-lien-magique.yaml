@@ -1,0 +1,14 @@
+# docs/05 parcours 2 — lien magique d'un compte existant (Camille, déjà onboardée) → Jardin.
+appId: com.zeve.app
+name: 02 — Lien magique
+---
+- runFlow:
+    file: ../subflows/login.yaml
+    env:
+      EMAIL: camille@zeve.test
+- extendedWaitUntil:
+    visible: "Mon jardin"
+    timeout: 15000
+- assertVisible: "Bonjour Camille"
+- assertVisible: "6 plantes · 2 ont soif aujourd.hui"
+- assertVisible: "Gaston, .*"

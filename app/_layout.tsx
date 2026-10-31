@@ -81,6 +81,7 @@ export default function RootLayout() {
             <Stack.Screen name="(app)" />
             <Stack.Screen name="dev/plants" />
             <Stack.Screen name="dev/kitchen" />
+            <Stack.Screen name="dev/icon" />
           </Stack>
           <ToastHost />
         </SafeAreaProvider>

@@ -1,5 +1,9 @@
 // Liens et réglages fournis par l'environnement (docs/09 « À fournir par toi »).
 
-/** Pages web légales [À FOURNIR] : à remplacer par les vraies URL via EXPO_PUBLIC_*. */
-export const TERMS_URL = process.env.EXPO_PUBLIC_TERMS_URL ?? 'https://github.com/DimKlen/Zeve';
-export const PRIVACY_URL = process.env.EXPO_PUBLIC_PRIVACY_URL ?? 'https://github.com/DimKlen/Zeve';
+// Pages légales publiées dans le dépôt public (docs/store/) ; remplaçables par un site via EXPO_PUBLIC_*.
+const LEGAL_BASE = 'https://github.com/DimKlen/Zeve/blob/main/docs/store';
+
+export const TERMS_URL =
+  process.env.EXPO_PUBLIC_TERMS_URL ?? `${LEGAL_BASE}/conditions-utilisation.md`;
+export const PRIVACY_URL =
+  process.env.EXPO_PUBLIC_PRIVACY_URL ?? `${LEGAL_BASE}/politique-confidentialite.md`;
