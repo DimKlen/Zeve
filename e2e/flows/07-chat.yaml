@@ -11,6 +11,13 @@ name: 07 — Chat
     visible: "Gaston, .*"
     timeout: 15000
 - tapOn: "Gaston, .*"
+- extendedWaitUntil:
+    visible: "Gaston a soif"
+    timeout: 10000
+# La carte du chat est sous le pli de la fiche.
+- scrollUntilVisible:
+    element: "Poser une question sur Gaston"
+    direction: DOWN
 - tapOn: "Poser une question sur Gaston"
 - assertVisible: "Salut.*Je suis Gaston.*"
 - tapOn: "Engrais.*"
