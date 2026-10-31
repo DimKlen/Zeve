@@ -19,18 +19,15 @@ appId: com.zeve.app
 - hideKeyboard
 - waitForAnimationToEnd
 - tapOn: "Recevoir un lien de connexion"
-- extendedWaitUntil:
-    visible: "Lien envoyé.*"
-    timeout: 10000
+# Pas d'assertion sur le toast « Lien envoyé » ni sur « Connexion en cours » : ils sont
+# transitoires et tapOn/openLink attendent que l'écran se stabilise, souvent plus longtemps
+# qu'ils ne restent affichés. La preuve de l'envoi est l'e-mail dans Mailpit (le script attend).
 - retry:
-    maxRetries: 5
+    maxRetries: 3
     commands:
       - runScript:
           file: ../scripts/magic-link.js
           env:
             EMAIL: ${EMAIL}
 - openLink: ${output.link}
-# « Connexion en cours » dure au moins 1.8 s.
-- extendedWaitUntil:
-    visible: "Connexion via.*"
-    timeout: 10000
+# Chaque flow attend ensuite son écran d'arrivée (Jardin, Rappels…).

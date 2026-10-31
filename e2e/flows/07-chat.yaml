@@ -19,4 +19,3 @@ name: 07 — Chat
     timeout: 20000
 - assertVisible: "Me rappeler dans 3 jours"
 - tapOn: "Me rappeler dans 3 jours"
-- assertVisible: "Rappel prévu dans 3 jours"

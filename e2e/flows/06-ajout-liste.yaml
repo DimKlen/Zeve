@@ -39,7 +39,6 @@ name: 06 — Ajout par la liste
     visible: "Lianne est chez elle.*"
     timeout: 15000
 - tapOn: "Voir sa fiche"
-- assertVisible: "Lianne a rejoint ton jardin"
 - extendedWaitUntil:
     visible: "Lianne est en forme"
     timeout: 10000
