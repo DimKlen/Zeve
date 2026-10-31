@@ -16,5 +16,6 @@ name: 03 — Arrosage quotidien
     text: "J'ai arrosé"
     index: 0
 - assertVisible: "Arrosé"
-- assertVisible: "6 plantes · 1 a soif aujourd.hui"
+# Nombre de plantes libre : le flow 06 (ajout par la liste) peut avoir tourné avant.
+- assertVisible: "[0-9]+ plantes · 1 a soif aujourd.hui"
 - assertVisible: "Gaston, .*Arrosée · eau dans 8 j"
