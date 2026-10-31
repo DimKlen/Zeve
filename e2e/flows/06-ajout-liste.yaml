@@ -35,6 +35,11 @@ name: 06 — Ajout par la liste
     id: "plant-name"
 - inputText: "Lianne"
 - hideKeyboard
+# Les options de lumière sont sous le pli, derrière le bouton fixe « Ajouter au jardin ».
+- scrollUntilVisible:
+    element: "Ombre, loin des fenêtres"
+    direction: DOWN
+    centerElement: true
 - tapOn: "Ombre, loin des fenêtres"
 - tapOn: "Ajouter au jardin"
 - extendedWaitUntil:
