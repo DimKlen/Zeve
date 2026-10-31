@@ -1,0 +1,22 @@
+# docs/05 parcours 7 — chat : fiche → « Une question » → suggestion « Engrais ? » → points → réponse.
+# Réponse déterministe : CHAT_MOCK=1 dans supabase/functions/.env.
+appId: com.zeve.app
+name: 07 — Chat
+---
+- runFlow:
+    file: ../subflows/login.yaml
+    env:
+      EMAIL: camille@zeve.test
+- extendedWaitUntil:
+    visible: "Gaston, .*"
+    timeout: 15000
+- tapOn: "Gaston, .*"
+- tapOn: "Poser une question sur Gaston"
+- assertVisible: "Salut.*Je suis Gaston.*"
+- tapOn: "Engrais.*"
+- extendedWaitUntil:
+    visible: "Merci de prendre soin de moi.*"
+    timeout: 20000
+- assertVisible: "Me rappeler dans 3 jours"
+- tapOn: "Me rappeler dans 3 jours"
+- assertVisible: "Rappel prévu dans 3 jours"

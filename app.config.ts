@@ -10,6 +10,13 @@ const SUN = '#E8B931';
 // [À FOURNIR] bundle id / package définitifs (docs/09 « À fournir par toi »).
 const BUNDLE_ID = process.env.ZEVE_BUNDLE_ID ?? 'com.zeve.app';
 
+// Build de tests de bout en bout (profil EAS « e2e ») : l'émulateur parle au Supabase local en HTTP,
+// interdit par défaut sur Android. Jamais activé dans les builds preview / production.
+const E2E = process.env.ZEVE_E2E === '1';
+const e2ePlugins: NonNullable<ExpoConfig['plugins']> = E2E
+  ? [['expo-build-properties', { android: { usesCleartextTraffic: true } }]]
+  : [];
+
 const config: ExpoConfig = {
   name: 'Zeve',
   slug: 'zeve',
@@ -51,7 +58,8 @@ const config: ExpoConfig = {
     'expo-web-browser',
     'expo-apple-authentication',
     ['expo-status-bar', { style: 'dark' }],
-    ['expo-notifications', { color: SUN }],
+    // Petite icône Android de la barre d'état : silhouette blanche, teintée en jaune.
+    ['expo-notifications', { icon: './assets/notification-icon.png', color: SUN }],
     [
       'expo-image-picker',
       {
@@ -62,6 +70,7 @@ const config: ExpoConfig = {
     ],
     // Splash natif uni : la séquence de lancement animée est rendue par app/index.tsx (docs/03 §6).
     ['expo-splash-screen', { backgroundColor: FOREST }],
+    ...e2ePlugins,
   ],
   experiments: {
     typedRoutes: true,

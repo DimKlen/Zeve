@@ -1,0 +1,45 @@
+# docs/05 parcours 5 — ajout par photo. La reconnaissance est bouchonnée côté serveur
+# (IDENTIFY_MOCK_SPECIES=monstera dans supabase/functions/.env). La prise de vue dépend de
+# l'application appareil photo de l'émulateur : flow marqué « manual » (lancé à la demande).
+appId: com.zeve.app
+name: 05 — Ajout par photo
+tags:
+  - manual
+---
+- runFlow:
+    file: ../subflows/login.yaml
+    env:
+      EMAIL: camille@zeve.test
+- extendedWaitUntil:
+    visible: "Ajouter une plante"
+    timeout: 15000
+- tapOn: "Ajouter une plante"
+- tapOn: "Prendre une photo.*"
+- tapOn:
+    id: "com.android.permissioncontroller:id/permission_allow_foreground_only_button"
+    optional: true
+- tapOn:
+    id: "com.android.permissioncontroller:id/permission_allow_button"
+    optional: true
+# Appareil photo de l'émulateur (Camera AOSP / Google) : déclencheur puis validation.
+- tapOn:
+    id: ".*shutter.*"
+    optional: true
+- tapOn:
+    id: ".*(done|ok|confirm).*"
+    optional: true
+- extendedWaitUntil:
+    visible: "Espèce reconnue sur ta photo"
+    timeout: 30000
+- assertVisible: "Monstera"
+- tapOn: "Ex.*Monstera"
+- inputText: "Lianne"
+- tapOn: "Ajouter au jardin"
+- extendedWaitUntil:
+    visible: "Lianne est chez elle.*"
+    timeout: 15000
+- tapOn: "Voir sa fiche"
+- extendedWaitUntil:
+    visible: "Lianne est en forme"
+    timeout: 10000
+- assertVisible: "Pousse, .*"

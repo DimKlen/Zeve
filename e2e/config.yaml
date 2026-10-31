@@ -1,0 +1,16 @@
+# Suite Maestro (docs/05 « Parcours clés »). Ordre imposé : les parcours partagent le compte
+# de démo Camille ; la fiche (04) remet Gaston dans son état, l'arrosage (03) passe après.
+flows:
+  - flows/*
+excludeTags:
+  - manual
+executionOrder:
+  continueOnFailure: false
+  flowsOrder:
+    - 02 — Lien magique
+    - 04 — Fiche et annulation
+    - 07 — Chat
+    - 06 — Ajout par la liste
+    - 03 — Arrosage quotidien
+    - 08 — Déconnexion
+    - 01 — Premier lancement

@@ -1,0 +1,24 @@
+# docs/05 parcours 1 — premier lancement : nouveau compte → Bienvenue · rappels → Activer → Jardin vide.
+# Le parcours Google passe par le navigateur de Google : testé à la main (voir e2e/README.md).
+# Ici, même parcours avec un compte neuf par lien magique.
+appId: com.zeve.app
+name: 01 — Premier lancement
+---
+- evalScript: ${output.email = 'e2e+' + Date.now() + '@zeve.test'}
+- runFlow:
+    file: ../subflows/login.yaml
+    env:
+      EMAIL: ${output.email}
+- extendedWaitUntil:
+    visible: "Bienvenue.*"
+    timeout: 15000
+- assertVisible: "Tes plantes t'enverront un petit mot.*"
+- tapOn: "Activer les rappels"
+# Autorisation des notifications (Android 13+), si le système la demande.
+- tapOn:
+    id: "com.android.permissioncontroller:id/permission_allow_button"
+    optional: true
+- extendedWaitUntil:
+    visible: "Ton jardin est vide"
+    timeout: 15000
+- assertVisible: "Ajouter ma première plante"

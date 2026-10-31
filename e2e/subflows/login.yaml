@@ -1,0 +1,29 @@
+# Connexion par lien magique (docs/05 parcours 2), utilisée par les autres flows.
+# Variable : EMAIL. Le Supabase local et Mailpit doivent tourner (npm run db:start).
+appId: com.zeve.app
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible: "Continuer avec un e-mail"
+    timeout: 15000
+- runScript: ../scripts/clear-mailbox.js
+- tapOn: "Continuer avec un e-mail"
+- tapOn: "nom@exemple.fr"
+- inputText: ${EMAIL}
+- tapOn: "Recevoir un lien de connexion"
+- extendedWaitUntil:
+    visible: "Lien envoyé.*"
+    timeout: 10000
+- retry:
+    maxRetries: 5
+    commands:
+      - runScript:
+          file: ../scripts/magic-link.js
+          env:
+            EMAIL: ${EMAIL}
+- openLink: ${output.link}
+# « Connexion en cours » dure au moins 1.8 s.
+- extendedWaitUntil:
+    visible: "Connexion via.*"
+    timeout: 10000

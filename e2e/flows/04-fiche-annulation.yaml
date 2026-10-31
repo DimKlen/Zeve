@@ -1,0 +1,27 @@
+# docs/05 parcours 4 — arrosage depuis la fiche puis annulation : Gaston revient à l'état assoiffé.
+appId: com.zeve.app
+name: 04 — Fiche et annulation
+---
+- runFlow:
+    file: ../subflows/login.yaml
+    env:
+      EMAIL: camille@zeve.test
+- extendedWaitUntil:
+    visible: "Gaston, .*"
+    timeout: 15000
+- tapOn: "Gaston, .*"
+- extendedWaitUntil:
+    visible: "Gaston a soif"
+    timeout: 10000
+- assertVisible: "J.ai un peu soif.*9 j sans eau.*"
+- tapOn: "J.ai arrosé"
+- assertVisible: "Gaston est en forme"
+- assertVisible: "Merci.*Prochain arrosage dans 8 j.*"
+- assertVisible: "Gaston te dit merci.*"
+- tapOn: "Arrosé aujourd.hui · annuler"
+- extendedWaitUntil:
+    visible: "Gaston a soif"
+    timeout: 10000
+- assertVisible: "J.ai arrosé"
+- tapOn: "Retour au jardin"
+- assertVisible: "6 plantes · 2 ont soif aujourd.hui"
