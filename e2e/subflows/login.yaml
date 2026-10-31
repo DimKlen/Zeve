@@ -13,7 +13,9 @@ appId: com.zeve.app
 - tapOn:
     id: "email-input"
 - inputText: ${EMAIL}
-- tapOn: "Recevoir un lien de connexion"
+# Envoi par la touche du clavier (action « send » → onSubmitEditing) : pendant que la vue
+# s'ajuste au clavier, la position du bouton bouge et un tap à coordonnées peut tomber à côté.
+- pressKey: Enter
 - extendedWaitUntil:
     visible: "Lien envoyé.*"
     timeout: 10000
