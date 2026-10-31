@@ -21,6 +21,8 @@ name: 06 — Ajout par la liste
 - extendedWaitUntil:
     visible: "5 espèces"
     timeout: 5000
+# Le clavier masque le bas de la liste (Figuier lyre).
+- hideKeyboard
 - assertVisible: "Ficus benjamina, .*"
 - tapOn: "Figuier lyre, .*"
 - assertVisible: "Espèce choisie"
