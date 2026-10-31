@@ -9,7 +9,9 @@ appId: com.zeve.app
     timeout: 15000
 - runScript: ../scripts/clear-mailbox.js
 - tapOn: "Continuer avec un e-mail"
-- tapOn: "nom@exemple.fr"
+# Champ identifié par son testID (resource-id Android) : le texte indicatif n'est pas fiable.
+- tapOn:
+    id: "email-input"
 - inputText: ${EMAIL}
 - tapOn: "Recevoir un lien de connexion"
 - extendedWaitUntil:

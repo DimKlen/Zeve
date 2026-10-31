@@ -1,6 +1,6 @@
 import * as WebBrowser from 'expo-web-browser';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, StyleSheet, Text, View } from 'react-native';
+import { KeyboardAvoidingView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { IconSend } from '@/components/icons';
@@ -53,7 +53,7 @@ export default function LoginScreen() {
     <Screen name="login" edges={['top']}>
       <KeyboardAvoidingView
         style={[styles.root, { paddingBottom: Math.max(insets.bottom, space.x5) }]}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior="padding"
       >
         <View style={styles.hero}>
           <MascotTrio />
@@ -138,6 +138,7 @@ function EmailSection() {
         <View style={styles.field}>
           <TextField
             variant="email"
+            testID="email-input"
             value={email}
             onChangeText={(value) => {
               setEmail(value);

@@ -79,7 +79,7 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back emulated
           script: |
             adb install -r android/app/build/outputs/apk/release/app-release.apk
-            maestro test e2e --format junit --output maestro-report.xml --debug-output maestro-debug
+            maestro test e2e --format junit --output maestro-report.xml
 
       - name: Publier l'APK, le rapport et les captures
         if: always()
@@ -89,5 +89,5 @@ jobs:
           path: |
             android/app/build/outputs/apk/release/app-release.apk
             maestro-report.xml
-            maestro-debug
+            ~/.maestro/tests
           if-no-files-found: warn

@@ -1,14 +1,6 @@
 import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import {
-  FlatList,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { FlatList, KeyboardAvoidingView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ChatBubble } from '@/components/ChatBubble';
@@ -97,10 +89,7 @@ export default function ChatScreen() {
 
   return (
     <Screen name="chat" edges={['top']}>
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
+      <KeyboardAvoidingView style={styles.flex} behavior="padding">
         <View style={styles.header}>
           <IconButton
             accessibilityLabel={t('chat.backA11y')}
@@ -201,6 +190,7 @@ export default function ChatScreen() {
           <View style={styles.field}>
             <TextField
               variant="chat"
+              testID="chat-input"
               value={draft}
               onChangeText={setDraft}
               accessibilityLabel={t('chat.inputA11y')}

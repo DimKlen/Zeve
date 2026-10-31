@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { Modal, Pressable, StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView, Modal, Pressable, StyleSheet } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useReducedMotion,
@@ -49,7 +49,8 @@ export function BottomSheet({ visible, onClose, children }: Props) {
 
   return (
     <Modal transparent visible={mounted} onRequestClose={onClose} statusBarTranslucent>
-      <View style={styles.root}>
+      {/* La feuille remonte au-dessus du clavier (champs : renommer, nouvelle pièce…). */}
+      <KeyboardAvoidingView style={styles.root} behavior="padding">
         <Animated.View style={[StyleSheet.absoluteFill, styles.overlay, overlay]}>
           <Pressable
             style={StyleSheet.absoluteFill}
@@ -64,7 +65,7 @@ export function BottomSheet({ visible, onClose, children }: Props) {
         >
           {children}
         </Animated.View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

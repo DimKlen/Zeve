@@ -32,7 +32,8 @@ tags:
     visible: "Espèce reconnue sur ta photo"
     timeout: 30000
 - assertVisible: "Monstera"
-- tapOn: "Ex.*Monstera"
+- tapOn:
+    id: "plant-name"
 - inputText: "Lianne"
 - tapOn: "Ajouter au jardin"
 - extendedWaitUntil:

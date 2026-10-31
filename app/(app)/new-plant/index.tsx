@@ -1,6 +1,6 @@
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BottomSheet } from '@/components/BottomSheet';
@@ -93,89 +93,93 @@ export default function NewPlantScreen() {
 
   return (
     <Screen name="newPlant" enter="up" edges={['top']}>
-      <View style={styles.header}>
-        <ScreenHeader
-          title={t('newPlant.title')}
-          onBack={close}
-          backLabel={t('newPlant.backA11y')}
-        />
-      </View>
-      <ScrollView contentContainerStyle={styles.form} keyboardShouldPersistTaps="handled">
-        <SpeciesPicker
-          speciesId={draft.speciesId}
-          source={draft.source}
-          confidence={draft.confidence}
-          recognizing={draft.status === 'recognizing'}
-          onPhoto={() => void recognize()}
-          onList={() => go('species')}
-        />
-
-        <TextField
-          label={t('newPlant.nameLabel')}
-          value={draft.name}
-          onChangeText={(name) => draft.set({ name })}
-          placeholder={
-            species
-              ? t('newPlant.namePlaceholder', { species: species.name })
-              : t('newPlant.namePlaceholderDefault')
-          }
-          maxLength={NAME_MAX}
-          returnKeyType="done"
-        />
-
-        <View style={styles.group}>
-          <Text style={styles.label}>{t('newPlant.room')}</Text>
-          <View style={styles.chips}>
-            {(rooms.data ?? []).map((room) => (
-              <Chip
-                key={room.id}
-                label={room.name}
-                variant="room"
-                selected={room.id === draft.roomId}
-                onPress={() => draft.set({ roomId: room.id })}
-              />
-            ))}
-            <Chip
-              label={`+ ${t('newPlant.addRoom')}`}
-              variant="room"
-              onPress={() => setRoomSheet(true)}
-            />
-          </View>
+      {/* Clavier (nom de la plante) : la page et le CTA du pied remontent, Android compris. */}
+      <KeyboardAvoidingView style={styles.flex} behavior="padding">
+        <View style={styles.header}>
+          <ScreenHeader
+            title={t('newPlant.title')}
+            onBack={close}
+            backLabel={t('newPlant.backA11y')}
+          />
         </View>
+        <ScrollView contentContainerStyle={styles.form} keyboardShouldPersistTaps="handled">
+          <SpeciesPicker
+            speciesId={draft.speciesId}
+            source={draft.source}
+            confidence={draft.confidence}
+            recognizing={draft.status === 'recognizing'}
+            onPhoto={() => void recognize()}
+            onList={() => go('species')}
+          />
 
-        <View style={styles.group}>
-          <Text style={styles.label}>{t('newPlant.light')}</Text>
-          <View style={styles.lights}>
-            {LIGHTS.map((l) => (
-              <View key={l.id} style={styles.light}>
-                <LightOption
-                  label={l.label}
-                  hint={l.hint}
-                  selected={draft.light === l.id}
-                  onPress={() => draft.set({ light: l.id })}
+          <TextField
+            label={t('newPlant.nameLabel')}
+            testID="plant-name"
+            value={draft.name}
+            onChangeText={(name) => draft.set({ name })}
+            placeholder={
+              species
+                ? t('newPlant.namePlaceholder', { species: species.name })
+                : t('newPlant.namePlaceholderDefault')
+            }
+            maxLength={NAME_MAX}
+            returnKeyType="done"
+          />
+
+          <View style={styles.group}>
+            <Text style={styles.label}>{t('newPlant.room')}</Text>
+            <View style={styles.chips}>
+              {(rooms.data ?? []).map((room) => (
+                <Chip
+                  key={room.id}
+                  label={room.name}
+                  variant="room"
+                  selected={room.id === draft.roomId}
+                  onPress={() => draft.set({ roomId: room.id })}
                 />
-              </View>
-            ))}
+              ))}
+              <Chip
+                label={`+ ${t('newPlant.addRoom')}`}
+                variant="room"
+                onPress={() => setRoomSheet(true)}
+              />
+            </View>
           </View>
-          {lightTip && (
-            <Rise key={lightTip}>
-              <Text style={styles.tip} accessibilityLiveRegion="polite">
-                {lightTip}
-              </Text>
-            </Rise>
-          )}
-        </View>
-      </ScrollView>
 
-      <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, space.x5) }]}>
-        <Button
-          label={species ? t('newPlant.add') : t('newPlant.addDisabled')}
-          disabled={!species}
-          loading={create.isPending}
-          icon={(c) => <IconPlus size={20} color={c} strokeWidth={2.4} />}
-          onPress={add}
-        />
-      </View>
+          <View style={styles.group}>
+            <Text style={styles.label}>{t('newPlant.light')}</Text>
+            <View style={styles.lights}>
+              {LIGHTS.map((l) => (
+                <View key={l.id} style={styles.light}>
+                  <LightOption
+                    label={l.label}
+                    hint={l.hint}
+                    selected={draft.light === l.id}
+                    onPress={() => draft.set({ light: l.id })}
+                  />
+                </View>
+              ))}
+            </View>
+            {lightTip && (
+              <Rise key={lightTip}>
+                <Text style={styles.tip} accessibilityLiveRegion="polite">
+                  {lightTip}
+                </Text>
+              </Rise>
+            )}
+          </View>
+        </ScrollView>
+
+        <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, space.x5) }]}>
+          <Button
+            label={species ? t('newPlant.add') : t('newPlant.addDisabled')}
+            disabled={!species}
+            loading={create.isPending}
+            icon={(c) => <IconPlus size={20} color={c} strokeWidth={2.4} />}
+            onPress={add}
+          />
+        </View>
+      </KeyboardAvoidingView>
 
       <NewRoomSheet
         visible={roomSheet}
@@ -238,6 +242,7 @@ function NewRoomSheet({
 }
 
 const styles = StyleSheet.create({
+  flex: { flex: 1 },
   header: { paddingTop: space.xs, paddingHorizontal: layout.screenPadDetail },
   form: {
     paddingVertical: space.xl,

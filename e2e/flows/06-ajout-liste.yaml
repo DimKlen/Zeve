@@ -15,7 +15,8 @@ name: 06 — Ajout par la liste
 - assertVisible: "Choisis d.abord son espèce"
 - tapOn: "Choisir dans la liste.*"
 - assertVisible: "52 espèces · 19 types"
-- tapOn: "Rechercher une espèce"
+- tapOn:
+    id: "species-search"
 - inputText: "fic"
 - extendedWaitUntil:
     visible: "5 espèces"
@@ -28,7 +29,8 @@ name: 06 — Ajout par la liste
 - tapOn: "Cactus & succulentes"
 - tapOn: "Echeveria, .*"
 - assertVisible: "Echeveria"
-- tapOn: "Ex.*Echeveria"
+- tapOn:
+    id: "plant-name"
 - inputText: "Lianne"
 - hideKeyboard
 - tapOn: "Ombre, loin des fenêtres"
