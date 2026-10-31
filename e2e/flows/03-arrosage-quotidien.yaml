@@ -15,7 +15,6 @@ name: 03 — Arrosage quotidien
 - tapOn:
     text: "J'ai arrosé"
     index: 0
-- assertVisible: "Gaston te dit merci.*"
 - assertVisible: "Arrosé"
 - assertVisible: "6 plantes · 1 a soif aujourd.hui"
 - assertVisible: "Gaston, .*Arrosée · eau dans 8 j"

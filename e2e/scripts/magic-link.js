@@ -4,9 +4,19 @@
 // (Chrome sur émulateur n'ouvre pas toujours un schéma personnalisé sans geste de l'utilisateur).
 var MAILPIT = 'http://127.0.0.1:55324';
 
-var search = http.get(MAILPIT + '/api/v1/search?query=' + encodeURIComponent('to:' + EMAIL));
-var messages = json(search.body).messages;
-if (!messages || messages.length === 0) {
+// L'envoi est asynchrone : on interroge Mailpit jusqu'à 15 s (le moteur JS n'a pas de sleep).
+var searchUrl = MAILPIT + '/api/v1/search?query=' + encodeURIComponent('to:' + EMAIL);
+var deadline = Date.now() + 15000;
+var messages = [];
+while (Date.now() < deadline) {
+  messages = json(http.get(searchUrl).body).messages || [];
+  if (messages.length > 0) break;
+  var pause = Date.now() + 500;
+  while (Date.now() < pause) {
+    // attente active entre deux requêtes
+  }
+}
+if (messages.length === 0) {
   throw new Error('Aucun e-mail reçu pour ' + EMAIL + ' (le flow réessaie).');
 }
 var message = json(http.get(MAILPIT + '/api/v1/message/' + messages[0].ID).body);

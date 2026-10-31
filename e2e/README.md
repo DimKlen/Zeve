@@ -35,3 +35,9 @@ L'ordre est fixé dans `config.yaml` (les parcours partagent le compte de démo)
 | 1 avec Google / Apple | page du fournisseur, comptes réels | à la main sur téléphone : Connexion → Google → choix du compte → Bienvenue → Jardin |
 | 5 (photo) | dépend de l'appareil photo de l'émulateur | `maestro test e2e/flows/05-ajout-photo.yaml` (tag `manual`) ou à la main |
 | Notifications | heure réelle du rappel | Réglages → heure dans 2 min, app fermée, plante assoiffée → notification → tap → fiche |
+
+## Toasts
+
+Les flows n'affirment jamais un toast : ils restent 2.6 s et `tapOn` attend que l'écran se
+stabilise, souvent plus longtemps. On vérifie l'effet durable (compteur, jauge, écran d'arrivée) ;
+les toasts sont couverts par les tests unitaires.

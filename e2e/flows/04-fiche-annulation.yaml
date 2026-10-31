@@ -17,7 +17,6 @@ name: 04 — Fiche et annulation
 - tapOn: "J.ai arrosé"
 - assertVisible: "Gaston est en forme"
 - assertVisible: "Merci.*Prochain arrosage dans 8 j.*"
-- assertVisible: "Gaston te dit merci.*"
 - tapOn: "Arrosé aujourd.hui · annuler"
 - extendedWaitUntil:
     visible: "Gaston a soif"
