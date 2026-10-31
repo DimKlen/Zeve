@@ -61,6 +61,7 @@ export default function SpeciesScreen() {
         />
         <TextField
           variant="search"
+          testID="species-search"
           value={input}
           onChangeText={setInput}
           accessibilityLabel={t('species.searchLabel')}
