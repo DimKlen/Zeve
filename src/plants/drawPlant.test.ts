@@ -11,9 +11,9 @@ const FORMS = Object.keys(PLANT_FORMS) as PlantForm[];
 const sampleOf = (form: PlantForm) => SPECIES.find((s) => s.form === form)!.id;
 
 describe('catalogue', () => {
-  it('a 19 types de dessin et 58 espèces', () => {
+  it('a 19 types de dessin et 220 espèces', () => {
     expect(FORMS).toHaveLength(19);
-    expect(SPECIES).toHaveLength(58);
+    expect(SPECIES).toHaveLength(220);
   });
 
   it('chaque espèce a un type existant et chaque type a au moins une espèce et ses infos', () => {

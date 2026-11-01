@@ -14,21 +14,28 @@ name: 06 — Ajout par la liste
 - assertVisible: "Nouvelle plante"
 - assertVisible: "Choisis d.abord son espèce"
 - tapOn: "Choisir dans la liste.*"
-- assertVisible: "58 espèces · 19 types"
+- assertVisible: "220 espèces · 19 types"
 - tapOn:
     id: "species-search"
 - inputText: "fic"
 - extendedWaitUntil:
-    visible: "5 espèces"
+    visible: "13 espèces"
     timeout: 5000
 # Le clavier masque le bas de la liste (Figuier lyre).
 - hideKeyboard
 - assertVisible: "Ficus benjamina, .*"
+# 13 résultats : Figuier lyre est plus bas dans la liste.
+- scrollUntilVisible:
+    element: "Figuier lyre, .*"
+    direction: DOWN
 - tapOn: "Figuier lyre, .*"
 - assertVisible: "Espèce choisie"
 - assertVisible: "Figuier lyre"
 - tapOn: "Changer"
 - tapOn: "Cactus & succulentes"
+- scrollUntilVisible:
+    element: "Echeveria, .*"
+    direction: DOWN
 - tapOn: "Echeveria, .*"
 - assertVisible: "Echeveria"
 - tapOn:
