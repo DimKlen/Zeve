@@ -43,7 +43,7 @@ describe('matchSpecies', () => {
   });
 
   it('propose les autres espèces du genre en alternatives', () => {
-    const id = matchSpecies([result('Ficus microcarpa', 0.6)], catalog);
+    const id = matchSpecies([result('Ficus maclellandii', 0.6)], catalog);
     expect(id.speciesId).toBe('benjamina');
     expect(id.alternatives).toEqual(['caoutchouc', 'lyrata']);
   });

@@ -59,12 +59,12 @@ jobs:
       - name: Démarrer Postgres et appliquer les migrations
         run: npx supabase db start
 
-      # Critère de la Phase 0 (docs/09) : tables créées et 58 espèces (52 du design + 6 de 0004).
+      # Critère de la Phase 0 (docs/09) : tables créées et 220 espèces (52 du design + 168 de 0004 et 0005).
       - name: Vérifier le seed des espèces
         run: |
           count=$(psql "postgresql://postgres:postgres@127.0.0.1:55322/postgres" -tAc "select count(*) from public.species")
           echo "Espèces : $count"
-          test "$count" -eq 58
+          test "$count" -eq 220
 
       # Échoue si src/lib/database.types.ts n'a pas été régénéré après une migration.
       - name: Types de la base à jour

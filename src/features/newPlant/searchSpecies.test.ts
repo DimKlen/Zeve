@@ -8,24 +8,32 @@ import { searchSpecies, waterEveryDaysOf } from './searchSpecies';
 const names = (list: { name: string }[]) => list.map((s) => s.name);
 
 describe('searchSpecies', () => {
-  it('liste les 58 espèces par ordre alphabétique sans filtre', () => {
+  it('liste les 220 espèces par ordre alphabétique sans filtre', () => {
     const all = searchSpecies('');
-    expect(all).toHaveLength(58);
-    expect(all[0]!.name).toBe('Agave');
+    expect(all).toHaveLength(220);
+    expect(all[0]!.name).toBe('Aechmea');
   });
 
-  it('« fic » trouve Ficus benjamina et Figuier lyre, aussi par le type (capture 12b)', () => {
+  it('« fic » trouve les ficus et Figuier lyre, aussi par le type et le nom latin (capture 12b)', () => {
     expect(names(searchSpecies('fic'))).toEqual([
       'Avocatier',
+      'Caféier',
       'Caoutchouc',
+      'Ficus altissima',
+      'Ficus Audrey',
       'Ficus benjamina',
+      'Ficus ginseng',
+      'Ficus rampant',
+      'Figuier',
       'Figuier lyre',
+      'Mélisse',
+      'Sauge',
       'Schefflera',
     ]);
   });
 
   it('ignore accents et majuscules, cherche aussi le nom latin', () => {
-    expect(names(searchSpecies('BEGONIA'))).toEqual(['Bégonia']);
+    expect(names(searchSpecies('BEGONIA'))).toEqual(['Bégonia', 'Bégonia maculata', 'Bégonia rex']);
     expect(names(searchSpecies('ocimum'))).toEqual(['Basilic']);
   });
 
