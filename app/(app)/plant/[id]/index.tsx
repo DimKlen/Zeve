@@ -16,6 +16,7 @@ import { statusOf } from '@/features/garden/gardenRules';
 import { MascotScene } from '@/features/plant/MascotScene';
 import { PlantOptionsSheet } from '@/features/plant/PlantOptionsSheet';
 import { t } from '@/i18n';
+import { SHOW_GROWTH_CARD } from '@/lib/config';
 import { go, goBack } from '@/motion/transitions';
 import { moodBubble, sinceText } from '@/plants/plantStatus';
 import { a11y, colors, control, layout, radius, space, type } from '@/theme';
@@ -121,15 +122,17 @@ export default function PlantScreen() {
             />
           </Rise>
 
-          <Rise delay="d3" style={styles.card}>
-            <View style={styles.growthHeader}>
-              <Text style={styles.overline}>{t('plant.growth')}</Text>
-              <Text style={styles.since}>
-                {t('plant.since', { since: sinceText(s.daysSinceCreated) })}
-              </Text>
-            </View>
-            <GrowthSteps stage={s.stage} />
-          </Rise>
+          {SHOW_GROWTH_CARD && (
+            <Rise delay="d3" style={styles.card}>
+              <View style={styles.growthHeader}>
+                <Text style={styles.overline}>{t('plant.growth')}</Text>
+                <Text style={styles.since}>
+                  {t('plant.since', { since: sinceText(s.daysSinceCreated) })}
+                </Text>
+              </View>
+              <GrowthSteps stage={s.stage} />
+            </Rise>
+          )}
 
           <Rise delay="d3" style={[styles.card, styles.tipCard]}>
             <Text style={styles.overline}>{t('plant.tip')}</Text>
