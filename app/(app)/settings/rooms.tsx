@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BottomSheet } from '@/components/BottomSheet';
@@ -18,7 +18,7 @@ import { useRoomMutations } from '@/features/settings/api';
 import { t } from '@/i18n';
 import { confirm } from '@/lib/confirm';
 import { goBack } from '@/motion/transitions';
-import { colors, layout, space, type } from '@/theme';
+import { layout, makeStyles, space, type } from '@/theme';
 
 const NAME_MAX = 24;
 const UNIQUE_VIOLATION = '23505';
@@ -28,6 +28,7 @@ const countLabel = (n: number) =>
 
 /** Mes pièces (non maquetté, docs/04 §10) : liste, ajout, renommage, suppression. */
 export default function RoomsScreen() {
+  const styles = useStyles();
   const insets = useSafeAreaInsets();
   const { data: rooms = [] } = useRooms();
   const { data: plants = [] } = usePlants();
@@ -85,6 +86,7 @@ function RoomSheet({
   position: number;
   onClose: () => void;
 }) {
+  const styles = useStyles();
   const isNew = room === 'new';
   const [name, setName] = useState(room && room !== 'new' ? room.name : '');
   const [error, setError] = useState<string | undefined>();
@@ -146,10 +148,10 @@ function RoomSheet({
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   header: { paddingTop: space.xs, paddingHorizontal: layout.screenPadDetail },
   content: { padding: layout.screenPadDetail },
   empty: { ...type.small, color: colors.inkMuted, textAlign: 'center', marginTop: space.x5 },
   footer: { paddingTop: space.sm, paddingHorizontal: layout.screenPadDetail },
   sheet: { gap: space.m },
-});
+}));

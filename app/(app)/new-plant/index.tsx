@@ -1,6 +1,6 @@
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { KeyboardAvoidingView, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BottomSheet } from '@/components/BottomSheet';
@@ -22,7 +22,7 @@ import { t } from '@/i18n';
 import { go, goBack } from '@/motion/transitions';
 import { FORM_INFO, LIGHT_TIPS, type Light } from '@/plants/careInfo';
 import { SPECIES_BY_ID } from '@/plants/species';
-import { colors, layout, space, type } from '@/theme';
+import { layout, makeStyles, space, type } from '@/theme';
 
 const LIGHTS: { id: Light; label: string; hint: string }[] = [
   { id: 'ombre', label: t('newPlant.lightShade'), hint: t('newPlant.lightShadeHint') },
@@ -34,6 +34,7 @@ const DEFAULT_ROOM = 'Salon';
 
 /** Nouvelle plante (docs/04 §11), ouverte uniquement depuis le + du jardin. */
 export default function NewPlantScreen() {
+  const styles = useStyles();
   const insets = useSafeAreaInsets();
   const draft = useNewPlantDraft();
   const rooms = useRooms();
@@ -203,6 +204,7 @@ function NewRoomSheet({
   onClose: () => void;
   onCreated: (roomId: string) => void;
 }) {
+  const styles = useStyles();
   const [name, setName] = useState('');
   const createRoom = useCreateRoom();
   const save = () =>
@@ -241,7 +243,7 @@ function NewRoomSheet({
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   flex: { flex: 1 },
   header: { paddingTop: space.xs, paddingHorizontal: layout.screenPadDetail },
   form: {
@@ -257,4 +259,4 @@ const styles = StyleSheet.create({
   tip: { ...type.caption, color: colors.warnText },
   footer: { paddingTop: space.sm, paddingHorizontal: layout.screenPadDetail },
   sheet: { gap: space.m },
-});
+}));

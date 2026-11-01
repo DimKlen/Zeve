@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { useReducedMotion } from 'react-native-reanimated';
 
 import { AddedBadge } from '@/components/AddedBadge';
@@ -38,7 +38,7 @@ import { goBack } from '@/motion/transitions';
 import type { Stage } from '@/plants/drawPlant';
 import { PlantAvatar } from '@/plants/PlantAvatar';
 import { CATEGORIES } from '@/plants/careInfo';
-import { colors, layout, space, type } from '@/theme';
+import { layout, makeStyles, space, type, useColors } from '@/theme';
 
 // Page « kitchen sink » (Phase 1) : chaque composant dans tous ses états, pour la comparaison visuelle.
 const ROOMS = ['Salon', 'Chambre', 'Cuisine'];
@@ -49,6 +49,8 @@ const LIGHTS = [
 ];
 
 export default function DevKitchenScreen() {
+  const colors = useColors();
+  const styles = useStyles();
   const reduced = useReducedMotion();
   const [thirsty, setThirsty] = useState(true);
   const [stage, setStage] = useState<Stage>(3);
@@ -331,6 +333,7 @@ export default function DevKitchenScreen() {
 }
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
+  const styles = useStyles();
   return (
     <Rise style={styles.section}>
       <Text style={styles.sectionTitle} accessibilityRole="header">
@@ -341,7 +344,7 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   content: {
     padding: layout.screenPadDetail,
     gap: space.x4,
@@ -359,4 +362,4 @@ const styles = StyleSheet.create({
   toggleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   toggleLabel: { ...type.bodyS, fontFamily: type.cardTitle.fontFamily, color: colors.ink },
   tiles: { flexDirection: 'row', gap: space.sm },
-});
+}));

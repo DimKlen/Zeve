@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 
 import { Button } from '@/components/Button';
@@ -10,7 +10,7 @@ import { t } from '@/i18n';
 import { usePop } from '@/motion/useEnter';
 import { PlantAvatar } from '@/plants/PlantAvatar';
 import { SPECIES, SPECIES_BY_ID } from '@/plants/species';
-import { colors, radius, space, type } from '@/theme';
+import { makeStyles, radius, space, type, useColors } from '@/theme';
 
 import { typeLabel } from './searchSpecies';
 
@@ -35,6 +35,8 @@ export function SpeciesPicker({
   onPhoto,
   onList,
 }: Props) {
+  const colors = useColors();
+  const styles = useStyles();
   if (recognizing) {
     return (
       <View
@@ -107,6 +109,7 @@ function SpeciesCard({
   unsure: boolean;
   onChange: () => void;
 }) {
+  const styles = useStyles();
   const species = SPECIES_BY_ID[speciesId]!;
   const pop = usePop(speciesId, true);
   return (
@@ -134,6 +137,7 @@ function SpeciesCard({
 
 /** « Changer » : contour strongBorder, h 44, pilule. */
 function ChangeButton({ onPress }: { onPress: () => void }) {
+  const styles = useStyles();
   return (
     <View style={styles.change}>
       <Button
@@ -147,7 +151,7 @@ function ChangeButton({ onPress }: { onPress: () => void }) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   block: { gap: space.s },
   label: { ...type.label, color: colors.inkMuted },
   choices: { flexDirection: 'row', gap: space.sm },
@@ -202,4 +206,4 @@ const styles = StyleSheet.create({
   type: { ...type.micro, color: colors.forestText },
   change: { flexShrink: 0 },
   unsure: { ...type.caption, color: colors.warnText },
-});
+}));

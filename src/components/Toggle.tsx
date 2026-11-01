@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Pressable, StyleSheet } from 'react-native';
+import { Pressable } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useReducedMotion,
@@ -8,7 +8,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { duration, ease } from '@/motion';
-import { colors, control, layout, shadow } from '@/theme';
+import { control, layout, makeStyles, shadow, useColors } from '@/theme';
 
 import { useColorTransition } from './useColorTransition';
 
@@ -25,6 +25,8 @@ const TRAVEL = w - knob - PAD * 2;
 
 /** Interrupteur 56×34 (docs/02 §7) : fond et position animés en 250 ms. */
 export function Toggle({ value, onValueChange, accessibilityLabel, disabled = false }: Props) {
+  const colors = useColors();
+  const styles = useStyles();
   const reduced = useReducedMotion();
   const bg = useColorTransition(value ? colors.forest2 : colors.strongBorder, duration.toggle);
   const x = useSharedValue(value ? TRAVEL : 0);
@@ -53,7 +55,7 @@ export function Toggle({ value, onValueChange, accessibilityLabel, disabled = fa
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   track: { width: w, height: h, borderRadius: h / 2, padding: PAD },
   knob: { width: knob, height: knob, borderRadius: knob / 2, backgroundColor: colors.white },
-});
+}));

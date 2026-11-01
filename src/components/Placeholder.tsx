@@ -1,7 +1,7 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import type { ScreenKey } from '@/motion/transitions';
-import { colors, type } from '@/theme';
+import { makeStyles, type } from '@/theme';
 
 import { Screen } from './Screen';
 
@@ -14,6 +14,7 @@ type Props = {
 
 // Écran vide de la Phase 0 : remplacé écran par écran à partir de la Phase 2.
 export function Placeholder({ name, route, tone = 'light' }: Props) {
+  const styles = useStyles();
   return (
     <Screen name={name} tone={tone} refocusEnter={name === 'garden' ? 'fade' : 'back'}>
       <View style={styles.center}>
@@ -23,8 +24,8 @@ export function Placeholder({ name, route, tone = 'light' }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   route: { ...type.subTitle, color: colors.forest },
   routeDark: { color: colors.darkText },
-});
+}));

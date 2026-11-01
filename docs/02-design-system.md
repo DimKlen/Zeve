@@ -45,6 +45,15 @@ Toutes les valeurs sont dans `reference/theme.ts` (à copier en `src/theme/index
 ### Couleurs des plantes
 Chaque espèce a 3 couleurs (`a` feuille principale, `b` secondaire, `f` fleur/fruit) dans `reference/plants/species.ts`. Constantes du dessin : tige #3F6B45 (assoiffée #6E7A4A), nervure #EAF0DE, détail foncé #2F5A3A, tronc #7A5A3A. Plante assoiffée : `a` et `b` mélangées à 50 % avec #B5A85E.
 
+### Mode sombre (ajout hors design, Réglages → « Mode sombre »)
+Non maquetté : mêmes rôles que la palette claire, valeurs dans `darkColors` (`src/theme/colors.ts`).
+Fond vert nuit `#121A15`, surfaces `#1C2620` ; les verts « forêt » deviennent clairs (`#A9D18E` : titres,
+boutons pleins), les fonds teintés (sauge, beurre) s'assombrissent, le jaune `#E8B931` reste.
+Rôles ajoutés pour que les deux palettes divergent proprement : `onSun` (texte sur le jaune), `heroBg`
+(lancement, plante ajoutée : restent vert forêt), `sheet`, `onLight`, `toastIcon`, `navBg` / `onNav`.
+Les écrans lisent les couleurs via `useColors()` / `makeStyles()` ; contrastes testés dans
+`src/theme/colors.test.ts` (≥ 4.5:1 dans les deux modes). Le choix est gardé sur l'appareil.
+
 ## 2. Typographie
 Paquets : `@expo-google-fonts/bricolage-grotesque` (500, 700) et `@expo-google-fonts/figtree` (400, 500, 600, 700). Écran de lancement natif maintenu jusqu'au chargement des polices.
 

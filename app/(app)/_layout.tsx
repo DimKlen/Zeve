@@ -1,13 +1,14 @@
 import { Redirect, Stack } from 'expo-router';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 
 import { useAuthStore } from '@/features/auth/authStore';
 import { useProfile } from '@/features/auth/profile';
 import { useNotificationTaps } from '@/features/notifications/useNotificationTaps';
-import { colors } from '@/theme';
+import { makeStyles } from '@/theme';
 
 /** Garde (docs/05) : session obligatoire, onboarding fait. */
 export default function AppLayout() {
+  const styles = useStyles();
   const ready = useAuthStore((s) => s.ready);
   const session = useAuthStore((s) => s.session);
   const { data: profile, isPending } = useProfile();
@@ -32,6 +33,6 @@ function ConnectedApp() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   blank: { flex: 1, backgroundColor: colors.bg },
-});
+}));

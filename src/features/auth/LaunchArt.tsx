@@ -11,7 +11,7 @@ import Animated, {
 import Svg, { Circle, Path } from 'react-native-svg';
 
 import { ease, splashTimings } from '@/motion';
-import { colors } from '@/theme';
+import { useColors } from '@/theme';
 
 const APath = Animated.createAnimatedComponent(Path);
 
@@ -30,6 +30,7 @@ const origin = (x: number, y: number) => `${(x / W) * 100}% ${(y / H) * 100}%`;
 
 /** Tige qui se dessine, feuilles qui poussent, bourgeon (docs/03 §6). */
 export function LaunchArt() {
+  const colors = useColors();
   const reduced = useReducedMotion();
   const stem = useSharedValue(reduced ? 0 : STEM_LENGTH);
   const leafL = useSharedValue(reduced ? 1 : 0);

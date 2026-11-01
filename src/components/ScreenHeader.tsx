@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
-import { a11y, colors, control, space, type } from '@/theme';
+import { a11y, control, makeStyles, space, type } from '@/theme';
 
 import { IconBack } from './icons';
 import { IconButton } from './IconButton';
@@ -19,6 +19,7 @@ type Props = {
 
 /** En-tête : bouton retour 44 + titre (docs/02 §7). Centré si `subtitle` ou `right` est fourni. */
 export function ScreenHeader({ title, onBack, backLabel, caption, subtitle, right }: Props) {
+  const styles = useStyles();
   const back = (
     <IconButton
       accessibilityLabel={backLabel}
@@ -73,7 +74,7 @@ export function ScreenHeader({ title, onBack, backLabel, caption, subtitle, righ
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   row: { flexDirection: 'row', alignItems: 'center', gap: space.m },
   centered: { justifyContent: 'space-between' },
   titleColumn: { flexShrink: 1 },
@@ -83,4 +84,4 @@ const styles = StyleSheet.create({
   plantName: { ...type.plantName, color: colors.forest },
   subtitle: { ...type.caption, fontStyle: 'italic', color: colors.inkMuted },
   spacer: { width: control.roundIcon },
-});
+}));

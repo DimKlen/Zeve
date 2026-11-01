@@ -1,6 +1,6 @@
 import * as WebBrowser from 'expo-web-browser';
 import { useEffect, useRef, useState, type ComponentRef } from 'react';
-import { Keyboard, KeyboardAvoidingView, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Keyboard, KeyboardAvoidingView, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { IconSend } from '@/components/icons';
@@ -24,10 +24,11 @@ import { isValidEmail } from '@/features/auth/rules';
 import { t } from '@/i18n';
 import { PRIVACY_URL, TERMS_URL } from '@/lib/config';
 import { go } from '@/motion/transitions';
-import { a11y, colors, control, layout, space, type } from '@/theme';
+import { a11y, control, layout, makeStyles, space, type } from '@/theme';
 
 /** Connexion (docs/04 §2) : Google, Apple, e-mail par lien magique. */
 export default function LoginScreen() {
+  const styles = useStyles();
   const insets = useSafeAreaInsets();
   const [busy, setBusy] = useState(false);
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
@@ -117,6 +118,7 @@ export default function LoginScreen() {
 
 /** « Continuer avec un e-mail » remplacé par le formulaire du lien magique. */
 function EmailSection() {
+  const styles = useStyles();
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [error, setError] = useState<string | undefined>();
@@ -190,6 +192,7 @@ function EmailSection() {
 
 /** Mentions légales avec liens vers les pages web. */
 function Legal() {
+  const styles = useStyles();
   const parts = t('login.legal').split(/(\{terms\}|\{privacy\})/);
   const open = (url: string) => void WebBrowser.openBrowserAsync(url);
   return (
@@ -214,7 +217,7 @@ function Legal() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   root: { flex: 1 },
   content: { flexGrow: 1, paddingHorizontal: layout.screenPadTabs },
   hero: {
@@ -235,4 +238,4 @@ const styles = StyleSheet.create({
   help: { ...type.caption, color: colors.inkMuted },
   legal: { ...type.micro, lineHeight: 17.4, color: colors.inkMuted, textAlign: 'center' },
   link: { color: colors.forest, textDecorationLine: 'underline' },
-});
+}));

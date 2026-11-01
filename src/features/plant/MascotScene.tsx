@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { useColorTransition } from '@/components/useColorTransition';
@@ -7,7 +7,7 @@ import { duration } from '@/motion';
 import { usePop } from '@/motion/useEnter';
 import type { Stage } from '@/plants/drawPlant';
 import { PlantAvatar } from '@/plants/PlantAvatar';
-import { colors, radius, shadow, space, type } from '@/theme';
+import { makeStyles, radius, shadow, space, type, useColors } from '@/theme';
 
 type Props = {
   name: string;
@@ -24,6 +24,8 @@ const HALO = 250;
 
 /** Scène de la fiche (docs/04 §8) : halo, bulle d'humeur, mascotte 230 px. */
 export function MascotScene({ name, speciesId, stage, thirsty, bubble, dropsKey }: Props) {
+  const colors = useColors();
+  const styles = useStyles();
   const halo = useColorTransition(thirsty ? colors.butter : colors.sage, duration.colorChange);
   const haloStyle = useAnimatedStyle(() => ({ backgroundColor: halo.value }));
   const pop = usePop(bubble);
@@ -53,7 +55,7 @@ export function MascotScene({ name, speciesId, stage, thirsty, bubble, dropsKey 
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   scene: { height: SCENE_H, alignItems: 'center', justifyContent: 'flex-end' },
   halo: {
     position: 'absolute',
@@ -79,4 +81,4 @@ const styles = StyleSheet.create({
     paddingHorizontal: space.m,
   },
   bubbleText: { ...type.small, lineHeight: 19, color: colors.ink },
-});
+}));

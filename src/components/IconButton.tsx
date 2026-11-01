@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 import { StyleSheet } from 'react-native';
 
-import { colors, control, shadow } from '@/theme';
+import { control, shadow, useColors, type Palette } from '@/theme';
 
 import { PressableScale } from './PressableScale';
 
@@ -20,12 +20,12 @@ type Props = {
   size?: number;
 };
 
-const BG: Record<Variant, string> = {
+const bgOf = (colors: Palette): Record<Variant, string> => ({
   surface: colors.surface,
   sun: colors.sun,
   sage: colors.sage,
   forest: colors.forest,
-};
+});
 
 /** Bouton rond à icône (docs/02 §7). */
 export function IconButton({
@@ -37,7 +37,8 @@ export function IconButton({
   size: forcedSize,
 }: Props) {
   const size = forcedSize ?? (variant === 'surface' ? control.roundIcon : control.roundIconL);
-  const fg = variant === 'forest' ? colors.bg : colors.forest;
+  const colors = useColors();
+  const fg = variant === 'forest' ? colors.bg : variant === 'sun' ? colors.onSun : colors.forest;
   return (
     <PressableScale
       onPress={onPress}
@@ -47,7 +48,12 @@ export function IconButton({
       accessibilityState={{ disabled }}
       style={[
         styles.base,
-        { width: size, height: size, borderRadius: size / 2, backgroundColor: BG[variant] },
+        {
+          width: size,
+          height: size,
+          borderRadius: size / 2,
+          backgroundColor: bgOf(colors)[variant],
+        },
         variant === 'sun' && shadow.plusButton,
       ]}
     >

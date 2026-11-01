@@ -11,14 +11,16 @@ import Animated, {
 
 import { t } from '@/i18n';
 import { duration, ease } from '@/motion';
-import { colors, space, type } from '@/theme';
+import { space, type, useColors } from '@/theme';
 
 import { IconSpinner } from './icons';
 
 type Props = { size?: number; color?: string };
 
 /** Arc de chargement qui tourne (spin 1.1 s linéaire). Mouvement réduit : arc fixe + « Chargement… ». */
-export function Spinner({ size = 30, color = colors.forest }: Props) {
+export function Spinner({ size = 30, color: colorProp }: Props) {
+  const colors = useColors();
+  const color = colorProp ?? colors.forest;
   const reduced = useReducedMotion();
   const rotation = useSharedValue(0);
 

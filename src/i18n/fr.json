@@ -138,6 +138,8 @@
     "remindersHint": "Quand une plante a soif",
     "reminderTime": "Heure du rappel",
     "rooms": "Mes pièces",
+    "darkMode": "Mode sombre",
+    "darkModeHint": "Un fond sombre, plus doux le soir",
     "privacy": "Confidentialité",
     "logout": "Se déconnecter",
     "logoutConfirm": "Se déconnecter de Zeve ?",

@@ -10,7 +10,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { t } from '@/i18n';
 import { duration, ease } from '@/motion';
-import { colors, radius, space } from '@/theme';
+import { makeStyles, radius, space } from '@/theme';
 
 type Props = {
   visible: boolean;
@@ -22,6 +22,7 @@ const OFFSCREEN = 600;
 
 /** Feuille du bas (docs/02 §7) : voile en fondu 300 ms, feuille qui monte en 500 ms. */
 export function BottomSheet({ visible, onClose, children }: Props) {
+  const styles = useStyles();
   const insets = useSafeAreaInsets();
   const reduced = useReducedMotion();
   const [mounted, setMounted] = useState(visible);
@@ -70,14 +71,14 @@ export function BottomSheet({ visible, onClose, children }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   root: { flex: 1, justifyContent: 'flex-end' },
   overlay: { backgroundColor: colors.overlay },
   sheet: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.sheet,
     borderTopLeftRadius: radius.sheet,
     borderTopRightRadius: radius.sheet,
     paddingTop: space.l,
     paddingHorizontal: space.l,
   },
-});
+}));

@@ -1,7 +1,7 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { t } from '@/i18n';
-import { colors, control, space, type } from '@/theme';
+import { control, makeStyles, space, type, useColors } from '@/theme';
 
 import { LogoApple, LogoGoogle } from './icons';
 import { PressableScale } from './PressableScale';
@@ -17,6 +17,8 @@ type Props = {
  * Google blanc + contour strongBorder ; Apple noir, texte blanc.
  */
 export function ProviderButton({ provider, onPress, disabled = false }: Props) {
+  const colors = useColors();
+  const styles = useStyles();
   const google = provider === 'google';
   const label = t(google ? 'login.google' : 'login.apple');
   return (
@@ -31,12 +33,12 @@ export function ProviderButton({ provider, onPress, disabled = false }: Props) {
       <View style={styles.logo}>
         {google ? <LogoGoogle /> : <LogoApple color={colors.white} />}
       </View>
-      <Text style={[styles.label, { color: google ? colors.ink : colors.white }]}>{label}</Text>
+      <Text style={[styles.label, { color: google ? colors.onLight : colors.white }]}>{label}</Text>
     </PressableScale>
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   base: {
     height: control.providerButton,
     borderRadius: control.providerButton / 2,
@@ -49,4 +51,4 @@ const styles = StyleSheet.create({
   apple: { backgroundColor: colors.apple },
   logo: { width: 26, height: 26, alignItems: 'center', justifyContent: 'center' },
   label: { ...type.cardTitle },
-});
+}));

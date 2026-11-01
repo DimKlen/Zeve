@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { FlatList, Text, useWindowDimensions, View } from 'react-native';
 
 import { Screen } from '@/components/Screen';
 import { TextButton } from '@/components/TextButton';
@@ -8,7 +8,7 @@ import { FORM_INFO } from '@/plants/careInfo';
 import { PlantAvatar } from '@/plants/PlantAvatar';
 import { PLANT_FORMS, type PlantForm } from '@/plants/plantForms.generated';
 import { SPECIES } from '@/plants/species';
-import { colors, radius, space, type } from '@/theme';
+import { makeStyles, radius, space, type } from '@/theme';
 
 // Planche des dessins (docs/10, design/screens/15-planche-dessins.png) : 19 types × 3 tailles.
 const FORMS = Object.keys(PLANT_FORMS) as PlantForm[];
@@ -23,6 +23,7 @@ const GAP = 16;
 const CARD_MIN = 200;
 
 export default function DevPlantsScreen() {
+  const styles = useStyles();
   const { width } = useWindowDimensions();
   const pad = width < 600 ? space.l : PAD;
   const columns = Math.max(1, Math.min(5, Math.floor((width - pad * 2 + GAP) / (CARD_MIN + GAP))));
@@ -81,7 +82,7 @@ export default function DevPlantsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   list: { gap: GAP },
   columns: { gap: GAP },
   header: { gap: space.xs, marginBottom: space.m },
@@ -111,4 +112,4 @@ const styles = StyleSheet.create({
   label: { ...type.sectionTitle, color: colors.forest },
   examples: { ...type.micro, color: colors.inkMuted },
   footer: { height: space.x5 },
-});
+}));

@@ -1,13 +1,13 @@
 import DateTimePicker, { type DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { useState } from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import { Platform, Text, View } from 'react-native';
 
 import { BottomSheet } from '@/components/BottomSheet';
 import { Button } from '@/components/Button';
 import { Chip } from '@/components/Chip';
 import { parseTime } from '@/features/notifications/reminderPlan';
 import { t } from '@/i18n';
-import { colors, space, type } from '@/theme';
+import { makeStyles, space, type } from '@/theme';
 
 type Props = {
   visible: boolean;
@@ -28,6 +28,7 @@ const WEB_MINUTES = [0, 15, 30, 45];
  * sur le web, chips heures / minutes.
  */
 export function TimePickerSheet({ visible, value, onClose, onChange }: Props) {
+  const styles = useStyles();
   const initial = parseTime(value);
   const [draft, setDraft] = useState(() => {
     const d = new Date();
@@ -102,8 +103,8 @@ export function TimePickerSheet({ visible, value, onClose, onChange }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   panel: { gap: space.m },
   label: { ...type.label, color: colors.inkMuted },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: space.s },
-});
+}));

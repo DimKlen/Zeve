@@ -1,6 +1,6 @@
 import { Redirect } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -18,10 +18,11 @@ import { t } from '@/i18n';
 import { useNotifEnter } from '@/motion/useEnter';
 import { go } from '@/motion/transitions';
 import { PlantAvatar } from '@/plants/PlantAvatar';
-import { a11y, colors, layout, radius, shadow, space, type } from '@/theme';
+import { a11y, layout, makeStyles, radius, shadow, space, type, useColors } from '@/theme';
 
 /** Bienvenue · rappels (docs/04 §6) : la seule étape d'onboarding. */
 export default function RemindersScreen() {
+  const styles = useStyles();
   const insets = useSafeAreaInsets();
   const session = useAuthStore((s) => s.session);
   const ready = useAuthStore((s) => s.ready);
@@ -95,6 +96,8 @@ export default function RemindersScreen() {
 
 /** Exemple de notification (fixe, illustratif), entrée « notif » délai 0.5 s. */
 function NotificationCard() {
+  const colors = useColors();
+  const styles = useStyles();
   const enter = useNotifEnter();
   return (
     <Animated.View
@@ -115,7 +118,7 @@ function NotificationCard() {
 
 const APP_ICON = 40;
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   root: { flex: 1, paddingHorizontal: layout.screenPadTabs },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: space.sm },
   title: { ...type.onboarding, color: colors.forest, textAlign: 'center' },
@@ -143,4 +146,4 @@ const styles = StyleSheet.create({
   notifText: { flex: 1 },
   notifTitle: { ...type.buttonS, fontFamily: type.button.fontFamily, color: colors.ink },
   notifBody: { ...type.small, color: colors.inkSoft },
-});
+}));

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { RefreshControl, ScrollView, Text, View } from 'react-native';
 
 import { IconPlus } from '@/components/icons';
 import { IconButton } from '@/components/IconButton';
@@ -22,12 +22,14 @@ import { useNewPlantDraft } from '@/features/newPlant/draftStore';
 import { t } from '@/i18n';
 import type { riseDelay } from '@/motion';
 import { go } from '@/motion/transitions';
-import { a11y, colors, layout, space, type } from '@/theme';
+import { a11y, layout, makeStyles, space, type, useColors } from '@/theme';
 
 const DELAYS: (keyof typeof riseDelay)[] = ['d1', 'd2', 'd3', 'd4'];
 
 /** Mon jardin (docs/04 §7). */
 export default function GardenScreen() {
+  const colors = useColors();
+  const styles = useStyles();
   const { data: profile } = useProfile();
   const { data: plants, isError, refetch, isRefetching } = usePlants();
   const { water } = useWatering();
@@ -135,7 +137,7 @@ function pairs<T>(list: T[]): [T, ...T[]][] {
   return out;
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   content: {
     paddingTop: space.xs,
     paddingHorizontal: layout.screenPadTabs,
@@ -151,4 +153,4 @@ const styles = StyleSheet.create({
   grid: { gap: space.m },
   row: { flexDirection: 'row', gap: space.m },
   filler: { flex: 1 },
-});
+}));

@@ -1,14 +1,15 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { Button } from '@/components/Button';
 import { IconPlus } from '@/components/icons';
 import { Rise } from '@/components/Rise';
 import { t } from '@/i18n';
 import { PlantAvatar } from '@/plants/PlantAvatar';
-import { a11y, colors, radius, space, type } from '@/theme';
+import { a11y, makeStyles, radius, space, type } from '@/theme';
 
 /** Jardin vide (non maquetté, docs/04 §7) : trio de pousses, texte et CTA vers Nouvelle plante. */
 export function EmptyGarden({ onAdd }: { onAdd: () => void }) {
+  const styles = useStyles();
   return (
     <Rise delay="d1">
       <View style={styles.card}>
@@ -41,7 +42,7 @@ export function EmptyGarden({ onAdd }: { onAdd: () => void }) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   card: {
     backgroundColor: colors.surface,
     borderRadius: radius.section,
@@ -53,4 +54,4 @@ const styles = StyleSheet.create({
   title: { ...type.buttonL, color: colors.forest, textAlign: 'center' },
   text: { ...type.small, color: colors.inkMuted, textAlign: 'center' },
   cta: { alignSelf: 'stretch', marginTop: space.m },
-});
+}));

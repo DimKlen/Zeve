@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 
 import { BottomSheet } from '@/components/BottomSheet';
 import { Button } from '@/components/Button';
@@ -10,7 +10,7 @@ import { TextField } from '@/components/TextField';
 import { showToast } from '@/components/Toast';
 import type { GardenPlant } from '@/features/garden/gardenRules';
 import { t } from '@/i18n';
-import { colors, space, type } from '@/theme';
+import { makeStyles, space, type } from '@/theme';
 
 import { useRooms, useUpdatePlant, useWateringHistory } from './api';
 
@@ -43,6 +43,7 @@ const dayFormat = new Intl.DateTimeFormat('fr-FR', {
  * Menu « … » de la fiche (non maquetté, docs/04 §8) : feuille du bas, lignes au style des Réglages.
  */
 export function PlantOptionsSheet({ plant, visible, onClose, onDeleted }: Props) {
+  const styles = useStyles();
   const [view, setView] = useState<View_>('menu');
   const [name, setName] = useState(plant.nickname);
   const [every, setEvery] = useState(plant.waterEveryDays);
@@ -185,7 +186,7 @@ export function PlantOptionsSheet({ plant, visible, onClose, onDeleted }: Props)
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   row: {
     minHeight: 52,
     flexDirection: 'row',
@@ -204,4 +205,4 @@ const styles = StyleSheet.create({
   history: { maxHeight: 360 },
   muted: { ...type.small, color: colors.inkMuted, paddingVertical: space.m },
   confirm: { ...type.body, color: colors.ink },
-});
+}));

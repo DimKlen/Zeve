@@ -1,12 +1,12 @@
 import { memo } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { IconCheck } from '@/components/icons';
 import { PressableScale } from '@/components/PressableScale';
 import { t } from '@/i18n';
 import { PlantAvatar } from '@/plants/PlantAvatar';
 import type { Species } from '@/plants/species';
-import { colors, radius, space, type } from '@/theme';
+import { makeStyles, radius, space, type, useColors } from '@/theme';
 
 import { typeLabel } from './searchSpecies';
 
@@ -16,6 +16,8 @@ const CHECK = 28;
 
 /** Ligne de la liste des espèces (docs/02 §7) : dessin Jeune sans visage ni sway. */
 function SpeciesRowBase({ species, selected, onPress }: Props) {
+  const colors = useColors();
+  const styles = useStyles();
   const label = typeLabel(species);
   return (
     <PressableScale
@@ -50,7 +52,7 @@ function SpeciesRowBase({ species, selected, onPress }: Props) {
 
 export const SpeciesRow = memo(SpeciesRowBase);
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   row: {
     minHeight: 72,
     paddingVertical: space.xs,
@@ -82,4 +84,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-});
+}));

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import Animated, {
   cancelAnimation,
   useAnimatedStyle,
@@ -12,10 +12,11 @@ import Animated, {
 
 import { t } from '@/i18n';
 import { duration, ease } from '@/motion';
-import { colors, radius, space, type } from '@/theme';
+import { makeStyles, radius, space, type, useColors } from '@/theme';
 
 /** Indicateur « l'assistant écrit » (docs/03 §5) : 3 points, décalés de 0.2 s. Mouvement réduit : « … ». */
 export function TypingDots() {
+  const styles = useStyles();
   return (
     <View
       style={styles.bubble}
@@ -29,7 +30,10 @@ export function TypingDots() {
 }
 
 /** Les 3 points animés seuls (aussi dans un bouton en cours d'enregistrement). */
-export function Dots({ color = colors.inkMuted }: { color?: string }) {
+export function Dots({ color: colorProp }: { color?: string }) {
+  const colors = useColors();
+  const color = colorProp ?? colors.inkMuted;
+  const styles = useStyles();
   const reduced = useReducedMotion();
   if (reduced) return <Text style={[styles.static, { color }]}>…</Text>;
   return (
@@ -42,6 +46,7 @@ export function Dots({ color = colors.inkMuted }: { color?: string }) {
 }
 
 function Dot({ index, color }: { index: number; color: string }) {
+  const styles = useStyles();
   const progress = useSharedValue(0);
   useEffect(() => {
     progress.set(
@@ -61,7 +66,7 @@ function Dot({ index, color }: { index: number; color: string }) {
   return <Animated.View style={[styles.dot, { backgroundColor: color }, style]} />;
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   bubble: {
     alignSelf: 'flex-start',
     flexDirection: 'row',
@@ -77,4 +82,4 @@ const styles = StyleSheet.create({
   dots: { flexDirection: 'row', gap: 5 },
   dot: { width: 8, height: 8, borderRadius: 4 },
   static: { ...type.bodyS, color: colors.inkMuted },
-});
+}));

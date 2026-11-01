@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { PressableScale } from '@/components/PressableScale';
 import { Rise } from '@/components/Rise';
@@ -7,7 +7,7 @@ import { t } from '@/i18n';
 import type { riseDelay } from '@/motion';
 import { cardStatus } from '@/plants/plantStatus';
 import { PlantAvatar } from '@/plants/PlantAvatar';
-import { colors, radius, space, type } from '@/theme';
+import { makeStyles, radius, space, type, useColors } from '@/theme';
 
 import { statusOf, type GardenPlant } from './gardenRules';
 
@@ -20,6 +20,8 @@ type Props = {
 
 /** Carte du jardin (docs/02 §7 PlantCard, docs/04 §7). */
 function PlantCardBase({ plant, now, delay, onPress }: Props) {
+  const colors = useColors();
+  const styles = useStyles();
   const s = statusOf(plant, now);
   const status = cardStatus(s);
   return (
@@ -57,7 +59,7 @@ function PlantCardBase({ plant, now, delay, onPress }: Props) {
 
 export const PlantCard = memo(PlantCardBase);
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   cell: { flex: 1 },
   card: {
     backgroundColor: colors.surface,
@@ -91,4 +93,4 @@ const styles = StyleSheet.create({
   status: { flexDirection: 'row', alignItems: 'center', gap: space.xs },
   dot: { width: 8, height: 8, borderRadius: 4 },
   statusText: { ...type.caption, color: colors.inkMuted, flexShrink: 1 },
-});
+}));

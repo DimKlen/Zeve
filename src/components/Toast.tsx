@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
-import { AccessibilityInfo, Platform, StyleSheet, Text } from 'react-native';
+import { AccessibilityInfo, Platform, Text } from 'react-native';
 import Animated, { FadeOut, useReducedMotion } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { create } from 'zustand';
 
 import { duration, toastEnter } from '@/motion';
-import { colors, layout, radius, shadow, space, type } from '@/theme';
+import { layout, makeStyles, radius, shadow, space, type, useColors } from '@/theme';
 
 import { IconCheck } from './icons';
 
@@ -29,6 +29,8 @@ export const showToast = (message: string) => useToastStore.getState().show(mess
 
 /** Hôte des toasts, monté une fois dans le layout racine (docs/02 §7). */
 export function ToastHost() {
+  const colors = useColors();
+  const styles = useStyles();
   const { message, key, hide } = useToastStore();
   const insets = useSafeAreaInsets();
   const reduced = useReducedMotion();
@@ -53,13 +55,13 @@ export function ToastHost() {
       accessibilityLiveRegion="polite"
       style={[styles.toast, shadow.toast, { top: insets.top + space.s }]}
     >
-      <IconCheck size={18} color={colors.sun} strokeWidth={2.4} />
+      <IconCheck size={18} color={colors.toastIcon} strokeWidth={2.4} />
       <Text style={styles.text}>{message}</Text>
     </Animated.View>
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   toast: {
     position: 'absolute',
     left: layout.screenPadTabs,
@@ -75,4 +77,4 @@ const styles = StyleSheet.create({
     zIndex: 100,
   },
   text: { ...type.buttonS, color: colors.bg, flexShrink: 1 },
-});
+}));
