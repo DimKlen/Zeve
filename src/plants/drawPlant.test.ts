@@ -30,8 +30,7 @@ describe('catalogue', () => {
     const dir = join(__dirname, '../../supabase/migrations');
     const sql = readdirSync(dir)
       .map((file) => readFileSync(join(dir, file), 'utf8'))
-      .join('
-');
+      .join('\n');
     for (const id of ids) expect(sql).toContain(`'${id}'`);
   });
 });
