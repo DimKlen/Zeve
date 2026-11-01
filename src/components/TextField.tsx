@@ -1,15 +1,7 @@
 import { useId, type ComponentRef, type Ref } from 'react';
-import {
-  Platform,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-  type TextInputProps,
-  type TextStyle,
-} from 'react-native';
+import { Platform, Text, TextInput, View, type TextInputProps, type TextStyle } from 'react-native';
 
-import { colors, control, fonts, radius, space, type } from '@/theme';
+import { control, fonts, makeStyles, radius, space, type, useColors } from '@/theme';
 
 import { IconSearch } from './icons';
 
@@ -40,6 +32,8 @@ export function TextField({
   accessibilityLabel,
   ...input
 }: Props) {
+  const colors = useColors();
+  const styles = useStyles();
   const id = useId();
   const height = HEIGHT[variant];
   const pill = variant !== 'default';
@@ -85,7 +79,7 @@ export function TextField({
 // « none » n'existe que pour React Native Web : absent des types de React Native.
 const WEB_NO_OUTLINE = { outlineWidth: 0, outlineStyle: 'none' } as unknown as TextStyle;
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   wrap: { gap: space.s },
   label: { ...type.label, color: colors.inkMuted },
   input: {
@@ -112,4 +106,4 @@ const styles = StyleSheet.create({
   },
   inputError: { borderColor: colors.danger },
   error: { ...type.caption, color: colors.danger },
-});
+}));

@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
-import { colors, radius, space, type } from '@/theme';
+import { makeStyles, radius, space, type } from '@/theme';
 
 type Props = {
   /** Overline (EAU, LUMIÈRE, AIR). */
@@ -13,6 +13,7 @@ type Props = {
 
 /** Tuile d'info de la fiche (docs/02 §7) : surface, r 18, padding 12, gap 8. */
 export function InfoTile({ title, children, value }: Props) {
+  const styles = useStyles();
   return (
     <View style={styles.tile} accessible accessibilityLabel={`${title} : ${value}`}>
       <Text style={styles.title}>{title}</Text>
@@ -22,7 +23,7 @@ export function InfoTile({ title, children, value }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   tile: {
     flex: 1,
     backgroundColor: colors.surface,
@@ -32,4 +33,4 @@ const styles = StyleSheet.create({
   },
   title: { ...type.overline, color: colors.inkMuted },
   value: { ...type.buttonS, color: colors.ink },
-});
+}));

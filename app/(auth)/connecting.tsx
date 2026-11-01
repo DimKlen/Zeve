@@ -21,7 +21,7 @@ import { queryClient } from '@/lib/queryClient';
 import { duration, ease, flowTimings } from '@/motion';
 import { go } from '@/motion/transitions';
 import { PlantAvatar } from '@/plants/PlantAvatar';
-import { colors, space, type } from '@/theme';
+import { makeStyles, space, type, useColors } from '@/theme';
 
 const PROVIDER_NAME: Record<Provider, string> = {
   google: 'Google',
@@ -36,6 +36,7 @@ const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
  * magique), charge le profil, puis Bienvenue · rappels ou Jardin. Minimum 1.8 s à l'écran.
  */
 export default function ConnectingScreen() {
+  const styles = useStyles();
   const [provider] = useState<Provider>(() => useAuthStore.getState().pending?.provider ?? 'email');
   const started = useRef(false);
 
@@ -83,6 +84,7 @@ const DISC = 200;
 
 /** Disque sauge r 90 + anneau pointillé r 96 qui tourne (spin 1.1 s). */
 function Ring() {
+  const colors = useColors();
   const reduced = useReducedMotion();
   const rotation = useSharedValue(0);
   useEffect(() => {
@@ -116,10 +118,10 @@ function Ring() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: space.x3 },
   disc: { width: DISC, height: DISC, alignItems: 'center', justifyContent: 'center' },
   texts: { alignItems: 'center', gap: space.xs },
   title: { ...type.subTitle, color: colors.forest, textAlign: 'center' },
   subtitle: { ...type.bodyS, color: colors.inkMuted, textAlign: 'center' },
-});
+}));

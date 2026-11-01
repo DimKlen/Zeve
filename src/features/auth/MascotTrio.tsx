@@ -1,7 +1,7 @@
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 
 import { PlantAvatar } from '@/plants/PlantAvatar';
-import { colors } from '@/theme';
+import { makeStyles } from '@/theme';
 
 // Trio de la Connexion (docs/04 §2) : disque butter 220×190 derrière trois mascottes alignées en bas,
 // sway + bob décalés de 1.1 s / 2.2 s.
@@ -9,6 +9,7 @@ const BLOCK = { w: 300, h: 190 };
 const DISC = { w: 220, h: 190 };
 
 export function MascotTrio() {
+  const styles = useStyles();
   return (
     <View
       style={styles.block}
@@ -24,7 +25,7 @@ export function MascotTrio() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   block: {
     width: BLOCK.w,
     height: BLOCK.h,
@@ -41,4 +42,4 @@ const styles = StyleSheet.create({
     borderRadius: DISC.w / 2,
     backgroundColor: colors.butter,
   },
-});
+}));

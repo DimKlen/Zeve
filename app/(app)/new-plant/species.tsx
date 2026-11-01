@@ -1,6 +1,6 @@
 import * as Haptics from 'expo-haptics';
 import { useCallback, useEffect, useState } from 'react';
-import { FlatList, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { FlatList, ScrollView, Text, View } from 'react-native';
 
 import { Button } from '@/components/Button';
 import { Chip } from '@/components/Chip';
@@ -15,13 +15,14 @@ import { t } from '@/i18n';
 import { goBack } from '@/motion/transitions';
 import { CATEGORIES, FORM_INFO, type Category } from '@/plants/careInfo';
 import { SPECIES, type Species } from '@/plants/species';
-import { colors, layout, space, type } from '@/theme';
+import { layout, makeStyles, space, type } from '@/theme';
 
 const DEBOUNCE_MS = 120;
 const FORM_COUNT = Object.keys(FORM_INFO).length;
 
 /** Liste des espèces (docs/04 §12). */
 export default function SpeciesScreen() {
+  const styles = useStyles();
   const selectedId = useNewPlantDraft((s) => s.speciesId);
   const setDraft = useNewPlantDraft((s) => s.set);
   const [input, setInput] = useState('');
@@ -115,7 +116,7 @@ export default function SpeciesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   header: {
     paddingTop: space.xs,
     paddingHorizontal: layout.screenPadDetail,
@@ -131,4 +132,4 @@ const styles = StyleSheet.create({
   empty: { alignItems: 'center', gap: space.s, paddingTop: 60, paddingHorizontal: space.xl },
   emptyTitle: { ...type.cardTitle, fontFamily: type.button.fontFamily, color: colors.forest },
   emptyText: { ...type.small, color: colors.inkMuted, textAlign: 'center', marginBottom: space.s },
-});
+}));

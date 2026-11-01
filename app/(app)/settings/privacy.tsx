@@ -1,6 +1,6 @@
 import * as WebBrowser from 'expo-web-browser';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 
 import { Rise } from '@/components/Rise';
 import { Screen } from '@/components/Screen';
@@ -12,10 +12,11 @@ import { t } from '@/i18n';
 import { PRIVACY_URL } from '@/lib/config';
 import { confirm } from '@/lib/confirm';
 import { go, goBack } from '@/motion/transitions';
-import { colors, layout, space, type } from '@/theme';
+import { layout, makeStyles, space, type } from '@/theme';
 
 /** Confidentialité (non maquetté, docs/06 F10) : politique, export JSON, suppression du compte. */
 export default function PrivacyScreen() {
+  const styles = useStyles();
   const [busy, setBusy] = useState<'export' | 'delete' | null>(null);
 
   const doExport = async () => {
@@ -84,8 +85,8 @@ export default function PrivacyScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   header: { paddingTop: space.xs, paddingHorizontal: layout.screenPadDetail },
   content: { padding: layout.screenPadDetail, gap: space.xl },
   text: { ...type.small, color: colors.inkMuted },
-});
+}));

@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
-import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Pressable, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 
-import { colors, radius, space, type } from '@/theme';
+import { makeStyles, radius, space, type } from '@/theme';
 
 import { IconChevronRight } from './icons';
 
@@ -13,6 +13,7 @@ export function SettingsCard({
   children: ReactNode;
   style?: StyleProp<ViewStyle>;
 }) {
+  const styles = useStyles();
   return <View style={[styles.card, style]}>{children}</View>;
 }
 
@@ -43,6 +44,7 @@ export function SettingsRow({
   onPress,
   accessibilityLabel,
 }: RowProps) {
+  const styles = useStyles();
   const content = (
     <>
       <View style={styles.texts}>
@@ -78,7 +80,7 @@ export function SettingsRow({
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   card: { backgroundColor: colors.surface, borderRadius: radius.section, overflow: 'hidden' },
   row: {
     minHeight: 56,
@@ -97,4 +99,4 @@ const styles = StyleSheet.create({
   hint: { ...type.caption, color: colors.inkMuted },
   end: { flexDirection: 'row', alignItems: 'center', gap: space.xs },
   value: { ...type.bodyS, color: colors.inkMuted },
-});
+}));

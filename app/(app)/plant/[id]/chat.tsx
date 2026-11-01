@@ -1,6 +1,6 @@
 import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { FlatList, KeyboardAvoidingView, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { FlatList, KeyboardAvoidingView, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ChatBubble } from '@/components/ChatBubble';
@@ -27,13 +27,14 @@ import { pickPlantPhoto } from '@/features/newPlant/api';
 import { t, tList } from '@/i18n';
 import { goBack } from '@/motion/transitions';
 import { PlantAvatar } from '@/plants/PlantAvatar';
-import { a11y, colors, control, layout, space, type } from '@/theme';
+import { a11y, control, layout, makeStyles, space, type } from '@/theme';
 
 type Pending = SendInput & { localUri?: string };
 type Failure = { kind: 'quota' | 'failed'; input: Pending };
 
 /** Chat avec la plante (docs/04 §9). */
 export default function ChatScreen() {
+  const styles = useStyles();
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const { data: plant } = usePlant(id);
@@ -214,10 +215,14 @@ export default function ChatScreen() {
   );
 }
 
-const Gap = () => <View style={styles.gap} />;
+function Gap() {
+  const styles = useStyles();
+  return <View style={styles.gap} />;
+}
 
 /** Message en cours d'envoi (affiché tout de suite). */
 function PendingBubbles({ pending }: { pending: Pending }) {
+  const styles = useStyles();
   return (
     <View style={styles.userGroup}>
       {(pending.localUri || pending.photoPath) && (
@@ -242,7 +247,7 @@ function FailureBubble({ failure, onRetry }: { failure: Failure; onRetry: () => 
 
 const AVATAR = control.roundIcon;
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   flex: { flex: 1 },
   header: {
     paddingTop: space.xs,
@@ -285,4 +290,4 @@ const styles = StyleSheet.create({
     gap: space.s,
   },
   field: { flex: 1 },
-});
+}));

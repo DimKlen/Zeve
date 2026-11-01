@@ -1,6 +1,6 @@
 import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 
 import { Button } from '@/components/Button';
 import { IconAir, IconBack, IconCamera, IconDrop, IconMore, IconSun } from '@/components/icons';
@@ -19,10 +19,12 @@ import { t } from '@/i18n';
 import { SHOW_GROWTH_CARD } from '@/lib/config';
 import { go, goBack } from '@/motion/transitions';
 import { moodBubble, sinceText } from '@/plants/plantStatus';
-import { a11y, colors, control, layout, radius, space, type } from '@/theme';
+import { a11y, control, layout, makeStyles, radius, space, type, useColors } from '@/theme';
 
 /** Fiche plante (docs/04 §8). */
 export default function PlantScreen() {
+  const colors = useColors();
+  const styles = useStyles();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: plant, isSuccess } = usePlant(id);
   const { water, undo } = useWatering();
@@ -171,7 +173,7 @@ export default function PlantScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   scroll: { paddingBottom: space.x4 + 2 },
   header: {
     paddingTop: space.xs,
@@ -230,4 +232,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-});
+}));

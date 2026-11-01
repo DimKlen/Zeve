@@ -1,8 +1,8 @@
-import { StyleSheet, Text } from 'react-native';
+import { Text } from 'react-native';
 import { useAnimatedStyle } from 'react-native-reanimated';
 
 import { duration } from '@/motion';
-import { colors, control, radius, space, type } from '@/theme';
+import { control, makeStyles, radius, space, type, useColors } from '@/theme';
 
 import { PressableScale } from './PressableScale';
 import { useColorTransition } from './useColorTransition';
@@ -16,6 +16,8 @@ type Props = {
 
 /** Choix de lumière (docs/02 §7) : h 64 r 16 ; sélectionné fond butter, bordure sunDeep. */
 export function LightOption({ label, hint, selected = false, onPress }: Props) {
+  const colors = useColors();
+  const styles = useStyles();
   const bg = useColorTransition(selected ? colors.butter : colors.surface, duration.chip);
   const border = useColorTransition(selected ? colors.sunDeep : colors.inputBorder, duration.chip);
   const box = useAnimatedStyle(() => ({ backgroundColor: bg.value, borderColor: border.value }));
@@ -33,7 +35,7 @@ export function LightOption({ label, hint, selected = false, onPress }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   base: {
     height: control.lightOption,
     borderRadius: radius.md,
@@ -45,4 +47,4 @@ const styles = StyleSheet.create({
   },
   label: { ...type.label, color: colors.ink },
   hint: { ...type.lightHint, color: colors.inkMuted, textAlign: 'center' },
-});
+}));

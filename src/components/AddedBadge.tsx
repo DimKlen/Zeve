@@ -1,9 +1,9 @@
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import Animated from 'react-native-reanimated';
 
 import { usePop } from '@/motion/useEnter';
 import { PlantAvatar } from '@/plants/PlantAvatar';
-import { colors } from '@/theme';
+import { makeStyles } from '@/theme';
 
 type Props = { speciesId: string; name: string };
 
@@ -11,6 +11,7 @@ const DISC = 170;
 
 /** Disque de « Plante ajoutée » (docs/02 §7) : Ø 170, bordure 6 sun, plante Pousse 130 px (visage simple, sway), entrée pop. */
 export function AddedBadge({ speciesId, name }: Props) {
+  const styles = useStyles();
   const pop = usePop(speciesId, true);
   return (
     <Animated.View
@@ -26,7 +27,7 @@ export function AddedBadge({ speciesId, name }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   disc: {
     width: DISC,
     height: DISC,
@@ -39,4 +40,4 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   plant: { marginBottom: 2 },
-});
+}));

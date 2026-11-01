@@ -1,69 +1,8 @@
 // Tokens de design Zeve — valeurs exactes du prototype Claude Design.
 // Toute couleur / taille utilisée dans l'app DOIT venir d'ici (aucun hex en dur dans les écrans).
+// Couleurs : lues via useColors() / makeStyles() (./scheme), qui suivent le mode clair/sombre.
 
-export const colors = {
-  // Fonds
-  bg: '#F3EEE3', // fond d'app (crème)
-  surface: '#FBF8F1', // cartes, champs, boutons ronds clairs
-  well: '#EDE5D4', // puits des vignettes de plantes, badges neutres
-  surfaceAlt: '#F7F4ED', // en-tête de la feuille OAuth, encadré permissions
-  white: '#FFFFFF',
-
-  // Verts « forêt » (marque)
-  forest: '#1F3D2B', // titres, boutons primaires, barre de nav, écrans sombres (lancement, plante ajoutée)
-  forest2: '#2F5A3A', // état actif sombre, bouton fermer sur fond forest, coche
-  forestText: '#3F5A45', // texte sur fond sauge
-
-  // Texte
-  ink: '#1C2A21', // texte courant, fond du toast
-  inkMuted: '#55604F', // texte secondaire, légendes, overlines
-  inkSoft: '#3A453C', // texte tertiaire sur surfaces claires
-
-  // Accents
-  sun: '#E8B931', // jaune principal : CTA « J'ai arrosé », bouton +, onglet actif, cercle de « Plante ajoutée », bord du pot
-  sunDeep: '#C48A0E', // bord de sélection lumière, icône soleil, ombre du +
-  potBody: '#D6A132', // corps du pot
-  potShadow: '#B88424',
-  butter: '#F6E3A6', // carte « À arroser », halo de soif, chips de suggestion, sélection lumière
-  sage: '#DCE8CF', // halo « en forme », carte chat, avatar, étapes passées, ligne sélectionnée
-  sageDeep: '#CFE0C3', // placeholders photo, reconnaissance en cours
-  sagePale: '#E9EFDF', // bouton « Prendre une photo »
-  sageLine: '#A9B79A', // pointillé du bouton photo
-  sageDash: '#8DAA80', // pointillé photo dans le chat
-
-  // Lignes & bordures
-  line: '#E2D9C6', // séparateurs d'en-tête, bordures d'étapes
-  lineSoft: '#ECE4D3', // séparateurs de lignes de réglages
-  inputBorder: '#D8CFBB', // champs, chips non sélectionnées
-  strongBorder: '#CFC6B2', // bouton Google, bouton « Changer », bouton + (ancien)
-  track: '#E6DDCB', // piste de la jauge d'eau
-
-  // Sémantique
-  water: '#3E77A8', // jauge d'eau, gouttes
-  thirstyDot: '#D99A12', // pastille « A soif »
-  okDot: '#4F8350', // pastille « Eau dans… »
-  danger: '#A23B1F', // « Se déconnecter »
-  warnText: '#8A5A00', // conseil de lumière
-  blush: '#E98B6B', // joues de la mascotte
-  disabledBg: '#B9B4A6',
-  disabledFg: '#2E3530',
-
-  // Écrans sombres (lancement, plante ajoutée)
-  darkText: '#F3EEE3',
-  darkMuted: '#C9D6C0',
-
-  // Lancement
-  splashStem: '#8DB46A',
-  splashLeaf: '#6E9F4E',
-
-  // Boutons fournisseurs
-  apple: '#141414',
-  appleRing: '#5A5A5A',
-
-  overlay: 'rgba(15,30,20,0.45)',
-  todoRow: 'rgba(251,248,241,0.7)',
-  badgeBg: 'rgba(251,248,241,0.85)',
-} as const;
+export { darkColors, lightColors, type Palette } from './colors';
 
 export const fonts = {
   display: 'BricolageGrotesque_700Bold', // titres (opsz auto)
@@ -217,5 +156,11 @@ export const control = {
 /** Accessibilité (docs/11) : titres limités à 130 % de la taille de police du système. */
 export const a11y = { maxTitleScale: 1.3 } as const;
 
-export const theme = { colors, fonts, type, space, layout, radius, shadow, control, a11y };
-export type Theme = typeof theme;
+export {
+  makeStyles,
+  useColorScheme,
+  useColors,
+  useSchemeHydrated,
+  useSchemeStore,
+  type ColorScheme,
+} from './scheme';

@@ -1,10 +1,10 @@
 import type { ReactElement } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { duration } from '@/motion';
 import { usePop } from '@/motion/useEnter';
-import { colors, control, space, type } from '@/theme';
+import { control, makeStyles, space, type, useColors, type Palette } from '@/theme';
 
 import { PressableScale } from './PressableScale';
 import { Dots } from './TypingDots';
@@ -28,20 +28,20 @@ type Props = {
   accessibilityHint?: string;
 };
 
-const BG: Record<ButtonVariant, string> = {
+const bgOf = (colors: Palette): Record<ButtonVariant, string> => ({
   primary: colors.forest,
   sun: colors.sun,
   sage: colors.sage,
   secondary: 'transparent',
   outline: 'transparent',
-};
-const FG: Record<ButtonVariant, string> = {
+});
+const fgOf = (colors: Palette): Record<ButtonVariant, string> => ({
   primary: colors.bg,
-  sun: colors.forest,
+  sun: colors.onSun,
   sage: colors.forest,
   secondary: colors.forest,
   outline: colors.forest,
-};
+});
 const HEIGHT: Record<Size, number> = {
   l: control.primaryButton,
   water: control.waterButton,
@@ -63,9 +63,11 @@ export function Button({
   popKey,
   accessibilityHint,
 }: Props) {
+  const colors = useColors();
+  const styles = useStyles();
   const inactive = disabled || loading;
-  const bg = disabled ? colors.disabledBg : BG[variant];
-  const fg = disabled ? colors.disabledFg : FG[variant];
+  const bg = disabled ? colors.disabledBg : bgOf(colors)[variant];
+  const fg = disabled ? colors.disabledFg : fgOf(colors)[variant];
 
   const bgValue = useColorTransition(bg, duration.buttonBg);
   const animatedBg = useAnimatedStyle(() => ({ backgroundColor: bgValue.value }));
@@ -107,11 +109,11 @@ export function Button({
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   base: { alignItems: 'center', justifyContent: 'center', paddingHorizontal: space.l },
   compact: { alignSelf: 'flex-start', paddingHorizontal: space.l },
   secondary: { borderWidth: 1.5, borderColor: colors.forest },
   // « Changer » de la carte espèce : contour clair.
   outline: { borderWidth: 1.5, borderColor: colors.strongBorder },
   content: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
-});
+}));

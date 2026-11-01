@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 
 import { Button } from '@/components/Button';
@@ -6,7 +6,7 @@ import { IconCheck, IconDrop } from '@/components/icons';
 import { Rise } from '@/components/Rise';
 import { t } from '@/i18n';
 import { usePop } from '@/motion/useEnter';
-import { a11y, colors, control, radius, space, type } from '@/theme';
+import { a11y, control, makeStyles, radius, space, type, useColors } from '@/theme';
 
 import type { GardenPlant, TodoItem } from './gardenRules';
 
@@ -18,7 +18,10 @@ type Props = {
 };
 
 /** Carte « À arroser aujourd'hui » (docs/04 §7). */
-export function TodoCard({ items, onWater, accent = colors.butter }: Props) {
+export function TodoCard({ items, onWater, accent: accentProp }: Props) {
+  const colors = useColors();
+  const accent = accentProp ?? colors.butter;
+  const styles = useStyles();
   return (
     <Rise delay="d1">
       <View style={[styles.card, { backgroundColor: accent }]}>
@@ -41,6 +44,7 @@ export function TodoCard({ items, onWater, accent = colors.butter }: Props) {
 }
 
 function TodoRow({ item, onWater }: { item: TodoItem; onWater: (plant: GardenPlant) => void }) {
+  const styles = useStyles();
   const { plant, done, sinceLabel } = item;
   const subtitle = plant.roomName ? `${plant.roomName} · ${sinceLabel}` : sinceLabel;
   return (
@@ -64,6 +68,8 @@ function TodoRow({ item, onWater }: { item: TodoItem; onWater: (plant: GardenPla
 
 /** « ✓ Arrosé » qui apparaît en pop. */
 function DoneBadge() {
+  const colors = useColors();
+  const styles = useStyles();
   const pop = usePop('done', true);
   return (
     <Animated.View
@@ -78,7 +84,7 @@ function DoneBadge() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   card: { borderRadius: radius.section, padding: space.l, gap: space.m },
   header: { flexDirection: 'row', alignItems: 'center', gap: space.s },
   title: { ...type.sectionTitle, color: colors.forest },
@@ -104,4 +110,4 @@ const styles = StyleSheet.create({
     paddingHorizontal: space.ml,
   },
   doneText: { ...type.buttonS, color: colors.forest2 },
-});
+}));

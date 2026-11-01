@@ -1,8 +1,8 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { t } from '@/i18n';
 import type { Stage } from '@/plants/drawPlant';
-import { colors, radius, space, type } from '@/theme';
+import { makeStyles, radius, space, type, useColors } from '@/theme';
 
 import { IconSprout } from './icons';
 
@@ -16,6 +16,8 @@ const STEPS: { stage: Stage; icon: number }[] = [
 
 /** Étapes de croissance (docs/02 §7) : actuelle forest, passée sauge, future crème bordée. */
 export function GrowthSteps({ stage }: Props) {
+  const colors = useColors();
+  const styles = useStyles();
   return (
     <View style={styles.row}>
       {STEPS.map((step) => {
@@ -43,7 +45,7 @@ export function GrowthSteps({ stage }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   row: { flexDirection: 'row', gap: space.s },
   step: {
     flex: 1,
@@ -56,4 +58,4 @@ const styles = StyleSheet.create({
     gap: space.xs,
   },
   hint: { ...type.hint, color: colors.inkMuted },
-});
+}));

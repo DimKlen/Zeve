@@ -1,6 +1,6 @@
 import { StyleSheet, Text } from 'react-native';
 
-import { colors, control, type } from '@/theme';
+import { control, type, useColors } from '@/theme';
 
 import { PressableScale } from './PressableScale';
 
@@ -13,7 +13,9 @@ type Props = {
 };
 
 /** Bouton texte transparent, h 48, Figtree 600 15 (docs/02 §7). */
-export function TextButton({ label, onPress, underline = false, color = colors.forest }: Props) {
+export function TextButton({ label, onPress, underline = false, color: colorProp }: Props) {
+  const colors = useColors();
+  const color = colorProp ?? colors.forest;
   return (
     <PressableScale
       onPress={onPress}

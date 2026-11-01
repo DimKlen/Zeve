@@ -2,7 +2,7 @@ import { Image } from 'expo-image';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { t } from '@/i18n';
-import { colors, radius, space, type } from '@/theme';
+import { makeStyles, radius, space, type, useColors } from '@/theme';
 
 import { Button } from './Button';
 import { IconCamera } from './icons';
@@ -16,6 +16,8 @@ const PHOTO = { w: 190, h: 150 };
 
 /** Bulle de chat (docs/02 §7) : moi à droite (forest), assistant à gauche (surface), photo. */
 export function ChatBubble(props: Props) {
+  const colors = useColors();
+  const styles = useStyles();
   if (props.from === 'photo') {
     return (
       <Rise style={styles.right}>
@@ -65,7 +67,7 @@ export function ChatBubble(props: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   right: { alignSelf: 'flex-end' },
   left: { alignSelf: 'flex-start' },
   meCorner: {
@@ -106,4 +108,4 @@ const styles = StyleSheet.create({
     gap: space.xs,
   },
   photoCaption: { ...type.caption, color: colors.forest2 },
-});
+}));

@@ -1,6 +1,6 @@
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useRef, type ReactNode } from 'react';
-import { StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
+import { type StyleProp, type ViewStyle } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useReducedMotion,
@@ -11,7 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { duration, ease, type ScreenAnim } from '@/motion';
 import { setCurrentScreen, takePendingAnim, type ScreenKey } from '@/motion/transitions';
-import { colors } from '@/theme';
+import { makeStyles } from '@/theme';
 
 type Props = {
   /** Identifiant de l'écran pour la table des transitions (docs/03 §2). */
@@ -47,6 +47,7 @@ export function Screen({
   edges = ['top', 'bottom'],
   style,
 }: Props) {
+  const styles = useStyles();
   const insets = useSafeAreaInsets();
   const reduced = useReducedMotion();
   const firstFocus = useRef(true);
@@ -100,7 +101,7 @@ export function Screen({
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   root: { flex: 1, backgroundColor: colors.bg },
-  dark: { backgroundColor: colors.forest },
-});
+  dark: { backgroundColor: colors.heroBg },
+}));

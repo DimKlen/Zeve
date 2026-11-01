@@ -12,10 +12,11 @@ import {
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import * as SystemUI from 'expo-system-ui';
 import * as WebBrowser from 'expo-web-browser';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
-import { StyleSheet } from 'react-native';
+
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -24,9 +25,9 @@ import { initAuth } from '@/features/auth/auth';
 import { registerWateringMutations } from '@/features/garden/api';
 import { configureNotifications } from '@/features/notifications/schedule';
 import { persistMaxAge, queryClient, queryPersister } from '@/lib/queryClient';
-import { colors } from '@/theme';
+import { makeStyles, useColors, useColorScheme, useSchemeHydrated } from '@/theme';
 
-// Le splash natif (#1F3D2B) reste affiché jusqu'au chargement des polices.
+// Le splash natif (#1F3D2B) reste affiché jusqu'au chargement des polices et du mode clair/sombre.
 void SplashScreen.preventAutoHideAsync();
 // Web : ferme la fenêtre de connexion OAuth et rend la main à l'app.
 WebBrowser.maybeCompleteAuthSession();
@@ -36,6 +37,10 @@ registerWateringMutations(queryClient);
 const persistOptions = { persister: queryPersister, maxAge: persistMaxAge, buster: 'v1' };
 
 export default function RootLayout() {
+  const styles = useStyles();
+  const colors = useColors();
+  const scheme = useColorScheme();
+  const schemeReady = useSchemeHydrated();
   const [fontsLoaded, fontError] = useFonts({
     BricolageGrotesque_500Medium,
     BricolageGrotesque_700Bold,
@@ -44,7 +49,7 @@ export default function RootLayout() {
     Figtree_600SemiBold,
     Figtree_700Bold,
   });
-  const ready = fontsLoaded || fontError !== null;
+  const ready = (fontsLoaded || fontError !== null) && schemeReady;
 
   // Session Supabase restaurée et suivie pendant toute la vie de l'app (docs/06 F1).
   useEffect(() => initAuth(), []);
@@ -52,6 +57,11 @@ export default function RootLayout() {
   useEffect(() => {
     if (ready) void SplashScreen.hideAsync();
   }, [ready]);
+
+  // Fond de la fenêtre native (visible derrière le clavier et pendant les transitions).
+  useEffect(() => {
+    void SystemUI.setBackgroundColorAsync(colors.bg);
+  }, [colors.bg]);
 
   if (!ready) return null;
 
@@ -64,7 +74,7 @@ export default function RootLayout() {
     >
       <GestureHandlerRootView style={styles.root}>
         <SafeAreaProvider>
-          <StatusBar style="dark" />
+          <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
           {/* Transitions maison (docs/03) : la pile native n'anime rien. */}
           <Stack
             screenOptions={{
@@ -90,7 +100,7 @@ export default function RootLayout() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   root: { flex: 1, backgroundColor: colors.bg },
   content: { backgroundColor: colors.bg },
-});
+}));

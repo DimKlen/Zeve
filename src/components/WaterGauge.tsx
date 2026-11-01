@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useReducedMotion,
@@ -8,7 +8,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { duration, ease } from '@/motion';
-import { colors } from '@/theme';
+import { makeStyles } from '@/theme';
 
 type Props = {
   /** Niveau d'eau 0..1 (plantStatus.waterLevel). */
@@ -17,6 +17,7 @@ type Props = {
 
 /** Jauge d'eau (docs/02 §7) : piste h 8 r 4, remplissage animé en 800 ms. */
 export function WaterGauge({ level }: Props) {
+  const styles = useStyles();
   const reduced = useReducedMotion();
   const clamped = Math.min(1, Math.max(0, level));
   const width = useSharedValue(clamped * 100);
@@ -37,7 +38,7 @@ export function WaterGauge({ level }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   track: { height: 8, borderRadius: 4, backgroundColor: colors.track, overflow: 'hidden' },
   fill: { height: 8, borderRadius: 4, backgroundColor: colors.water },
-});
+}));

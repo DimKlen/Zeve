@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { duration } from '@/motion';
-import { colors, control, space, type } from '@/theme';
+import { control, space, type, useColors } from '@/theme';
 
 import { PressableScale } from './PressableScale';
 import { useColorTransition } from './useColorTransition';
@@ -25,6 +25,7 @@ const HEIGHT: Record<Variant, number> = {
 
 /** Chip pilule (docs/02 §7) : fond et couleur animés en 200 ms à la sélection. */
 export function Chip({ label, onPress, selected = false, variant = 'category' }: Props) {
+  const colors = useColors();
   const suggestion = variant === 'suggestion';
   const bg = suggestion ? colors.butter : selected ? colors.forest : colors.surface;
   const border = suggestion ? colors.butter : selected ? colors.forest : colors.inputBorder;

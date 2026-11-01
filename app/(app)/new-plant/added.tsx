@@ -1,7 +1,7 @@
 import * as Haptics from 'expo-haptics';
 import { Redirect } from 'expo-router';
 import { useEffect } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { AddedBadge } from '@/components/AddedBadge';
 import { Button } from '@/components/Button';
@@ -12,10 +12,12 @@ import { showToast } from '@/components/Toast';
 import { useNewPlantDraft } from '@/features/newPlant/draftStore';
 import { t } from '@/i18n';
 import { go } from '@/motion/transitions';
-import { a11y, colors, space, type } from '@/theme';
+import { a11y, makeStyles, space, type, useColors } from '@/theme';
 
 /** Plante ajoutée (docs/04 §13). Le retour système ramène au jardin (pile de la modale vidée). */
 export default function PlantAddedScreen() {
+  const colors = useColors();
+  const styles = useStyles();
   const created = useNewPlantDraft((s) => s.created);
 
   useEffect(() => {
@@ -61,7 +63,7 @@ export default function PlantAddedScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   center: {
     flex: 1,
     alignItems: 'center',
@@ -73,4 +75,4 @@ const styles = StyleSheet.create({
   title: { ...type.added, color: colors.darkText, textAlign: 'center' },
   text: { ...type.bodyS, color: colors.darkMuted, textAlign: 'center', maxWidth: 290 },
   actions: { alignSelf: 'stretch', gap: space.s },
-});
+}));

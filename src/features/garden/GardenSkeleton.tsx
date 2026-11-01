@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import Animated, {
   cancelAnimation,
   useAnimatedStyle,
@@ -11,12 +11,13 @@ import Animated, {
 
 import { t } from '@/i18n';
 import { ease } from '@/motion';
-import { colors, radius, space } from '@/theme';
+import { makeStyles, radius, space } from '@/theme';
 
 const PULSE_MS = 600; // .6 ↔ 1 sur 1.2 s aller-retour
 
 /** Chargement (non maquetté, docs/04 §7) : squelettes des cartes avec pulsation d'opacité. */
 export function GardenSkeleton() {
+  const styles = useStyles();
   const reduced = useReducedMotion();
   const opacity = useSharedValue(1);
   useEffect(() => {
@@ -43,7 +44,7 @@ export function GardenSkeleton() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: space.m },
   card: {
     width: '48%',
@@ -59,4 +60,4 @@ const styles = StyleSheet.create({
   line: { height: 12, borderRadius: 6, backgroundColor: colors.track },
   lineLong: { width: '70%' },
   lineShort: { width: '45%' },
-});
+}));

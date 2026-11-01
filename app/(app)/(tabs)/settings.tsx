@@ -1,6 +1,6 @@
 import Constants from 'expo-constants';
 import { useState } from 'react';
-import { Linking, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Linking, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 
 import { IconCheck } from '@/components/icons';
 import { Rise } from '@/components/Rise';
@@ -18,7 +18,7 @@ import { TimePickerSheet } from '@/features/settings/TimePickerSheet';
 import { t } from '@/i18n';
 import { confirm } from '@/lib/confirm';
 import { go } from '@/motion/transitions';
-import { a11y, colors, layout, radius, space, type } from '@/theme';
+import { a11y, layout, makeStyles, radius, space, type, useColors, useSchemeStore } from '@/theme';
 
 const PROVIDER_NAME: Record<string, string> = {
   google: 'Google',
@@ -29,10 +29,14 @@ const AVATAR = 56;
 
 /** Réglages (docs/04 §10). */
 export default function SettingsScreen() {
+  const colors = useColors();
+  const styles = useStyles();
   const { data: profile } = useProfile();
   const { data: rooms } = useRooms();
   const update = useUpdateProfile();
   const [timeSheet, setTimeSheet] = useState(false);
+  const dark = useSchemeStore((st) => st.scheme === 'dark');
+  const setScheme = useSchemeStore((st) => st.setScheme);
 
   const email = profile?.display_email ?? '';
   const name = profile?.first_name || email.split('@')[0] || '';
@@ -131,6 +135,23 @@ export default function SettingsScreen() {
 
         <Rise delay="d3">
           <SettingsCard>
+            <SettingsRow
+              label={t('settings.darkMode')}
+              hint={t('settings.darkModeHint')}
+              last
+              right={
+                <Toggle
+                  value={dark}
+                  onValueChange={(on) => setScheme(on ? 'dark' : 'light')}
+                  accessibilityLabel={t('settings.darkMode')}
+                />
+              }
+            />
+          </SettingsCard>
+        </Rise>
+
+        <Rise delay="d3">
+          <SettingsCard>
             <SettingsRow label={t('settings.privacy')} chevron onPress={() => go('privacy')} />
             <SettingsRow label={t('settings.logout')} danger last onPress={() => void logout()} />
           </SettingsCard>
@@ -158,7 +179,7 @@ export default function SettingsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   content: {
     paddingTop: space.xs,
     paddingHorizontal: layout.screenPadTabs,
@@ -200,4 +221,4 @@ const styles = StyleSheet.create({
   badgeText: { ...type.micro, fontFamily: type.label.fontFamily, color: colors.inkSoft },
   versionHit: { alignSelf: 'center', padding: space.s },
   version: { ...type.micro, color: colors.inkMuted, textAlign: 'center' },
-});
+}));

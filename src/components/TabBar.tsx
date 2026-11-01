@@ -1,13 +1,13 @@
 import type { BottomTabBarProps } from 'expo-router/tabs';
 import * as Haptics from 'expo-haptics';
 import type { ReactElement } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { t } from '@/i18n';
 import { duration } from '@/motion';
-import { colors, control, radius, shadow, space, type } from '@/theme';
+import { control, makeStyles, radius, shadow, space, type, useColors } from '@/theme';
 
 import { IconSettings, IconSprout } from './icons';
 import { useColorTransition } from './useColorTransition';
@@ -24,6 +24,7 @@ const TABS: Record<TabName, { label: string; icon: (color: string) => ReactEleme
  * Actif : fond sun, texte forest. Elle ne s'anime pas entre les onglets (seul le contenu fait un fondu).
  */
 export function TabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
+  const styles = useStyles();
   const insets = useSafeAreaInsets();
   return (
     <View
@@ -65,11 +66,13 @@ type TabProps = {
 };
 
 function Tab({ label, icon, focused, onPress }: TabProps) {
-  const bg = useColorTransition(focused ? colors.sun : colors.forest, duration.tab);
-  const fg = useColorTransition(focused ? colors.forest : colors.bg, duration.tab);
+  const colors = useColors();
+  const styles = useStyles();
+  const bg = useColorTransition(focused ? colors.sun : colors.navBg, duration.tab);
+  const fg = useColorTransition(focused ? colors.onSun : colors.onNav, duration.tab);
   const box = useAnimatedStyle(() => ({ backgroundColor: bg.value }));
   const text = useAnimatedStyle(() => ({ color: fg.value }));
-  const iconColor = focused ? colors.forest : colors.bg;
+  const iconColor = focused ? colors.onSun : colors.onNav;
   return (
     <Pressable
       onPress={onPress}
@@ -86,14 +89,14 @@ function Tab({ label, icon, focused, onPress }: TabProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   bar: {
     position: 'absolute',
     alignSelf: 'center',
     width: control.navWidth,
     height: control.navHeight,
     borderRadius: radius.nav,
-    backgroundColor: colors.forest,
+    backgroundColor: colors.navBg,
     padding: space.xs,
     flexDirection: 'row',
     gap: space.xs,
@@ -108,4 +111,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: space.s,
   },
-});
+}));

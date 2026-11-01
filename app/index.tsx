@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { useReducedMotion } from 'react-native-reanimated';
 
 import { Rise } from '@/components/Rise';
@@ -12,13 +12,14 @@ import { t } from '@/i18n';
 import { queryClient } from '@/lib/queryClient';
 import { splashTimings } from '@/motion';
 import { go } from '@/motion/transitions';
-import { a11y, colors, space, type } from '@/theme';
+import { a11y, makeStyles, space, type } from '@/theme';
 
 /**
  * Lancement (docs/04 §1) : séquence animée de 2.6 s pendant la restauration de session,
  * puis Connexion, Bienvenue · rappels ou Jardin (fade). Notification d'ouverture : Phase 6.
  */
 export default function LaunchScreen() {
+  const styles = useStyles();
   const reduced = useReducedMotion();
   const ready = useAuthStore((s) => s.ready);
   const session = useAuthStore((s) => s.session);
@@ -74,8 +75,8 @@ export default function LaunchScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: space.l },
   word: { ...type.splash, color: colors.darkText },
   tagline: { ...type.body, color: colors.darkMuted },
-});
+}));
