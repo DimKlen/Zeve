@@ -62,6 +62,18 @@ export const IconAir = ({ size = 22, color = '#4F8350', strokeWidth = 2 }: P) =>
     <Path d="M3 9h11a3 3 0 1 0-3-3M3 15h15a3 3 0 1 1-3 3" {...line(color, strokeWidth)} />
   </S>
 );
+// Ajouts hors prototype (carte « Saison » de la fiche), même style de trait.
+export const IconThermometer = ({ size = 22, color = '#1F3D2B', strokeWidth = 2 }: P) => (
+  <S size={size}>
+    <Path d="M10 13.5V5a2 2 0 1 1 4 0v8.5a4 4 0 1 1-4 0z" {...line(color, strokeWidth)} />
+    <Path d="M12 9v6" {...line(color, strokeWidth)} />
+  </S>
+);
+export const IconHome = ({ size = 22, color = '#1F3D2B', strokeWidth = 2 }: P) => (
+  <S size={size}>
+    <Path d="M4 11l8-7 8 7M6 9.5V20h12V9.5M10 20v-5h4v5" {...line(color, strokeWidth)} />
+  </S>
+);
 export const IconCamera = ({ size = 22, color = '#1F3D2B', strokeWidth = 2 }: P) => (
   <S size={size}>
     <Path d="M4 8h3l2-3h6l2 3h3v11H4z" {...line(color, strokeWidth)} />

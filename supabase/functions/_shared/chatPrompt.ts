@@ -12,6 +12,8 @@ export type PlantContext = {
   lightLabel: string;
   stage: 'Pousse' | 'Jeune' | 'Adulte';
   recentWaterings: string[];
+  /** Saison en cours, en toutes lettres (« automne »). */
+  season: string;
 };
 
 export type ChatAction = { type: 'remind'; days: number; label: string };
@@ -31,6 +33,14 @@ const LIGHT_NAMES: Record<string, string> = {
   soleil: 'plein soleil',
 };
 
+const SEASON_BY_MONTH = [
+  'hiver', 'hiver', 'printemps', 'printemps', 'printemps', 'été',
+  'été', 'été', 'automne', 'automne', 'automne', 'hiver',
+];
+
+/** Saison météorologique de l'hémisphère nord (même découpage que src/plants/seasons.ts). */
+export const seasonNameOf = (date: Date): string => SEASON_BY_MONTH[date.getMonth()]!;
+
 /** Prompt système de docs/07, adapté à Gemini. */
 export function buildSystemPrompt(p: PlantContext): string {
   const home = p.roomName
@@ -45,6 +55,8 @@ export function buildSystemPrompt(p: PlantContext): string {
     `Ton état : dernier arrosage il y a ${p.daysSinceWater} jours (rythme idéal : tous les ${p.waterEveryDays} jours), ` +
       `lumière à ton emplacement : ${LIGHT_NAMES[p.light] ?? p.light}, lumière idéale : ${p.lightLabel}, stade dans l'app : ${p.stage}.`,
     waterings,
+    `Saison actuelle : ${p.season} (France, hémisphère nord). Adapte tes conseils à la saison : ` +
+      'arrosage, lumière, emplacement (intérieur ou dehors), engrais, humidité de l’air et température de la pièce.',
     'Réponds en 2 à 5 phrases, avec des conseils concrets et prudents, en texte simple sans Markdown. ' +
       'Si une photo est fournie, décris ce que tu observes avant de conseiller.',
     'Ne prétends jamais être un professionnel ; en cas de doute sérieux (parasites étendus, pourriture), conseille de demander à un jardinier.',

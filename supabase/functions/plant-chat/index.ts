@@ -9,6 +9,7 @@ import { encodeBase64 } from 'jsr:@std/encoding@1/base64';
 import {
   buildSystemPrompt,
   extractAction,
+  seasonNameOf,
   toGeminiContents,
   type GeminiPart,
   type StoredMessage,
@@ -101,6 +102,7 @@ Deno.serve(async (req) => {
     lightLabel: plant.light_label,
     stage: stageOf(plant.days_since_created),
     recentWaterings: (waterings ?? []).map((w) => shortDate.format(new Date(w.watered_at))),
+    season: seasonNameOf(new Date()),
   });
 
   // Message courant : texte + photo réelle (image en ligne) si fournie.

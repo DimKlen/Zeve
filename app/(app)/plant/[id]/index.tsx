@@ -15,6 +15,7 @@ import { usePlant, useWatering } from '@/features/garden/api';
 import { statusOf } from '@/features/garden/gardenRules';
 import { MascotScene } from '@/features/plant/MascotScene';
 import { PlantOptionsSheet } from '@/features/plant/PlantOptionsSheet';
+import { SeasonCard } from '@/features/plant/SeasonCard';
 import { t } from '@/i18n';
 import { SHOW_GROWTH_CARD } from '@/lib/config';
 import { go, goBack } from '@/motion/transitions';
@@ -139,6 +140,10 @@ export default function PlantScreen() {
           <Rise delay="d3" style={[styles.card, styles.tipCard]}>
             <Text style={styles.overline}>{t('plant.tip')}</Text>
             <Text style={styles.tip}>{plant.tip}</Text>
+          </Rise>
+
+          <Rise delay="d4">
+            <SeasonCard speciesId={plant.speciesId} />
           </Rise>
 
           <Rise delay="d4">

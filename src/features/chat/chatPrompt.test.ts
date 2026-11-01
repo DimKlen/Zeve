@@ -1,6 +1,7 @@
 import {
   buildSystemPrompt,
   extractAction,
+  seasonNameOf,
   toGeminiContents,
   type PlantContext,
 } from '../../../supabase/functions/_shared/chatPrompt';
@@ -16,6 +17,7 @@ const gaston: PlantContext = {
   lightLabel: 'Vive, indirecte',
   stage: 'Adulte',
   recentWaterings: ['21 oct.', '13 oct.'],
+  season: 'automne',
 };
 
 describe('buildSystemPrompt', () => {
@@ -28,6 +30,15 @@ describe('buildSystemPrompt', () => {
     expect(prompt).toContain('lumière à ton emplacement : lumineux, sans soleil direct');
     expect(prompt).toContain('Derniers arrosages : 21 oct., 13 oct.');
     expect(prompt).toContain('"type":"remind"');
+  });
+
+  it('donne la saison pour adapter les conseils', () => {
+    expect(buildSystemPrompt(gaston)).toContain(
+      'Saison actuelle : automne (France, hémisphère nord)',
+    );
+    expect(seasonNameOf(new Date(2026, 0, 5))).toBe('hiver');
+    expect(seasonNameOf(new Date(2026, 6, 5))).toBe('été');
+    expect(seasonNameOf(new Date(2026, 10, 1))).toBe('automne');
   });
 
   it('se passe de pièce et d’arrosages', () => {
