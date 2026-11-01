@@ -44,8 +44,7 @@ describe('waterEveryDaysOf', () => {
     const dir = join(__dirname, '../../../supabase/migrations');
     const sql = readdirSync(dir)
       .map((file) => readFileSync(join(dir, file), 'utf8'))
-      .join('
-');
+      .join('\n');
     for (const s of SPECIES) {
       const row = sql.match(new RegExp(`\\('${s.id}',[^\\n]*?, (\\d+), '`));
       expect(row).not.toBeNull();
