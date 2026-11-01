@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs';
+import { readdirSync, readFileSync } from 'fs';
 import { join } from 'path';
 
 import { FORM_INFO } from './careInfo';
@@ -11,9 +11,9 @@ const FORMS = Object.keys(PLANT_FORMS) as PlantForm[];
 const sampleOf = (form: PlantForm) => SPECIES.find((s) => s.form === form)!.id;
 
 describe('catalogue', () => {
-  it('a 19 types de dessin et 52 espèces', () => {
+  it('a 19 types de dessin et 58 espèces', () => {
     expect(FORMS).toHaveLength(19);
-    expect(SPECIES).toHaveLength(52);
+    expect(SPECIES).toHaveLength(58);
   });
 
   it('chaque espèce a un type existant et chaque type a au moins une espèce et ses infos', () => {
@@ -24,10 +24,14 @@ describe('catalogue', () => {
     }
   });
 
-  it('les ids sont uniques et identiques au seed SQL de la table species', () => {
+  it('les ids sont uniques et présents dans les migrations de la table species', () => {
     const ids = SPECIES.map((s) => s.id);
     expect(new Set(ids).size).toBe(ids.length);
-    const sql = readFileSync(join(__dirname, '../../supabase/migrations/0001_init.sql'), 'utf8');
+    const dir = join(__dirname, '../../supabase/migrations');
+    const sql = readdirSync(dir)
+      .map((file) => readFileSync(join(dir, file), 'utf8'))
+      .join('
+');
     for (const id of ids) expect(sql).toContain(`'${id}'`);
   });
 });

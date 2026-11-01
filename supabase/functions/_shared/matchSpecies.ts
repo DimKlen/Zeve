@@ -1,4 +1,4 @@
-// Correspondance entre les résultats Pl@ntNet (noms latins à jour) et le catalogue Zeve (52 espèces).
+// Correspondance entre les résultats Pl@ntNet (noms latins à jour) et le catalogue Zeve (table species).
 // Module pur, sans API Deno : partagé par l'Edge Function identify-species et testé par Jest.
 
 export type CatalogEntry = { id: string; latin: string };

@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs';
+import { readdirSync, readFileSync } from 'fs';
 import { join } from 'path';
 
 import { SPECIES } from '@/plants/species';
@@ -8,9 +8,9 @@ import { searchSpecies, waterEveryDaysOf } from './searchSpecies';
 const names = (list: { name: string }[]) => list.map((s) => s.name);
 
 describe('searchSpecies', () => {
-  it('liste les 52 espèces par ordre alphabétique sans filtre', () => {
+  it('liste les 58 espèces par ordre alphabétique sans filtre', () => {
     const all = searchSpecies('');
-    expect(all).toHaveLength(52);
+    expect(all).toHaveLength(58);
     expect(all[0]!.name).toBe('Agave');
   });
 
@@ -40,8 +40,12 @@ describe('searchSpecies', () => {
 });
 
 describe('waterEveryDaysOf', () => {
-  it('correspond au rythme de la table species du seed SQL pour les 52 espèces', () => {
-    const sql = readFileSync(join(__dirname, '../../../supabase/migrations/0001_init.sql'), 'utf8');
+  it('correspond au rythme de la table species des migrations pour chaque espèce', () => {
+    const dir = join(__dirname, '../../../supabase/migrations');
+    const sql = readdirSync(dir)
+      .map((file) => readFileSync(join(dir, file), 'utf8'))
+      .join('
+');
     for (const s of SPECIES) {
       const row = sql.match(new RegExp(`\\('${s.id}',[^\\n]*?, (\\d+), '`));
       expect(row).not.toBeNull();

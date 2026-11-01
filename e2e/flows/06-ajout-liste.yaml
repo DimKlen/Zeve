@@ -14,7 +14,7 @@ name: 06 — Ajout par la liste
 - assertVisible: "Nouvelle plante"
 - assertVisible: "Choisis d.abord son espèce"
 - tapOn: "Choisir dans la liste.*"
-- assertVisible: "52 espèces · 19 types"
+- assertVisible: "58 espèces · 19 types"
 - tapOn:
     id: "species-search"
 - inputText: "fic"
