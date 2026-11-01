@@ -1,4 +1,4 @@
-// Catalogue des 52 espèces (source : prototype Claude Design, buildSpecies()).
+// Catalogue des espèces : les 52 du prototype Claude Design (buildSpecies()), puis les ajouts de 0004.
 // a = couleur feuille principale, b = secondaire, f = fleur/fruit/accent.
 import type { PlantForm } from './plantForms.generated';
 
@@ -480,6 +480,61 @@ export const SPECIES: Species[] = [
     a: '#6E9F4E',
     b: '#9CC07A',
     f: '#E8B931',
+  },
+  // Ajouts hors design (supabase/migrations/0004_more_species.sql).
+  {
+    id: 'syngonium',
+    name: 'Syngonium',
+    latin: 'Syngonium podophyllum',
+    form: 'pothos',
+    a: '#5E9A5A',
+    b: '#A9C98F',
+    f: '#E8B931',
+  },
+  {
+    id: 'hoya',
+    name: 'Hoya',
+    latin: 'Hoya carnosa',
+    form: 'pothos',
+    a: '#4A7A4E',
+    b: '#6E9A62',
+    f: '#F08A8A',
+  },
+  {
+    id: 'ceropegia',
+    name: 'Chaîne des cœurs',
+    latin: 'Ceropegia linearis',
+    form: 'pothos',
+    a: '#5E8A6A',
+    b: '#9AB89A',
+    f: '#C9A0B8',
+  },
+  {
+    id: 'alocasia',
+    name: 'Alocasia',
+    latin: 'Alocasia amazonica',
+    form: 'monstera',
+    a: '#2F5E3E',
+    b: '#4E7F58',
+    f: '#E8B931',
+  },
+  {
+    id: 'dieffenbachia',
+    name: 'Dieffenbachia',
+    latin: 'Dieffenbachia seguine',
+    form: 'calathea',
+    a: '#4F8A4E',
+    b: '#B8D49A',
+    f: '#E8B931',
+  },
+  {
+    id: 'croton',
+    name: 'Croton',
+    latin: 'Codiaeum variegatum',
+    form: 'calathea',
+    a: '#4E7F42',
+    b: '#E8B931',
+    f: '#D9534F',
   },
 ];
 
