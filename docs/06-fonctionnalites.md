@@ -113,3 +113,22 @@ Script `supabase/seed.dev.sql` (ou bouton dev) qui crée les 6 plantes de Camill
 - **Pièces** : propres à chaque jardin (5 pièces par défaut créées avec lui).
 - **Noms de plantes** : un nom suggéré est pré-rempli (univers japonais, grec, égyptien, nordique, celte, étoiles),
   « Autre nom » en tire un autre, jamais un nom déjà porté dans le jardin ; le champ reste libre.
+
+## F15. Rythme d'arrosage appris et météo du jardin (ajout hors design)
+- **Apprentissage** : chaque arrosage garde l'intervalle attendu (`watering_events.expected_days`). Les
+  intervalles réels, ramenés aux conditions météo normales, donnent le rythme observé (moyenne qui privilégie
+  les plus récents ; absences > 2× l'attendu et arrosages du même jour ignorés). Module pur partagé app/chat :
+  `supabase/functions/_shared/wateringModel.ts` (réexporté par `src/plants/wateringModel.ts`).
+- **Proposer, jamais imposer** : après 3 intervalles exploitables, si le rythme est stable et diffère d'au
+  moins 1 jour, la fiche affiche « Son vrai rythme » [Adopter] [Plus tard]. Après « Plus tard », rien avant
+  3 nouveaux arrosages.
+- **Météo** : Edge Function `garden-weather` (Open-Meteo, gratuit, sans clé), cache `garden_weather` par jardin
+  et par jour (30 j passés + 7 j de prévisions), rafraîchi au plus toutes les 6 h. Chaque jour « sèche » la
+  terre selon l'évapotranspiration du lieu rapportée à sa normale ; la date d'arrosage est avancée ou retardée
+  d'au plus 2 jours, avec la raison sous la jauge (« Plus tôt : il fait chaud à Montréal »).
+- **Intérieur / extérieur** : les pièces extérieures (`rooms.outdoor`, Balcon par défaut, case « Pièce
+  extérieure » dans Mes pièces) subissent toute la météo ; à l'intérieur, un quart seulement.
+- **Une seule source de vérité** : `dueInfo` sert la jauge, la carte « À arroser », les rappels et le chat.
+  `plant_overview.is_thirsty` reste le calcul brut (rythme fixe) et n'est pas lu par l'app.
+- Local, CI et E2E : `WEATHER_MOCK=1` (météo neutre, aucun effet).
+

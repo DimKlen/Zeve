@@ -11,6 +11,11 @@ name: 08 — Déconnexion
     timeout: 15000
 - tapOn: "Réglages"
 - assertVisible: "camille@zeve.test"
+# Le bas des Réglages passe sous la barre d'onglets flottante : on centre la ligne avant le tap.
+- scrollUntilVisible:
+    element: "Se déconnecter"
+    direction: DOWN
+    centerElement: true
 - tapOn: "Se déconnecter"
 # Alerte native : le bouton de confirmation est le bouton « positif » de la boîte de dialogue.
 - tapOn:

@@ -1,0 +1,34 @@
+# Rythme appris (docs/06 F15) : Frida (rythme 5 j) est arrosée tous les 4 j dans les données de
+# démo → la fiche propose « tous les 4 jours » ; « Adopter » change son rythme.
+appId: com.zeve.app
+name: 09 — Rythme appris
+---
+- runFlow:
+    file: ../subflows/login.yaml
+    env:
+      EMAIL: camille@zeve.test
+- extendedWaitUntil:
+    visible: "Paris 1, .*"
+    timeout: 15000
+- tapOn: "Paris 1, .*"
+- extendedWaitUntil:
+    visible: "Frida, .*"
+    timeout: 10000
+- tapOn: "Frida, .*"
+- extendedWaitUntil:
+    visible: "Goeppertia orbifolia.*"
+    timeout: 10000
+- scrollUntilVisible:
+    element: "Adopter"
+    direction: DOWN
+    centerElement: true
+- assertVisible: "Frida boit plus souvent que prévu.*tous les 4 jours plutôt que 5.*"
+- tapOn: "Adopter"
+- extendedWaitUntil:
+    notVisible: "Adopter"
+    timeout: 10000
+# Le nouveau rythme est celui du menu « Rythme d'arrosage ».
+- tapOn: "Plus d'options"
+- tapOn: "Rythme d'arrosage"
+- assertVisible: "Tous les 4 jours"
+- assertVisible: "Appris d.après tes arrosages.*tous les 4.j"
