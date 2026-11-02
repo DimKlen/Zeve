@@ -72,6 +72,48 @@ export type Database = {
           },
         ];
       };
+      garden_weather: {
+        Row: {
+          day: string;
+          et0_mm: number | null;
+          fetched_at: string;
+          garden_id: string;
+          humidity_mean: number | null;
+          precipitation_mm: number | null;
+          sunshine_hours: number | null;
+          temp_mean: number | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          day: string;
+          et0_mm?: number | null;
+          fetched_at?: string;
+          garden_id: string;
+          humidity_mean?: number | null;
+          precipitation_mm?: number | null;
+          sunshine_hours?: number | null;
+          temp_mean?: number | null;
+        };
+        Update: {
+          day?: string;
+          et0_mm?: number | null;
+          fetched_at?: string;
+          garden_id?: string;
+          humidity_mean?: number | null;
+          precipitation_mm?: number | null;
+          sunshine_hours?: number | null;
+          temp_mean?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'garden_weather_garden_id_fkey';
+            columns: ['garden_id'];
+            isOneToOne: false;
+            referencedRelation: 'gardens';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       gardens: {
         Row: {
           city: string | null;
@@ -116,12 +158,15 @@ export type Database = {
           created_at: string;
           garden_id: string | null;
           id: string;
+          learned_every_days: number | null;
           light: Database['public']['Enums']['light_exposure'];
           nickname: string;
           photo_path: string | null;
           room_id: string | null;
           species_id: string;
           species_source: string | null;
+          suggestion_declined_count: number | null;
+          suggestion_declined_days: number | null;
           user_id: string;
           water_every_days: number;
         };
@@ -132,12 +177,15 @@ export type Database = {
           created_at?: string;
           garden_id?: string | null;
           id?: string;
+          learned_every_days?: number | null;
           light?: Database['public']['Enums']['light_exposure'];
           nickname: string;
           photo_path?: string | null;
           room_id?: string | null;
           species_id: string;
           species_source?: string | null;
+          suggestion_declined_count?: number | null;
+          suggestion_declined_days?: number | null;
           user_id: string;
           water_every_days: number;
         };
@@ -147,12 +195,15 @@ export type Database = {
           created_at?: string;
           garden_id?: string | null;
           id?: string;
+          learned_every_days?: number | null;
           light?: Database['public']['Enums']['light_exposure'];
           nickname?: string;
           photo_path?: string | null;
           room_id?: string | null;
           species_id?: string;
           species_source?: string | null;
+          suggestion_declined_count?: number | null;
+          suggestion_declined_days?: number | null;
           user_id?: string;
           water_every_days?: number;
         };
@@ -268,6 +319,7 @@ export type Database = {
           garden_id: string;
           id: string;
           name: string;
+          outdoor: boolean;
           position: number;
           user_id: string;
         };
@@ -276,6 +328,7 @@ export type Database = {
           garden_id: string;
           id?: string;
           name: string;
+          outdoor?: boolean;
           position?: number;
           user_id: string;
         };
@@ -283,6 +336,7 @@ export type Database = {
           garden_id?: string;
           id?: string;
           name?: string;
+          outdoor?: boolean;
           position?: number;
           user_id?: string;
         };
@@ -347,6 +401,7 @@ export type Database = {
       };
       watering_events: {
         Row: {
+          expected_days: number | null;
           id: string;
           plant_id: string;
           user_id: string;
@@ -354,12 +409,14 @@ export type Database = {
         };
         ComputedFields: never;
         Insert: {
+          expected_days?: number | null;
           id?: string;
           plant_id: string;
           user_id: string;
           watered_at?: string;
         };
         Update: {
+          expected_days?: number | null;
           id?: string;
           plant_id?: string;
           user_id?: string;
@@ -403,6 +460,7 @@ export type Database = {
           is_thirsty: boolean | null;
           last_watered_at: string | null;
           latin: string;
+          learned_every_days: number | null;
           light: Database['public']['Enums']['light_exposure'];
           light_label: string;
           nickname: string;
@@ -410,13 +468,17 @@ export type Database = {
           previous_watered_at: string | null;
           room_id: string | null;
           room_name: string | null;
+          room_outdoor: boolean | null;
           species_id: string;
           species_light: string;
           species_name: string;
           species_source: string | null;
+          suggestion_declined_count: number | null;
+          suggestion_declined_days: number | null;
           tip: string | null;
           user_id: string;
           water_every_days: number;
+          watering_history: Json | null;
         };
         ComputedFields: never;
         Relationships: [

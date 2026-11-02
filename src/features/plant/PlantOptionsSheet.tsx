@@ -13,6 +13,7 @@ import type { GardenPlant } from '@/features/garden/gardenRules';
 import { useGardens, useMovePlant } from '@/features/gardens/api';
 import { isLastInGarden, type Garden } from '@/features/gardens/gardenRules';
 import { t } from '@/i18n';
+import { learnRhythm } from '@/plants/wateringModel';
 import { makeStyles, space, type } from '@/theme';
 
 import { useRooms, useUpdatePlant, useWateringHistory } from './api';
@@ -58,6 +59,8 @@ export function PlantOptionsSheet({ plant, visible, onClose, onDeleted }: Props)
   const move = useMovePlant();
   const [target, setTarget] = useState<Garden | null>(null);
   const history = useWateringHistory(plant.id, visible && view === 'history');
+  // Rythme observé d'après les arrosages (repère dans « Rythme d'arrosage »).
+  const learned = learnRhythm(plant.history, plant.waterEveryDays, plant.drying);
   // Retirer la dernière plante d'un jardin le supprime (jamais de jardin vide) : on le dit avant.
   const last = isLastInGarden(plant, plants);
   // « Changer de jardin » seulement s'il y a un autre jardin.
@@ -199,6 +202,9 @@ export function PlantOptionsSheet({ plant, visible, onClose, onDeleted }: Props)
               icon={(c) => <IconPlus size={20} color={c} />}
             />
           </View>
+          {learned.estimate !== null && learned.stable && (
+            <Text style={styles.muted}>{t('rhythm.learned', { n: learned.estimate })}</Text>
+          )}
           <Button
             label={t('common.save')}
             loading={update.isPending}

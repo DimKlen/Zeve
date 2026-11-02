@@ -3,6 +3,8 @@ import { View } from 'react-native';
 
 import { useAuthStore } from '@/features/auth/authStore';
 import { useProfile } from '@/features/auth/profile';
+import { useWeatherRefresh } from '@/features/gardens/weather';
+import { rescheduleReminders } from '@/features/notifications/schedule';
 import { useNotificationTaps } from '@/features/notifications/useNotificationTaps';
 import { makeStyles } from '@/theme';
 
@@ -21,9 +23,13 @@ export default function AppLayout() {
   return <ConnectedApp />;
 }
 
-/** App connectée et onboardée : rappels recalculés, taps sur les notifications. */
+const refreshReminders = () => void rescheduleReminders();
+
+/** App connectée et onboardée : rappels recalculés, taps sur les notifications, météo des jardins. */
 function ConnectedApp() {
   useNotificationTaps();
+  // La date d'arrosage suit la météo : nouveaux rappels quand elle change.
+  useWeatherRefresh(refreshReminders);
 
   return (
     <Stack screenOptions={{ headerShown: false, animation: 'none' }}>

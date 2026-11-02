@@ -1,5 +1,6 @@
 // Règles métier de l'état d'une plante (soif, jauge, humeur, textes) — à couvrir par des tests unitaires.
 import { stageOf, type Stage } from './drawPlant';
+import { dueInfo, type Drying, type WeatherCause } from './wateringModel';
 
 export type PlantRow = {
   id: string;
@@ -8,6 +9,8 @@ export type PlantRow = {
   createdAt: Date;
   waterEveryDays: number;
   lastWateredAt: Date | null;
+  /** Météo du jardin (effet séchant jour par jour) ; absente : rythme fixe. */
+  drying?: Drying | null;
 };
 
 const DAY = 86_400_000;
@@ -28,15 +31,20 @@ export type PlantStatus = {
   waterText: 'Sèche' | 'Bientôt' | 'Parfait';
   nextLabel: string; // « aujourd'hui », « demain », « dans 3 j »
   sinceLabel: string; // « 9 j sans eau »
+  /** Décalage dû à la météo (jours, négatif : plus tôt) et sa cause. */
+  weatherShift: number;
+  weatherCause: WeatherCause | null;
 };
 
 export function plantStatus(p: PlantRow, now = new Date()): PlantStatus {
   const ref = p.lastWateredAt ?? p.createdAt;
   const daysSinceWater = Math.max(0, daysBetween(ref, now));
-  const daysUntilNext = p.waterEveryDays - daysSinceWater;
+  // Date d'arrosage : rythme de la plante ajusté à la météo du jardin (wateringModel).
+  const due = dueInfo(p, p.drying, now);
+  const daysUntilNext = due.daysUntilNext;
   const thirsty = daysUntilNext <= 0;
   const wateredToday = !!p.lastWateredAt && daysBetween(p.lastWateredAt, now) === 0;
-  const waterLevel = Math.min(1, Math.max(0, 1 - daysSinceWater / p.waterEveryDays));
+  const waterLevel = Math.min(1, Math.max(0, 1 - daysSinceWater / due.dueDays));
   const daysSinceCreated = Math.max(0, daysBetween(p.createdAt, now));
   return {
     stage: stageOf(daysSinceCreated),
@@ -55,6 +63,8 @@ export function plantStatus(p: PlantRow, now = new Date()): PlantStatus {
           ? 'demain'
           : `dans ${daysUntilNext} j`,
     sinceLabel: `${daysSinceWater} j sans eau`,
+    weatherShift: due.shift,
+    weatherCause: due.cause,
   };
 }
 

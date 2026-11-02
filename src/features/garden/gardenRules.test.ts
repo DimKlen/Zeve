@@ -35,6 +35,11 @@ const make = (
   gardenId: 'paris',
   gardenName: 'Paris 1',
   gardenPlace: { latitude: 48.85, countryCode: 'FR', country: 'France', city: 'Paris' },
+  outdoor: false,
+  history: [],
+  learnedEveryDays: null,
+  declined: null,
+  drying: null,
 });
 
 // Le jardin de Camille (docs/06 F13).

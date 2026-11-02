@@ -21,10 +21,11 @@ erDiagram
 |---|---|
 | `profiles` | id (= auth.users.id), first_name, display_email, auth_provider, reminders_enabled, reminder_time, timezone, expo_push_token, onboarded_at |
 | `gardens` | user_id, name, city, country, country_code, latitude, longitude (jamais vide, docs/06 F14) |
-| `rooms` | user_id, garden_id, name (unique par jardin), position (5 par défaut, créées avec le jardin) |
+| `rooms` | user_id, garden_id, name (unique par jardin), position (5 par défaut, créées avec le jardin), outdoor (Balcon) |
+| `garden_weather` | garden_id, day, temp_mean, humidity_mean, sunshine_hours, et0_mm, precipitation_mm (cache Open-Meteo, docs/06 F15) |
 | `species` | id texte, name, latin, form (type de dessin), category, color_a/b/f, light, light_label, air, water_every_days, tip — lecture publique |
-| `plants` | user_id, garden_id, species_id, nickname, room_id, light, water_every_days, species_source, photo_path, created_at (→ stade), archived_at |
-| `watering_events` | user_id, plant_id, watered_at |
+| `plants` | user_id, garden_id, species_id, nickname, room_id, light, water_every_days, learned_every_days, suggestion_declined_days/count, species_source, photo_path, created_at (→ stade), archived_at |
+| `watering_events` | user_id, plant_id, watered_at, expected_days (rythme attendu à ce moment) |
 | `chat_messages` | user_id, plant_id, role, content, photo_path, actions (jsonb), created_at |
 | `reminders` | user_id, plant_id, due_at, message, sent_at |
 | vue `plant_overview` | plante + espèce + pièce + jardin (nom, lieu) + last_watered_at, days_since_water, days_since_created, is_thirsty (security_invoker → respecte la RLS) |

@@ -9,6 +9,7 @@ import { Rise } from '@/components/Rise';
 import { Screen } from '@/components/Screen';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { SettingsCard, SettingsRow } from '@/components/SettingsRow';
+import { Toggle } from '@/components/Toggle';
 import { TextField } from '@/components/TextField';
 import { showToast } from '@/components/Toast';
 import { Chip } from '@/components/Chip';
@@ -116,7 +117,8 @@ function RoomSheet({
   const [name, setName] = useState(room && room !== 'new' ? room.name : '');
   const [error, setError] = useState<string | undefined>();
   const create = useCreateRoom();
-  const { rename, remove } = useRoomMutations();
+  const { rename, remove, setOutdoor } = useRoomMutations();
+  const [outdoor, setOutdoorValue] = useState(room && room !== 'new' ? room.outdoor : false);
   const busy = create.isPending || rename.isPending || remove.isPending;
 
   const onError = (e: unknown) => {
@@ -175,6 +177,25 @@ function RoomSheet({
           loading={create.isPending || rename.isPending}
           onPress={save}
         />
+        {!isNew && room && (
+          <SettingsRow
+            label={t('rooms.outdoor')}
+            hint={t('rooms.outdoorHint')}
+            right={
+              <Toggle
+                value={outdoor}
+                onValueChange={(on) => {
+                  setOutdoorValue(on);
+                  setOutdoor.mutate(
+                    { id: room.id, outdoor: on },
+                    { onError: () => setOutdoorValue(!on) },
+                  );
+                }}
+                accessibilityLabel={t('rooms.outdoor')}
+              />
+            }
+          />
+        )}
         {!isNew && (
           <SettingsRow
             label={t('rooms.delete')}

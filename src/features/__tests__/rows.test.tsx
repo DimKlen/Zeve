@@ -24,6 +24,11 @@ const gaston: GardenPlant = {
   gardenId: 'paris',
   gardenName: 'Paris 1',
   gardenPlace: { latitude: 48.85, countryCode: 'FR', country: 'France', city: 'Paris' },
+  outdoor: false,
+  history: [],
+  learnedEveryDays: null,
+  declined: null,
+  drying: null,
 };
 
 describe('TodoCard (lignes « À arroser »)', () => {
