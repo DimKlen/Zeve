@@ -13,6 +13,8 @@ export type ScreenKey =
   | 'garden'
   | 'gardenDetail'
   | 'settings'
+  | 'discover'
+  | 'discoverResult'
   | 'plant'
   | 'chat'
   | 'newPlant'
@@ -33,6 +35,8 @@ const ROUTES: Record<ScreenKey, (p: Params) => Href> = {
   garden: () => '/garden',
   gardenDetail: ({ id = '' }) => `/gardens/${id}`,
   settings: () => '/settings',
+  discover: () => '/discover',
+  discoverResult: ({ id = '' }) => `/discoveries/${id}`,
   plant: ({ id = '' }) => `/plant/${id}`,
   chat: ({ id = '' }) => `/plant/${id}/chat`,
   newPlant: () => '/new-plant',
@@ -65,6 +69,12 @@ export const TRANSITIONS: Partial<Record<`${ScreenKey}>${ScreenKey}`, ScreenAnim
   'chat>plant': 'back',
   'garden>settings': 'fade',
   'settings>garden': 'fade',
+  'garden>discover': 'fade',
+  'discover>garden': 'fade',
+  'discover>settings': 'fade',
+  'settings>discover': 'fade',
+  'discover>discoverResult': 'up',
+  'discoverResult>discover': 'back',
   'garden>newPlant': 'up',
   'newPlant>garden': 'back',
   'newPlant>species': 'fwd',

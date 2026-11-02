@@ -78,6 +78,13 @@ export function normalizeLatin(name: string): string {
 
 const genusOf = (latin: string) => normalizeLatin(latin).split(' ')[0] ?? '';
 
+/** Espèce du catalogue au nom latin exact (synonymes compris), sinon null (mode « Découvrir »). */
+export function catalogMatch(latin: string, catalog: CatalogEntry[]): string | null {
+  const name = normalizeLatin(latin);
+  const target = SYNONYMS[name] ?? name;
+  return catalog.find((c) => normalizeLatin(c.latin) === target)?.id ?? null;
+}
+
 type Candidate = { id: string; score: number };
 
 /** Meilleure espèce du catalogue, sa confiance et jusqu'à 2 alternatives (docs/06 F7). */

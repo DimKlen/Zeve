@@ -148,7 +148,7 @@ export const control = {
   roomChip: 44,
   lightOption: 64,
   navHeight: 64,
-  navWidth: 240,
+  navWidth: 340, // 3 onglets (Jardin, Découvrir, Réglages) ; 240 à l'origine pour 2
   navItem: 52,
   toggle: { w: 56, h: 34, knob: 28 },
 } as const;

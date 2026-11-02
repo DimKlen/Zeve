@@ -9,18 +9,19 @@ import { t } from '@/i18n';
 import { duration } from '@/motion';
 import { control, makeStyles, radius, shadow, space, type, useColors } from '@/theme';
 
-import { IconSettings, IconSprout } from './icons';
+import { IconLeafSearch, IconSettings, IconSprout } from './icons';
 import { useColorTransition } from './useColorTransition';
 
-type TabName = 'garden' | 'settings';
+type TabName = 'garden' | 'discover' | 'settings';
 
 const TABS: Record<TabName, { label: string; icon: (color: string) => ReactElement }> = {
   garden: { label: t('nav.garden'), icon: (c) => <IconSprout size={20} color={c} /> },
+  discover: { label: t('nav.discover'), icon: (c) => <IconLeafSearch size={20} color={c} /> },
   settings: { label: t('nav.settings'), icon: (c) => <IconSettings size={20} color={c} /> },
 };
 
 /**
- * Barre de navigation flottante (docs/02 §7) : pilule forest 240×64, 2 onglets.
+ * Barre de navigation flottante (docs/02 §7) : pilule 340×64, 3 onglets (Découvrir ajouté, docs/06 F16).
  * Actif : fond sun, texte forest. Elle ne s'anime pas entre les onglets (seul le contenu fait un fondu).
  */
 export function TabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {

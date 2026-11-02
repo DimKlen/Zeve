@@ -12,8 +12,13 @@ name: 09 — Rythme appris
     timeout: 15000
 - tapOn: "Paris 1, .*"
 - extendedWaitUntil:
-    visible: "Frida, .*"
+    visible: "[0-9]+ plantes · .*"
     timeout: 10000
+# Frida est plus bas dans la grille de Paris 1.
+- scrollUntilVisible:
+    element: "Frida, .*"
+    direction: DOWN
+    centerElement: true
 - tapOn: "Frida, .*"
 - extendedWaitUntil:
     visible: "Goeppertia orbifolia.*"

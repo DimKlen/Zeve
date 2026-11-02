@@ -1,0 +1,32 @@
+# Mode « Découvrir », parcours photo complet (manuel) : DISCOVER_MOCK=1 → pissenlit.
+# Une photo est ajoutée à la galerie de l'appareil, puis choisie dans le sélecteur Android.
+appId: com.zeve.app
+name: 11 — Découvrir par photo
+tags:
+  - manual
+---
+- addMedia:
+    # Illustration de l'app : en mode simulé, la photo n'influence pas le résultat.
+    - "../assets/plante.png"
+- runFlow:
+    file: ../subflows/login.yaml
+    env:
+      EMAIL: camille@zeve.test
+- extendedWaitUntil:
+    visible: "Mes jardins"
+    timeout: 15000
+- tapOn: "Découvrir"
+- tapOn: "Choisir une photo"
+# Sélecteur de photos Android : première image.
+- tapOn:
+    id: ".*icon_thumbnail.*"
+    index: 0
+    optional: true
+- extendedWaitUntil:
+    visible: "Pissenlit"
+    timeout: 30000
+- assertVisible: "Taraxacum officinale"
+- assertVisible: "Comestible"
+- assertVisible: "Ne mange jamais une plante identifiée seulement par une app."
+- goBack
+- assertVisible: "Pissenlit, Taraxacum officinale, .*"

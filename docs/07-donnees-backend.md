@@ -22,6 +22,8 @@ erDiagram
 | `profiles` | id (= auth.users.id), first_name, display_email, auth_provider, reminders_enabled, reminder_time, timezone, expo_push_token, onboarded_at |
 | `gardens` | user_id, name, city, country, country_code, latitude, longitude (jamais vide, docs/06 F14) |
 | `rooms` | user_id, garden_id, name (unique par jardin), position (5 par défaut, créées avec le jardin), outdoor (Balcon) |
+| `plant_facts` | latin_key, lang, latin, common_name, family, facts (jsonb) — fiches « découverte » partagées, lecture pour tout compte connecté (docs/06 F16) |
+| `discoveries` | user_id, latin, created_at (quota du mode Découvrir) |
 | `garden_weather` | garden_id, day, temp_mean, humidity_mean, sunshine_hours, et0_mm, precipitation_mm (cache Open-Meteo, docs/06 F15) |
 | `species` | id texte, name, latin, form (type de dessin), category, color_a/b/f, light, light_label, air, water_every_days, tip — lecture publique |
 | `plants` | user_id, garden_id, species_id, nickname, room_id, light, water_every_days, learned_every_days, suggestion_declined_days/count, species_source, photo_path, created_at (→ stade), archived_at |

@@ -26,12 +26,19 @@ const LAST_GARDEN_KEY = 'zeve-last-garden';
 
 export type PickedPhoto = { uri: string; width: number; height: number };
 
-/** Photo prise (caméra par défaut, galerie si la caméra est refusée ou absente), ou null si annulé. */
-export async function pickPlantPhoto(): Promise<PickedPhoto | null> {
+/**
+ * Photo prise (caméra par défaut, galerie si la caméra est refusée ou absente), ou null si annulé.
+ * `library` : directement la galerie (« Choisir une photo » du mode Découvrir).
+ */
+export async function pickPlantPhoto(
+  source: 'camera' | 'library' = 'camera',
+): Promise<PickedPhoto | null> {
   const options: ImagePicker.ImagePickerOptions = { mediaTypes: ['images'], quality: 1 };
   let result: ImagePicker.ImagePickerResult;
   const camera =
-    Platform.OS === 'web' ? { granted: false } : await ImagePicker.requestCameraPermissionsAsync();
+    Platform.OS === 'web' || source === 'library'
+      ? { granted: false }
+      : await ImagePicker.requestCameraPermissionsAsync();
   if (camera.granted) {
     result = await ImagePicker.launchCameraAsync(options);
   } else {

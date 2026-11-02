@@ -12,6 +12,7 @@ export default function TabsLayout() {
       screenOptions={{ headerShown: false, animation: 'none', sceneStyle: styles.scene }}
     >
       <Tabs.Screen name="garden" />
+      <Tabs.Screen name="discover" />
       <Tabs.Screen name="settings" />
     </Tabs>
   );
