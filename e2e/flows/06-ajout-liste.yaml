@@ -13,6 +13,11 @@ name: 06 — Ajout par la liste
 - tapOn: "Ajouter une plante"
 - assertVisible: "Nouvelle plante"
 - assertVisible: "Choisis d.abord son espèce"
+# Nom suggéré (univers japonais, grec, égyptien…) et jardin présélectionné.
+- assertVisible:
+    id: "plant-name"
+- assertVisible: "Autre nom"
+- assertVisible: "Paris 1"
 - tapOn: "Choisir dans la liste.*"
 - assertVisible: "220 espèces · 19 types"
 - tapOn:
@@ -40,6 +45,8 @@ name: 06 — Ajout par la liste
 - assertVisible: "Echeveria"
 - tapOn:
     id: "plant-name"
+# Le nom suggéré est pré-rempli : on l'efface avant d'écrire le sien.
+- eraseText: 30
 - inputText: "Lianne"
 - hideKeyboard
 # Les options de lumière sont sous le pli, derrière le bouton fixe « Ajouter au jardin ».

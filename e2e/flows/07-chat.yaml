@@ -7,9 +7,14 @@ name: 07 — Chat
     file: ../subflows/login.yaml
     env:
       EMAIL: camille@zeve.test
+# Camille a deux jardins (Paris 1, Montréal 1) : l'accueil les liste, Gaston est dans Paris 1.
+- extendedWaitUntil:
+    visible: "Paris 1, .*"
+    timeout: 15000
+- tapOn: "Paris 1, .*"
 - extendedWaitUntil:
     visible: "Gaston, .*"
-    timeout: 15000
+    timeout: 10000
 - tapOn: "Gaston, .*"
 - extendedWaitUntil:
     visible: "Gaston a soif"

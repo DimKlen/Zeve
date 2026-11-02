@@ -7,8 +7,17 @@ name: 02 — Lien magique
     env:
       EMAIL: camille@zeve.test
 - extendedWaitUntil:
-    visible: "Mon jardin"
+    visible: "Mes jardins"
     timeout: 15000
 - assertVisible: "Bonjour Camille"
-- assertVisible: "6 plantes · 2 ont soif aujourd.hui"
+- assertVisible: "2 jardins · 2 ont soif aujourd.hui"
+- assertVisible: "Montréal 1, .*"
+# Camille a deux jardins (Paris 1, Montréal 1) : l'accueil les liste, Gaston est dans Paris 1.
+- extendedWaitUntil:
+    visible: "Paris 1, .*"
+    timeout: 15000
+- tapOn: "Paris 1, .*"
+- extendedWaitUntil:
+    visible: "6 plantes · 2 ont soif aujourd.hui"
+    timeout: 10000
 - assertVisible: "Gaston, .*"

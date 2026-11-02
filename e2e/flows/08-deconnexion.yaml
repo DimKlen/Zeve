@@ -7,7 +7,7 @@ name: 08 — Déconnexion
     env:
       EMAIL: camille@zeve.test
 - extendedWaitUntil:
-    visible: "Mon jardin"
+    visible: "Mes jardins"
     timeout: 15000
 - tapOn: "Réglages"
 - assertVisible: "camille@zeve.test"
