@@ -307,6 +307,39 @@
     "humidityHeating": "Le chauffage assèche l’air : brumise ses feuilles ou pose son pot sur des billes d’argile humides.",
     "humidityHeat": "Par forte chaleur, brumise ses feuilles le matin."
   },
+  "discover": {
+    "title": "Découvrir",
+    "intro": "Une plante t’intrigue en balade ? Prends-la en photo, je te raconte tout.",
+    "take": "Photographier une plante",
+    "pick": "Choisir une photo",
+    "recognizing": "Je regarde de près…",
+    "history": "Tes dernières découvertes",
+    "empty": "Tes découvertes apparaîtront ici.",
+    "notFound": "Je n’ai pas reconnu de plante sur cette photo. Essaie de plus près, sur une feuille ou une fleur.",
+    "failed": "La reconnaissance n’a pas abouti. Réessaie dans un instant.",
+    "quota": "Tu as fait 20 découvertes aujourd’hui : reviens demain pour la suite !",
+    "confidence": "Sûr à {n} %",
+    "unsure": "Pas sûr à 100 % : ce pourrait être aussi…",
+    "family": "Famille : {family}",
+    "backA11y": "Retour à Découvrir",
+    "photoA11y": "Ta photo de {name}",
+    "rowA11y": "{name}, {latin}, {date}",
+    "edibleTitle": "Comestible ?",
+    "edibility": {
+      "edible": "Comestible",
+      "partly": "En partie",
+      "toxic": "Toxique",
+      "inedible": "Non comestible",
+      "unknown": "Inconnu"
+    },
+    "safety": "Ne mange jamais une plante identifiée seulement par une app.",
+    "originTitle": "D’où vient-elle ?",
+    "usesTitle": "À quoi sert-elle ?",
+    "wildlifeTitle": "Pour la faune",
+    "funTitle": "Le savais-tu ?",
+    "factsLoading": "Je prépare sa fiche…",
+    "factsFailed": "Je n’ai pas pu préparer sa fiche. Réessaie plus tard."
+  },
   "settings": {
     "title": "Réglages",
     "connectedWith": "Connecté avec {provider}",
@@ -389,7 +422,8 @@
   },
   "nav": {
     "garden": "Jardin",
-    "settings": "Réglages"
+    "settings": "Réglages",
+    "discover": "Découvrir"
   },
   "notifications": {
     "manyTitle": "Zeve",

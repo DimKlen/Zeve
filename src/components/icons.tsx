@@ -115,6 +115,15 @@ export const IconShuffle = ({ size = 22, color = '#1F3D2B', strokeWidth = 2 }: P
     />
   </S>
 );
+export const IconLeafSearch = ({ size = 22, color = '#1F3D2B', strokeWidth = 2 }: P) => (
+  <S size={size}>
+    <Circle cx={10.5} cy={10.5} r={6.5} {...line(color, strokeWidth)} />
+    <Path
+      d="M15.5 15.5L20 20M8 13c0-3 2-5 5-5 0 3-2 5-5 5zM8 13l2.5-2.5"
+      {...line(color, strokeWidth)}
+    />
+  </S>
+);
 export const IconCamera = ({ size = 22, color = '#1F3D2B', strokeWidth = 2 }: P) => (
   <S size={size}>
     <Path d="M4 8h3l2-3h6l2 3h3v11H4z" {...line(color, strokeWidth)} />
