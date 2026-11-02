@@ -32,6 +32,9 @@ const make = (
   waterEveryDays: every,
   lastWateredAt: lastDaysAgo === null ? null : daysAgo(lastDaysAgo),
   previousWateredAt: previousDaysAgo === null ? null : daysAgo(previousDaysAgo),
+  gardenId: 'paris',
+  gardenName: 'Paris 1',
+  gardenPlace: { latitude: 48.85, countryCode: 'FR', country: 'France', city: 'Paris' },
 });
 
 // Le jardin de Camille (docs/06 F13).
