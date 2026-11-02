@@ -18,6 +18,12 @@ export type PlantContext = {
   place: string | null;
   /** Jardin dans l'hémisphère sud. */
   southern: boolean;
+  /** Prochain arrosage d'après le rythme et la météo (« dans 2 jours »), si calculé. */
+  nextWatering?: string | null;
+  /** Rythme observé d'après les arrosages, s'il diffère du rythme réglé. */
+  learnedEveryDays?: number | null;
+  /** Météo récente du jardin (« 6 °C en moyenne, 80 % d'humidité »), si connue. */
+  recentWeather?: string | null;
 };
 
 export type ChatAction = { type: 'remind'; days: number; label: string };
@@ -71,6 +77,11 @@ export function buildSystemPrompt(p: PlantContext): string {
     `Ton état : dernier arrosage il y a ${p.daysSinceWater} jours (rythme idéal : tous les ${p.waterEveryDays} jours), ` +
       `lumière à ton emplacement : ${LIGHT_NAMES[p.light] ?? p.light}, lumière idéale : ${p.lightLabel}, stade dans l'app : ${p.stage}.`,
     waterings,
+    ...(p.nextWatering ? [`Prochain arrosage prévu ${p.nextWatering} (météo du jardin comprise).`] : []),
+    ...(p.learnedEveryDays && p.learnedEveryDays !== p.waterEveryDays
+      ? [`D'après ses arrosages, ton humain·e t'arrose plutôt tous les ${p.learnedEveryDays} jours.`]
+      : []),
+    ...(p.recentWeather ? [`Météo de ces derniers jours chez toi : ${p.recentWeather}.`] : []),
     `Saison actuelle : ${p.season} (hémisphère ${p.southern ? 'sud' : 'nord'}). Adapte tes conseils à la saison et au climat du lieu : ` +
       'arrosage, lumière, emplacement (intérieur ou dehors), engrais, humidité de l’air et température de la pièce.',
     'Réponds en 2 à 5 phrases, avec des conseils concrets et prudents, en texte simple sans Markdown. ' +

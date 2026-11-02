@@ -15,6 +15,7 @@ import {
   type GeminiPart,
   type StoredMessage,
 } from '../_shared/chatPrompt.ts';
+import { dayKey, dryingFromWeather, dueInfo, learnRhythm } from '../_shared/wateringModel.ts';
 
 const DEFAULT_MODEL = 'gemini-3.5-flash-lite';
 const DAILY_QUOTA = 30;
@@ -35,6 +36,19 @@ const json = (body: unknown, status = 200) =>
 
 const stageOf = (days: number) => (days < 90 ? 'Pousse' : days < 365 ? 'Jeune' : 'Adulte');
 const shortDate = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short' });
+
+/** « 6 °C en moyenne, 80 % d'humidité » sur les 3 derniers jours connus (jusqu'à aujourd'hui). */
+function recentWeatherLine(
+  weather: { day: string; tempMean: number | null; humidity: number | null }[],
+): string | null {
+  const today = dayKey(new Date());
+  const recent = weather.filter((w) => w.day <= today).slice(-3);
+  const temps = recent.flatMap((w) => (w.tempMean === null ? [] : [w.tempMean]));
+  const hums = recent.flatMap((w) => (w.humidity === null ? [] : [w.humidity]));
+  if (!temps.length) return null;
+  const avg = (v: number[]) => Math.round(v.reduce((a, b) => a + b, 0) / v.length);
+  return `${avg(temps)} °C en moyenne${hums.length ? `, ${avg(hums)} % d’humidité` : ''}`;
+}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
@@ -93,6 +107,39 @@ Deno.serve(async (req) => {
   ]);
 
   const southern = isSouthernPlace(plant.garden_latitude, plant.garden_country_code);
+
+  // Même calcul que l'app : date d'arrosage ajustée à la météo, rythme appris (wateringModel).
+  const weatherSince = new Date(Date.now() - 45 * 86_400_000);
+  const { data: weatherRows } = plant.garden_id
+    ? await supabase
+        .from('garden_weather')
+        .select('day, et0_mm, temp_mean, humidity_mean')
+        .eq('garden_id', plant.garden_id)
+        .gte('day', dayKey(weatherSince))
+        .order('day', { ascending: true })
+    : { data: null };
+  const weather = (weatherRows ?? []).map((w) => ({
+    day: w.day,
+    et0: w.et0_mm,
+    tempMean: w.temp_mean,
+    humidity: w.humidity_mean,
+  }));
+  const drying = dryingFromWeather(weather, !!plant.room_outdoor);
+  const due = dueInfo(
+    {
+      waterEveryDays: plant.water_every_days,
+      lastWateredAt: plant.last_watered_at ? new Date(plant.last_watered_at) : null,
+      createdAt: new Date(plant.created_at),
+    },
+    drying,
+  );
+  const wateringEvents = (Array.isArray(plant.watering_history) ? plant.watering_history : []).flatMap(
+    (item: { at?: unknown; expected?: unknown }) =>
+      typeof item?.at === 'string'
+        ? [{ at: new Date(item.at), expectedDays: typeof item.expected === 'number' ? item.expected : null }]
+        : [],
+  );
+  const learned = learnRhythm(wateringEvents, plant.water_every_days, drying);
   const system = buildSystemPrompt({
     nickname: plant.nickname,
     speciesName: plant.species_name,
@@ -107,6 +154,14 @@ Deno.serve(async (req) => {
     season: seasonNameOf(new Date(), southern),
     place: [plant.garden_city, plant.garden_country].filter(Boolean).join(', ') || null,
     southern,
+    nextWatering:
+      due.daysUntilNext <= 0
+        ? 'aujourd’hui'
+        : due.daysUntilNext === 1
+          ? 'demain'
+          : `dans ${due.daysUntilNext} jours`,
+    learnedEveryDays: learned.stable ? learned.estimate : null,
+    recentWeather: recentWeatherLine(weather),
   });
 
   // Message courant : texte + photo réelle (image en ligne) si fournie.

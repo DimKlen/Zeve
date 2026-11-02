@@ -4,6 +4,7 @@ import { Platform } from 'react-native';
 
 import { useAuthStore } from '@/features/auth/authStore';
 import { supabase } from '@/lib/supabase';
+import { dryingLookup, fetchWeatherRows, groupWeather } from '@/features/gardens/weather';
 
 import { planDailyReminders } from './reminderPlan';
 
@@ -35,12 +36,17 @@ async function cancelKind(kind: string) {
 async function reschedule(): Promise<void> {
   const userId = useAuthStore.getState().session?.user.id;
   if (!userId) return;
-  const [{ data: profile }, { data: rows }] = await Promise.all([
+  const [{ data: profile }, { data: rows }, weatherRows] = await Promise.all([
     supabase.from('profiles').select('reminders_enabled, reminder_time').eq('id', userId).single(),
     supabase
       .from('plant_overview')
-      .select('id, nickname, species_id, created_at, water_every_days, last_watered_at'),
+      .select(
+        'id, nickname, species_id, created_at, water_every_days, last_watered_at, garden_id, room_outdoor',
+      ),
+    // Même date d'arrosage que la jauge : météo du jardin comprise (hors ligne : rythme fixe).
+    fetchWeatherRows().catch(() => []),
   ]);
+  const drying = dryingLookup(groupWeather(weatherRows));
   if (!profile) return;
   // Rappels désactivés : plus aucune notification planifiée (docs/06 F9).
   if (!profile.reminders_enabled) {
@@ -58,6 +64,7 @@ async function reschedule(): Promise<void> {
       createdAt: new Date(r.created_at!),
       waterEveryDays: r.water_every_days!,
       lastWateredAt: r.last_watered_at ? new Date(r.last_watered_at) : null,
+      drying: r.garden_id ? drying(r.garden_id, !!r.room_outdoor) : null,
     })),
     profile.reminder_time,
   );
