@@ -74,6 +74,30 @@ export const IconHome = ({ size = 22, color = '#1F3D2B', strokeWidth = 2 }: P) =
     <Path d="M4 11l8-7 8 7M6 9.5V20h12V9.5M10 20v-5h4v5" {...line(color, strokeWidth)} />
   </S>
 );
+export const IconPot = ({ size = 22, color = '#1F3D2B', strokeWidth = 2 }: P) => (
+  <S size={size}>
+    <Path
+      d="M4 9h16M5.5 9l1.5 11h10l1.5-11M12 9V5M12 6c-2 0-3.5-1-4-3 2 0 3.5 1 4 3zM12 6c2 0 3.5-1 4-3-2 0-3.5 1-4 3z"
+      {...line(color, strokeWidth)}
+    />
+  </S>
+);
+export const IconLayers = ({ size = 22, color = '#1F3D2B', strokeWidth = 2 }: P) => (
+  <S size={size}>
+    <Path
+      d="M12 4l9 4.5-9 4.5-9-4.5zM3 13l9 4.5 9-4.5M3 17.5L12 22l9-4.5"
+      {...line(color, strokeWidth)}
+    />
+  </S>
+);
+export const IconRepot = ({ size = 22, color = '#1F3D2B', strokeWidth = 2 }: P) => (
+  <S size={size}>
+    <Path
+      d="M4 12a8 8 0 0 1 13.7-5.6L20 9M20 4v5h-5M20 12a8 8 0 0 1-13.7 5.6L4 15M4 20v-5h5"
+      {...line(color, strokeWidth)}
+    />
+  </S>
+);
 export const IconCamera = ({ size = 22, color = '#1F3D2B', strokeWidth = 2 }: P) => (
   <S size={size}>
     <Path d="M4 8h3l2-3h6l2 3h3v11H4z" {...line(color, strokeWidth)} />
