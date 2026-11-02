@@ -21,6 +21,9 @@ const gaston: GardenPlant = {
   waterEveryDays: 8,
   lastWateredAt: new Date(2026, 9, 21),
   previousWateredAt: null,
+  gardenId: 'paris',
+  gardenName: 'Paris 1',
+  gardenPlace: { latitude: 48.85, countryCode: 'FR', country: 'France', city: 'Paris' },
 };
 
 describe('TodoCard (lignes « À arroser »)', () => {

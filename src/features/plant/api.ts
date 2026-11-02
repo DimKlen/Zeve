@@ -12,9 +12,9 @@ type PlantUpdate = Pick<
   'nickname' | 'room_id' | 'water_every_days' | 'archived_at'
 >;
 
-export type Room = { id: string; name: string };
+export type Room = { id: string; name: string; gardenId: string };
 
-/** Pièces de l'utilisateur, dans l'ordre choisi. */
+/** Pièces de l'utilisateur (tous jardins), dans l'ordre choisi. */
 export function useRooms() {
   const userId = useAuthStore((s) => s.session?.user.id);
   return useQuery({
@@ -23,10 +23,10 @@ export function useRooms() {
     queryFn: async (): Promise<Room[]> => {
       const { data, error } = await supabase
         .from('rooms')
-        .select('id, name')
+        .select('id, name, garden_id')
         .order('position', { ascending: true });
       if (error) throw error;
-      return data;
+      return data.map((r) => ({ id: r.id, name: r.name, gardenId: r.garden_id }));
     },
   });
 }

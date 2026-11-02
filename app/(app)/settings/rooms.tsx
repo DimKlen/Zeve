@@ -11,7 +11,10 @@ import { ScreenHeader } from '@/components/ScreenHeader';
 import { SettingsCard, SettingsRow } from '@/components/SettingsRow';
 import { TextField } from '@/components/TextField';
 import { showToast } from '@/components/Toast';
+import { Chip } from '@/components/Chip';
 import { usePlants } from '@/features/garden/api';
+import { useGardens } from '@/features/gardens/api';
+import type { Garden } from '@/features/gardens/gardenRules';
 import { useCreateRoom } from '@/features/newPlant/api';
 import { useRooms, type Room } from '@/features/plant/api';
 import { useRoomMutations } from '@/features/settings/api';
@@ -26,13 +29,18 @@ const UNIQUE_VIOLATION = '23505';
 const countLabel = (n: number) =>
   n === 0 ? t('rooms.plantsNone') : n === 1 ? t('rooms.plantsOne') : t('rooms.plantsMany', { n });
 
-/** Mes pièces (non maquetté, docs/04 §10) : liste, ajout, renommage, suppression. */
+/**
+ * Mes pièces (non maquetté, docs/04 §10) : liste, ajout, renommage, suppression. Les pièces sont
+ * propres à chaque jardin : groupées par jardin quand il y en a plusieurs.
+ */
 export default function RoomsScreen() {
   const styles = useStyles();
   const insets = useSafeAreaInsets();
   const { data: rooms = [] } = useRooms();
   const { data: plants = [] } = usePlants();
+  const { data: gardens = [] } = useGardens();
   const [editing, setEditing] = useState<Room | 'new' | null>(null);
+  const grouped = gardens.length > 1;
 
   return (
     <Screen name="rooms" edges={['top']}>
@@ -40,24 +48,35 @@ export default function RoomsScreen() {
         <ScreenHeader title={t('rooms.title')} onBack={goBack} backLabel={t('common.back')} />
       </View>
       <ScrollView contentContainerStyle={styles.content}>
-        <Rise delay="d1">
-          {rooms.length ? (
-            <SettingsCard>
-              {rooms.map((room, i) => (
-                <SettingsRow
-                  key={room.id}
-                  label={room.name}
-                  value={countLabel(plants.filter((p) => p.roomId === room.id).length)}
-                  chevron
-                  last={i === rooms.length - 1}
-                  onPress={() => setEditing(room)}
-                />
-              ))}
-            </SettingsCard>
-          ) : (
-            <Text style={styles.empty}>{t('rooms.empty')}</Text>
-          )}
-        </Rise>
+        {!rooms.length && <Text style={styles.empty}>{t('rooms.empty')}</Text>}
+        {gardens.map((garden, g) => {
+          const own = rooms.filter((r) => r.gardenId === garden.id);
+          return (
+            <Rise key={garden.id} delay={g === 0 ? 'd1' : 'd2'} style={styles.section}>
+              {grouped && (
+                <Text style={styles.gardenTitle} accessibilityRole="header">
+                  {garden.name}
+                </Text>
+              )}
+              {own.length ? (
+                <SettingsCard>
+                  {own.map((room, i) => (
+                    <SettingsRow
+                      key={room.id}
+                      label={room.name}
+                      value={countLabel(plants.filter((p) => p.roomId === room.id).length)}
+                      chevron
+                      last={i === own.length - 1}
+                      onPress={() => setEditing(room)}
+                    />
+                  ))}
+                </SettingsCard>
+              ) : (
+                <Text style={styles.muted}>{t('rooms.gardenEmpty')}</Text>
+              )}
+            </Rise>
+          );
+        })}
       </ScrollView>
       <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, space.x5) }]}>
         <Button
@@ -69,7 +88,8 @@ export default function RoomsScreen() {
       <RoomSheet
         key={editing === 'new' ? 'new' : (editing?.id ?? 'none')}
         room={editing}
-        position={rooms.length}
+        gardens={gardens}
+        rooms={rooms}
         onClose={() => setEditing(null)}
       />
     </Screen>
@@ -79,15 +99,20 @@ export default function RoomsScreen() {
 /** Feuille : créer, renommer ou supprimer une pièce. */
 function RoomSheet({
   room,
-  position,
+  gardens,
+  rooms,
   onClose,
 }: {
   room: Room | 'new' | null;
-  position: number;
+  gardens: Garden[];
+  rooms: Room[];
   onClose: () => void;
 }) {
   const styles = useStyles();
   const isNew = room === 'new';
+  // Nouvelle pièce : dans le premier jardin, ou celui choisi quand il y en a plusieurs.
+  const [gardenId, setGardenId] = useState(gardens[0]?.id ?? null);
+  const position = rooms.filter((r) => r.gardenId === gardenId).length;
   const [name, setName] = useState(room && room !== 'new' ? room.name : '');
   const [error, setError] = useState<string | undefined>();
   const create = useCreateRoom();
@@ -100,8 +125,10 @@ function RoomSheet({
   };
   const save = () => {
     if (!name.trim() || !room) return;
-    if (isNew) create.mutate({ name, position }, { onSuccess: onClose, onError });
-    else rename.mutate({ id: room.id, name }, { onSuccess: onClose, onError });
+    if (isNew) {
+      if (gardenId) create.mutate({ name, position, gardenId }, { onSuccess: onClose, onError });
+    } else rename.mutate({ id: room.id, name }, { onSuccess: onClose, onError });
+    return;
   };
   const del = async () => {
     if (!room || isNew) return;
@@ -115,6 +142,19 @@ function RoomSheet({
   return (
     <BottomSheet visible={room !== null} onClose={onClose}>
       <View style={styles.sheet}>
+        {isNew && gardens.length > 1 && (
+          <View style={styles.chips}>
+            {gardens.map((g) => (
+              <Chip
+                key={g.id}
+                label={g.name}
+                variant="room"
+                selected={g.id === gardenId}
+                onPress={() => setGardenId(g.id)}
+              />
+            ))}
+          </View>
+        )}
         <TextField
           label={t('rooms.nameLabel')}
           value={name}
@@ -150,7 +190,11 @@ function RoomSheet({
 
 const useStyles = makeStyles((colors) => ({
   header: { paddingTop: space.xs, paddingHorizontal: layout.screenPadDetail },
-  content: { padding: layout.screenPadDetail },
+  content: { padding: layout.screenPadDetail, gap: space.xl },
+  section: { gap: space.s },
+  gardenTitle: { ...type.sectionTitle, color: colors.forest },
+  muted: { ...type.small, color: colors.inkMuted },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: space.s },
   empty: { ...type.small, color: colors.inkMuted, textAlign: 'center', marginTop: space.x5 },
   footer: { paddingTop: space.sm, paddingHorizontal: layout.screenPadDetail },
   sheet: { gap: space.m },

@@ -1,5 +1,6 @@
 // Saisons et climat idéal des plantes (ajout hors design : carte « Saison » de la fiche).
-// Saisons météorologiques de l'hémisphère nord (France) : déc–fév, mars–mai, juin–août, sept–nov.
+// Saisons météorologiques : déc–fév, mars–mai, juin–août, sept–nov dans l'hémisphère nord,
+// décalées de six mois dans l'hémisphère sud (lieu du jardin).
 import { FORM_INFO, type Light } from './careInfo';
 import type { PlantForm } from './plantForms.generated';
 import { SPECIES_BY_ID } from './species';
@@ -21,7 +22,8 @@ const BY_MONTH: Season[] = [
   'winter',
 ];
 
-export const seasonOf = (date: Date): Season => BY_MONTH[date.getMonth()]!;
+export const seasonOf = (date: Date, southern = false): Season =>
+  BY_MONTH[(date.getMonth() + (southern ? 6 : 0)) % 12]!;
 
 /** tropical : intérieur chaud · succulent : repos hivernal au sec · mediterranean : aime l'extérieur. */
 type Group = 'tropical' | 'succulent' | 'mediterranean';

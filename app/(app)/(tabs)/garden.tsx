@@ -1,39 +1,43 @@
-import { useCallback, useEffect, useState } from 'react';
-import { RefreshControl, ScrollView, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { RefreshControl, ScrollView, View } from 'react-native';
 
-import { IconPlus } from '@/components/icons';
-import { IconButton } from '@/components/IconButton';
 import { Screen } from '@/components/Screen';
 import { showToast } from '@/components/Toast';
 import { useProfile } from '@/features/auth/profile';
 import { usePlants, useWatering } from '@/features/garden/api';
 import { EmptyGarden } from '@/features/garden/EmptyGarden';
+import { GardenPlants } from '@/features/garden/GardenPlants';
 import { GardenSkeleton } from '@/features/garden/GardenSkeleton';
-import {
-  gardenSubtitle,
-  sortGarden,
-  todoList,
-  type GardenPlant,
-} from '@/features/garden/gardenRules';
-import { PlantCard } from '@/features/garden/PlantCard';
+import { gardenSubtitle, todoList } from '@/features/garden/gardenRules';
 import { TodoCard } from '@/features/garden/TodoCard';
 import { useGrowthToasts } from '@/features/garden/useGrowthToasts';
+import { useGardens, useRefreshGardens } from '@/features/gardens/api';
+import { GardenCard } from '@/features/gardens/GardenCard';
+import { GardenHeader } from '@/features/gardens/GardenHeader';
+import { GardenOptionsSheet } from '@/features/gardens/GardenOptionsSheet';
+import { placeLabel, summarizeGardens, type GardenSummary } from '@/features/gardens/gardenRules';
 import { useNewPlantDraft } from '@/features/newPlant/draftStore';
 import { t } from '@/i18n';
 import type { riseDelay } from '@/motion';
 import { go } from '@/motion/transitions';
-import { a11y, layout, makeStyles, space, type, useColors } from '@/theme';
+import { thirstLine } from '@/plants/plantStatus';
+import { layout, makeStyles, space, useColors } from '@/theme';
 
-const DELAYS: (keyof typeof riseDelay)[] = ['d1', 'd2', 'd3', 'd4'];
+const DELAYS: (keyof typeof riseDelay)[] = ['d2', 'd3', 'd4'];
 
-/** Mon jardin (docs/04 §7). */
-export default function GardenScreen() {
+/**
+ * Accueil (docs/04 §7, étendu aux jardins) : un seul jardin s'affiche directement, comme avant ;
+ * à partir de deux, la liste des jardins avec les arrosages du jour de tous les jardins.
+ */
+export default function HomeScreen() {
   const colors = useColors();
   const styles = useStyles();
   const { data: profile } = useProfile();
   const { data: plants, isError, refetch, isRefetching } = usePlants();
-  const { water } = useWatering();
+  const { data: gardens } = useGardens();
+  const refreshGardens = useRefreshGardens();
   const [pulled, setPulled] = useState(false);
+  const [menu, setMenu] = useState(false);
   useGrowthToasts(plants);
 
   // Échec sans cache (non maquetté) : squelettes + toast ; ne jamais montrer un faux « jardin vide ».
@@ -43,16 +47,42 @@ export default function GardenScreen() {
 
   // Une seule date par rendu : toutes les cartes calculent leur état au même instant.
   const now = new Date();
-  const sorted = plants ? sortGarden(plants, now) : [];
-  const todo = plants ? todoList(plants, now) : [];
+  const summaries = plants && gardens ? summarizeGardens(gardens, plants, now) : null;
+  const single = summaries?.length === 1 ? summaries[0]! : null;
 
-  const openPlant = useCallback((plant: GardenPlant) => go('plant', { id: plant.id }), []);
-  // Brouillon vidé à chaque ouverture depuis le + (docs/05).
+  // Brouillon vidé à chaque ouverture depuis le + (docs/05), jardin présélectionné s'il est unique.
   const addPlant = () => {
-    useNewPlantDraft.getState().reset();
+    useNewPlantDraft.getState().reset(single?.garden.id);
     go('newPlant');
   };
   const name = profile?.first_name;
+  const hello = name ? t('garden.hello', { name }) : t('garden.helloNoName');
+
+  let header;
+  if (single) {
+    header = (
+      <GardenHeader
+        hello={hello}
+        title={single.garden.name}
+        place={placeLabel(single.garden)}
+        subtitle={gardenSubtitle(single.plants, now)}
+        onMenu={() => setMenu(true)}
+        onAdd={addPlant}
+      />
+    );
+  } else if (summaries && summaries.length > 1) {
+    const thirsty = summaries.reduce((n, s) => n + s.thirsty, 0);
+    header = (
+      <GardenHeader
+        hello={hello}
+        title={t('gardens.homeTitle')}
+        subtitle={t('gardens.homeCount', { count: summaries.length, thirst: thirstLine(thirsty) })}
+        onAdd={addPlant}
+      />
+    );
+  } else {
+    header = <GardenHeader hello={hello} title={t('garden.title')} onAdd={addPlant} />;
+  }
 
   return (
     <Screen name="garden" refocusEnter="fade" edges={['top']}>
@@ -63,6 +93,7 @@ export default function GardenScreen() {
             refreshing={pulled && isRefetching}
             onRefresh={() => {
               setPulled(true);
+              refreshGardens();
               void refetch().finally(() => setPulled(false));
             }}
             tintColor={colors.forest}
@@ -70,87 +101,65 @@ export default function GardenScreen() {
           />
         }
       >
-        <View style={styles.header}>
-          <View style={styles.titles}>
-            <Text style={styles.hello}>
-              {name ? t('garden.hello', { name }) : t('garden.helloNoName')}
-            </Text>
-            <Text
-              style={styles.title}
-              accessibilityRole="header"
-              maxFontSizeMultiplier={a11y.maxTitleScale}
-            >
-              {t('garden.title')}
-            </Text>
-            {!!plants?.length && <Text style={styles.subtitle}>{gardenSubtitle(plants, now)}</Text>}
-          </View>
-          <IconButton
-            variant="sun"
-            accessibilityLabel={t('garden.addA11y')}
-            onPress={addPlant}
-            icon={(c) => <IconPlus size={22} color={c} strokeWidth={2.4} />}
-          />
-        </View>
+        {header}
 
-        {!plants ? (
+        {!summaries ? (
           <GardenSkeleton />
-        ) : !sorted.length ? (
+        ) : !summaries.length ? (
           <EmptyGarden onAdd={addPlant} />
+        ) : single ? (
+          <GardenPlants plants={single.plants} now={now} />
         ) : (
-          <>
-            {todo.length > 0 && <TodoCard items={todo} onWater={water} />}
-            <Text
-              style={styles.section}
-              accessibilityRole="header"
-              maxFontSizeMultiplier={a11y.maxTitleScale}
-            >
-              {t('garden.allPlants')}
-            </Text>
-            <View style={styles.grid}>
-              {pairs(sorted).map((row, r) => (
-                <View key={row[0].id} style={styles.row}>
-                  {row.map((plant, c) => (
-                    <PlantCard
-                      key={plant.id}
-                      plant={plant}
-                      now={now}
-                      delay={DELAYS[Math.min(r * 2 + c, DELAYS.length - 1)]!}
-                      onPress={openPlant}
-                    />
-                  ))}
-                  {row.length === 1 && <View style={styles.filler} />}
-                </View>
-              ))}
-            </View>
-          </>
+          <GardenList summaries={summaries} now={now} />
         )}
       </ScrollView>
+
+      {single && (
+        <GardenOptionsSheet
+          key={`${single.garden.id}-${single.garden.name}-${single.garden.city ?? ''}`}
+          garden={single.garden}
+          plantCount={single.plants.length}
+          visible={menu}
+          onClose={() => setMenu(false)}
+          onDeleted={() => setMenu(false)}
+        />
+      )}
     </Screen>
   );
 }
 
-function pairs<T>(list: T[]): [T, ...T[]][] {
-  const out: [T, ...T[]][] = [];
-  for (let i = 0; i < list.length; i += 2) {
-    out.push(list.slice(i, i + 2) as [T, ...T[]]);
-  }
-  return out;
+/** Plusieurs jardins : arrosages du jour (tous jardins), puis une carte par jardin. */
+function GardenList({ summaries, now }: { summaries: GardenSummary[]; now: Date }) {
+  const styles = useStyles();
+  const { water } = useWatering();
+  const todo = todoList(
+    summaries.flatMap((s) => s.plants),
+    now,
+  );
+  return (
+    <>
+      {todo.length > 0 && <TodoCard items={todo} onWater={water} place="garden" />}
+      <View style={styles.list}>
+        {summaries.map((summary, i) => (
+          <GardenCard
+            key={summary.garden.id}
+            summary={summary}
+            now={now}
+            delay={DELAYS[Math.min(i, DELAYS.length - 1)]!}
+            onPress={() => go('gardenDetail', { id: summary.garden.id })}
+          />
+        ))}
+      </View>
+    </>
+  );
 }
 
-const useStyles = makeStyles((colors) => ({
+const useStyles = makeStyles(() => ({
   content: {
     paddingTop: space.xs,
     paddingHorizontal: layout.screenPadTabs,
     paddingBottom: layout.bottomNavClearance,
     gap: space.xl,
   },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
-  titles: { gap: space.xxs, flexShrink: 1 },
-  hello: { ...type.bodyS, fontFamily: type.cardTitle.fontFamily, color: colors.inkMuted },
-  title: { ...type.title, color: colors.forest },
-  subtitle: { ...type.bodyS, color: colors.inkMuted },
-  section: { ...type.sectionTitle, color: colors.forest, marginTop: space.xxs },
-  grid: { gap: space.m },
-  row: { flexDirection: 'row', gap: space.m },
-  filler: { flex: 1 },
+  list: { gap: space.m },
 }));

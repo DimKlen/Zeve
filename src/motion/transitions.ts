@@ -11,6 +11,7 @@ export type ScreenKey =
   | 'connecting'
   | 'reminders'
   | 'garden'
+  | 'gardenDetail'
   | 'settings'
   | 'plant'
   | 'chat'
@@ -30,6 +31,7 @@ const ROUTES: Record<ScreenKey, (p: Params) => Href> = {
   connecting: () => '/connecting',
   reminders: () => '/reminders',
   garden: () => '/garden',
+  gardenDetail: ({ id = '' }) => `/gardens/${id}`,
   settings: () => '/settings',
   plant: ({ id = '' }) => `/plant/${id}`,
   chat: ({ id = '' }) => `/plant/${id}/chat`,
@@ -52,6 +54,12 @@ export const TRANSITIONS: Partial<Record<`${ScreenKey}>${ScreenKey}`, ScreenAnim
   'connecting>garden': 'fade',
   'reminders>garden': 'up',
   'garden>plant': 'zoom',
+  'garden>gardenDetail': 'fwd',
+  'gardenDetail>garden': 'back',
+  'gardenDetail>plant': 'zoom',
+  'plant>gardenDetail': 'back',
+  'gardenDetail>newPlant': 'up',
+  'newPlant>gardenDetail': 'back',
   'plant>garden': 'back',
   'plant>chat': 'fwd',
   'chat>plant': 'back',

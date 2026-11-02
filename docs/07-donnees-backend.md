@@ -8,8 +8,9 @@
 ## Modèle
 ```mermaid
 erDiagram
-  profiles ||--o{ rooms : possède
-  profiles ||--o{ plants : possède
+  profiles ||--o{ gardens : possède
+  gardens ||--o{ rooms : contient
+  gardens ||--o{ plants : contient
   species ||--o{ plants : "est de l'espèce"
   rooms ||--o{ plants : contient
   plants ||--o{ watering_events : "arrosée"
@@ -19,13 +20,14 @@ erDiagram
 | Table | Champs clés |
 |---|---|
 | `profiles` | id (= auth.users.id), first_name, display_email, auth_provider, reminders_enabled, reminder_time, timezone, expo_push_token, onboarded_at |
-| `rooms` | user_id, name, position (5 par défaut) |
+| `gardens` | user_id, name, city, country, country_code, latitude, longitude (jamais vide, docs/06 F14) |
+| `rooms` | user_id, garden_id, name (unique par jardin), position (5 par défaut, créées avec le jardin) |
 | `species` | id texte, name, latin, form (type de dessin), category, color_a/b/f, light, light_label, air, water_every_days, tip — lecture publique |
-| `plants` | user_id, species_id, nickname, room_id, light, water_every_days, species_source, photo_path, created_at (→ stade), archived_at |
+| `plants` | user_id, garden_id, species_id, nickname, room_id, light, water_every_days, species_source, photo_path, created_at (→ stade), archived_at |
 | `watering_events` | user_id, plant_id, watered_at |
 | `chat_messages` | user_id, plant_id, role, content, photo_path, actions (jsonb), created_at |
 | `reminders` | user_id, plant_id, due_at, message, sent_at |
-| vue `plant_overview` | plante + espèce + pièce + last_watered_at, days_since_water, days_since_created, is_thirsty (security_invoker → respecte la RLS) |
+| vue `plant_overview` | plante + espèce + pièce + jardin (nom, lieu) + last_watered_at, days_since_water, days_since_created, is_thirsty (security_invoker → respecte la RLS) |
 
 Le catalogue d'espèces existe **aussi** dans l'app (`reference/plants/species.ts`) pour l'affichage hors-ligne et les dessins. La table sert aux Edge Functions et à l'intégrité référentielle. Les deux doivent rester synchronisés (test qui compare les ids).
 

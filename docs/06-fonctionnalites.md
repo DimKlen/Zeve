@@ -98,3 +98,18 @@ Profil (prénom, e-mail affiché, fournisseur), rappels (interrupteur, heure), p
 
 ## F13. Données de démo
 Script `supabase/seed.dev.sql` (ou bouton dev) qui crée les 6 plantes de Camille avec des `created_at` et arrosages produisant exactement les captures : Gaston (430 j, dernier arrosage il y a 9 j, intervalle 8), Basilic (35 j, il y a 3 j, intervalle 2), Pépite (160 j, 3 j restants), Frida (290 j, demain), Olivia (820 j, dans 5 j), Piquant (60 j, dans 12 j).
+
+## F14. Plusieurs jardins (ajout hors design)
+- Un **jardin** est un lieu (ville, pays, coordonnées facultatives) qui regroupe des **pièces** et des **plantes**.
+- **Jamais de jardin vide** : un jardin naît avec sa première plante (RPC `create_garden_with_plant`) et la base le
+  supprime quand sa dernière plante active est supprimée ou déplacée (déclencheur `plants_drop_empty_garden`).
+  L'app prévient avant (« … est la dernière plante de … »).
+- **Nom par défaut** : « <Ville> <n> », premier numéro libre pour la ville (« Montréal 1 », « Montréal 2 ») ;
+  sans ville « Jardin <n> ». Modifiable à la création et dans le menu « … » du jardin.
+- **Lieu** : « Utiliser ma position » (permission demandée à ce moment, refus géré) ou saisie ville + pays.
+- **Accueil** : un seul jardin → l'écran du jardin directement (comme avant) ; plusieurs → « Mes jardins » :
+  arrosages du jour de tous les jardins puis une carte par jardin, qui ouvre l'écran du jardin.
+- **Saisons** : suivent l'hémisphère du jardin (latitude, sinon pays) ; le chat reçoit le lieu et la saison.
+- **Pièces** : propres à chaque jardin (5 pièces par défaut créées avec lui).
+- **Noms de plantes** : un nom suggéré est pré-rempli (univers japonais, grec, égyptien, nordique, celte, étoiles),
+  « Autre nom » en tire un autre, jamais un nom déjà porté dans le jardin ; le champ reste libre.

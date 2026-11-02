@@ -10,12 +10,16 @@ name: 03 — Arrosage quotidien
 - extendedWaitUntil:
     visible: "À arroser aujourd'hui"
     timeout: 15000
-# La première ligne est la plus assoiffée : Gaston (9 j sans eau).
-- assertVisible: "Salon · 9 j sans eau"
+# Arrosages du jour de tous les jardins ; la première ligne est la plus assoiffée : Gaston.
+- assertVisible: "Paris 1 · 9 j sans eau"
 - tapOn:
     text: "J'ai arrosé"
     index: 0
 - assertVisible: "Arrosé"
+- assertVisible: "2 jardins · 1 a soif aujourd.hui"
+- tapOn: "Paris 1, .*"
 # Nombre de plantes libre : le flow 06 (ajout par la liste) peut avoir tourné avant.
-- assertVisible: "[0-9]+ plantes · 1 a soif aujourd.hui"
+- extendedWaitUntil:
+    visible: "[0-9]+ plantes · 1 a soif aujourd.hui"
+    timeout: 10000
 - assertVisible: "Gaston, .*Arrosée · eau dans 8 j"

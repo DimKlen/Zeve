@@ -8,13 +8,16 @@ import { IconChevronRight, IconMinus, IconPlus } from '@/components/icons';
 import { IconButton } from '@/components/IconButton';
 import { TextField } from '@/components/TextField';
 import { showToast } from '@/components/Toast';
+import { usePlants } from '@/features/garden/api';
 import type { GardenPlant } from '@/features/garden/gardenRules';
+import { useGardens, useMovePlant } from '@/features/gardens/api';
+import { isLastInGarden, type Garden } from '@/features/gardens/gardenRules';
 import { t } from '@/i18n';
 import { makeStyles, space, type } from '@/theme';
 
 import { useRooms, useUpdatePlant, useWateringHistory } from './api';
 
-type View_ = 'menu' | 'rename' | 'room' | 'interval' | 'history' | 'delete';
+type View_ = 'menu' | 'rename' | 'room' | 'garden' | 'interval' | 'history' | 'delete';
 
 type Props = {
   plant: GardenPlant;
@@ -27,6 +30,7 @@ type Props = {
 const MENU: { view: Exclude<View_, 'menu'>; key: string; danger?: boolean }[] = [
   { view: 'rename', key: 'plant.menuRename' },
   { view: 'room', key: 'plant.menuRoom' },
+  { view: 'garden', key: 'gardens.move' },
   { view: 'interval', key: 'plant.menuInterval' },
   { view: 'history', key: 'plant.menuHistory' },
   { view: 'delete', key: 'plant.menuDelete', danger: true },
@@ -49,12 +53,32 @@ export function PlantOptionsSheet({ plant, visible, onClose, onDeleted }: Props)
   const [every, setEvery] = useState(plant.waterEveryDays);
   const update = useUpdatePlant();
   const rooms = useRooms();
+  const { data: gardens = [] } = useGardens();
+  const { data: plants = [] } = usePlants();
+  const move = useMovePlant();
+  const [target, setTarget] = useState<Garden | null>(null);
   const history = useWateringHistory(plant.id, visible && view === 'history');
+  // Retirer la dernière plante d'un jardin le supprime (jamais de jardin vide) : on le dit avant.
+  const last = isLastInGarden(plant, plants);
+  // « Changer de jardin » seulement s'il y a un autre jardin.
+  const menu = MENU.filter((item) => item.view !== 'garden' || gardens.length > 1);
 
   const close = () => {
     onClose();
     setView('menu');
+    setTarget(null);
   };
+  const moveTo = (garden: Garden) =>
+    move.mutate(
+      { plantId: plant.id, gardenId: garden.id, roomName: plant.roomName },
+      {
+        onSuccess: () => {
+          close();
+          showToast(t('gardens.movedToast', { name: plant.nickname, garden: garden.name }));
+        },
+        onError: () => showToast(t('toast.offline')),
+      },
+    );
   const save = (change: Parameters<typeof update.mutate>[0]['update'], after?: () => void) =>
     update.mutate(
       { plantId: plant.id, update: change },
@@ -71,12 +95,12 @@ export function PlantOptionsSheet({ plant, visible, onClose, onDeleted }: Props)
   return (
     <BottomSheet visible={visible} onClose={close}>
       {view === 'menu' &&
-        MENU.map((item, i) => (
+        menu.map((item, i) => (
           <Pressable
             key={item.view}
             onPress={() => setView(item.view)}
             accessibilityRole="button"
-            style={[styles.row, i < MENU.length - 1 && styles.separator]}
+            style={[styles.row, i < menu.length - 1 && styles.separator]}
           >
             <Text style={[styles.rowText, item.danger && styles.danger]}>{t(item.key)}</Text>
             {!item.danger && <IconChevronRight />}
@@ -106,16 +130,52 @@ export function PlantOptionsSheet({ plant, visible, onClose, onDeleted }: Props)
         <View style={styles.panel}>
           <Text style={styles.label}>{t('newPlant.room')}</Text>
           <View style={styles.chips}>
-            {(rooms.data ?? []).map((room) => (
-              <Chip
-                key={room.id}
-                label={room.name}
-                variant="room"
-                selected={room.id === plant.roomId}
-                onPress={() => save({ room_id: room.id })}
-              />
-            ))}
+            {(rooms.data ?? [])
+              .filter((room) => room.gardenId === plant.gardenId)
+              .map((room) => (
+                <Chip
+                  key={room.id}
+                  label={room.name}
+                  variant="room"
+                  selected={room.id === plant.roomId}
+                  onPress={() => save({ room_id: room.id })}
+                />
+              ))}
           </View>
+        </View>
+      )}
+
+      {view === 'garden' && !target && (
+        <View>
+          <Text style={styles.label}>{t('gardens.move')}</Text>
+          {gardens
+            .filter((g) => g.id !== plant.gardenId)
+            .map((g, i, list) => (
+              <Pressable
+                key={g.id}
+                onPress={() => (last ? setTarget(g) : moveTo(g))}
+                disabled={move.isPending}
+                accessibilityRole="button"
+                style={[styles.row, i < list.length - 1 && styles.separator]}
+              >
+                <Text style={styles.rowText}>{g.name}</Text>
+                <IconChevronRight />
+              </Pressable>
+            ))}
+        </View>
+      )}
+
+      {view === 'garden' && target && (
+        <View style={styles.panel}>
+          <Text style={styles.confirm}>
+            {t('gardens.lastPlantMove', { name: plant.nickname, garden: plant.gardenName })}
+          </Text>
+          <Button
+            label={t('gardens.moveConfirm')}
+            loading={move.isPending}
+            onPress={() => moveTo(target)}
+          />
+          <Button label={t('common.cancel')} variant="secondary" onPress={() => setTarget(null)} />
         </View>
       )}
 
@@ -167,6 +227,11 @@ export function PlantOptionsSheet({ plant, visible, onClose, onDeleted }: Props)
       {view === 'delete' && (
         <View style={styles.panel}>
           <Text style={styles.confirm}>{t('plant.deleteConfirm', { name: plant.nickname })}</Text>
+          {last && (
+            <Text style={styles.confirm}>
+              {t('gardens.lastPlantDelete', { name: plant.nickname, garden: plant.gardenName })}
+            </Text>
+          )}
           <Button
             label={t('plant.menuDelete')}
             loading={update.isPending}

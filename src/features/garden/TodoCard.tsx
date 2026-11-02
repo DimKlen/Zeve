@@ -15,10 +15,12 @@ type Props = {
   onWater: (plant: GardenPlant) => void;
   /** Couleur de fond réglable (butter par défaut, docs/02 §1). */
   accent?: string;
+  /** Lieu affiché sur chaque ligne : la pièce (un jardin) ou le jardin (accueil à plusieurs jardins). */
+  place?: 'room' | 'garden';
 };
 
 /** Carte « À arroser aujourd'hui » (docs/04 §7). */
-export function TodoCard({ items, onWater, accent: accentProp }: Props) {
+export function TodoCard({ items, onWater, accent: accentProp, place = 'room' }: Props) {
   const colors = useColors();
   const accent = accentProp ?? colors.butter;
   const styles = useStyles();
@@ -36,17 +38,26 @@ export function TodoCard({ items, onWater, accent: accentProp }: Props) {
           </Text>
         </View>
         {items.map((item) => (
-          <TodoRow key={item.plant.id} item={item} onWater={onWater} />
+          <TodoRow key={item.plant.id} item={item} onWater={onWater} place={place} />
         ))}
       </View>
     </Rise>
   );
 }
 
-function TodoRow({ item, onWater }: { item: TodoItem; onWater: (plant: GardenPlant) => void }) {
+function TodoRow({
+  item,
+  onWater,
+  place,
+}: {
+  item: TodoItem;
+  onWater: (plant: GardenPlant) => void;
+  place: 'room' | 'garden';
+}) {
   const styles = useStyles();
   const { plant, done, sinceLabel } = item;
-  const subtitle = plant.roomName ? `${plant.roomName} · ${sinceLabel}` : sinceLabel;
+  const where = place === 'garden' ? plant.gardenName : plant.roomName;
+  const subtitle = where ? `${where} · ${sinceLabel}` : sinceLabel;
   return (
     <View style={styles.row}>
       <View style={styles.texts}>

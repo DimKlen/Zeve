@@ -9,6 +9,7 @@ import { encodeBase64 } from 'jsr:@std/encoding@1/base64';
 import {
   buildSystemPrompt,
   extractAction,
+  isSouthernPlace,
   seasonNameOf,
   toGeminiContents,
   type GeminiPart,
@@ -91,6 +92,7 @@ Deno.serve(async (req) => {
       .limit(5),
   ]);
 
+  const southern = isSouthernPlace(plant.garden_latitude, plant.garden_country_code);
   const system = buildSystemPrompt({
     nickname: plant.nickname,
     speciesName: plant.species_name,
@@ -102,7 +104,9 @@ Deno.serve(async (req) => {
     lightLabel: plant.light_label,
     stage: stageOf(plant.days_since_created),
     recentWaterings: (waterings ?? []).map((w) => shortDate.format(new Date(w.watered_at))),
-    season: seasonNameOf(new Date()),
+    season: seasonNameOf(new Date(), southern),
+    place: [plant.garden_city, plant.garden_country].filter(Boolean).join(', ') || null,
+    southern,
   });
 
   // Message courant : texte + photo réelle (image en ligne) si fournie.

@@ -16,6 +16,13 @@ describe('seasonOf', () => {
     expect(seasonOf(new Date(2026, 10, 30))).toBe('autumn');
     expect(seasonOf(new Date(2026, 11, 1))).toBe('winter');
   });
+
+  it('inverse les saisons dans l’hémisphère sud', () => {
+    expect(seasonOf(new Date(2026, 0, 15), true)).toBe('summer');
+    expect(seasonOf(new Date(2026, 3, 15), true)).toBe('autumn');
+    expect(seasonOf(new Date(2026, 6, 15), true)).toBe('winter');
+    expect(seasonOf(new Date(2026, 9, 15), true)).toBe('spring');
+  });
 });
 
 describe('climateOf', () => {

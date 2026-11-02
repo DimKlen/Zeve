@@ -32,6 +32,14 @@ export function toGardenPlant(row: OverviewRow): GardenPlant {
     waterEveryDays: row.water_every_days!,
     lastWateredAt: date(row.last_watered_at),
     previousWateredAt: date(row.previous_watered_at),
+    gardenId: row.garden_id!,
+    gardenName: row.garden_name ?? '',
+    gardenPlace: {
+      latitude: row.garden_latitude,
+      countryCode: row.garden_country_code,
+      country: row.garden_country,
+      city: row.garden_city,
+    },
   };
 }
 

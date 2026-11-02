@@ -19,6 +19,15 @@ export type GardenPlant = {
   lastWateredAt: Date | null;
   /** Avant-dernier arrosage : savoir si une plante arrosée aujourd'hui avait soif. */
   previousWateredAt: Date | null;
+  /** Jardin (lieu) de la plante ; sa position sert aux saisons. */
+  gardenId: string;
+  gardenName: string;
+  gardenPlace: {
+    latitude: number | null;
+    countryCode: string | null;
+    country: string | null;
+    city: string | null;
+  };
 };
 
 export const statusOf = (p: GardenPlant, now = new Date()): PlantStatus => plantStatus(p, now);

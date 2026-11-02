@@ -68,6 +68,8 @@ const config: ExpoConfig = {
         microphonePermission: false,
       },
     ],
+    // Position demandée seulement à la création d'un jardin (« Utiliser ma position »).
+    ['expo-location', { locationWhenInUsePermission: fr.permissions.location }],
     // Splash natif uni : la séquence de lancement animée est rendue par app/index.tsx (docs/03 §6).
     ['expo-splash-screen', { backgroundColor: FOREST }],
     ...e2ePlugins,

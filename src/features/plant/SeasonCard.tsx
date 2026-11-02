@@ -13,7 +13,12 @@ import { t } from '@/i18n';
 import { climateOf, seasonalAdvice, seasonOf } from '@/plants/seasons';
 import { makeStyles, radius, space, type, useColors } from '@/theme';
 
-type Props = { speciesId: string; now?: Date };
+type Props = {
+  speciesId: string;
+  /** Jardin dans l'hémisphère sud : saisons inversées. */
+  southern?: boolean;
+  now?: Date;
+};
 
 /** Degrés avec un vrai signe moins (« −10 »). */
 const degrees = (n: number) => (n < 0 ? `−${-n}` : String(n));
@@ -22,10 +27,10 @@ const degrees = (n: number) => (n < 0 ? `−${-n}` : String(n));
  * Carte « Saison » de la fiche (non maquettée, même style que « Bon à savoir ») : saison en cours,
  * humidité et température idéales, puis les conseils de la saison pour cette espèce.
  */
-export function SeasonCard({ speciesId, now = new Date() }: Props) {
+export function SeasonCard({ speciesId, southern = false, now = new Date() }: Props) {
   const colors = useColors();
   const styles = useStyles();
-  const season = seasonOf(now);
+  const season = seasonOf(now, southern);
   const climate = climateOf(speciesId);
   const advice = seasonalAdvice(speciesId, season);
   const icon = colors.forest2;

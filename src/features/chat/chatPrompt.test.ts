@@ -1,6 +1,7 @@
 import {
   buildSystemPrompt,
   extractAction,
+  isSouthernPlace,
   seasonNameOf,
   toGeminiContents,
   type PlantContext,
@@ -18,6 +19,8 @@ const gaston: PlantContext = {
   stage: 'Adulte',
   recentWaterings: ['21 oct.', '13 oct.'],
   season: 'automne',
+  place: 'Paris, France',
+  southern: false,
 };
 
 describe('buildSystemPrompt', () => {
@@ -33,16 +36,26 @@ describe('buildSystemPrompt', () => {
   });
 
   it('donne la saison pour adapter les conseils', () => {
+    expect(buildSystemPrompt(gaston)).toContain('Saison actuelle : automne (hémisphère nord)');
     expect(buildSystemPrompt(gaston)).toContain(
-      'Saison actuelle : automne (France, hémisphère nord)',
+      'dans le/la Salon de ton humain·e, à Paris, France.',
     );
+    expect(seasonNameOf(new Date(2026, 0, 5), true)).toBe('été');
+    expect(isSouthernPlace(-33.9, null)).toBe(true);
+    expect(isSouthernPlace(null, 'au')).toBe(true);
+    expect(isSouthernPlace(45.5, 'AU')).toBe(false);
     expect(seasonNameOf(new Date(2026, 0, 5))).toBe('hiver');
     expect(seasonNameOf(new Date(2026, 6, 5))).toBe('été');
     expect(seasonNameOf(new Date(2026, 10, 1))).toBe('automne');
   });
 
   it('se passe de pièce et d’arrosages', () => {
-    const prompt = buildSystemPrompt({ ...gaston, roomName: null, recentWaterings: [] });
+    const prompt = buildSystemPrompt({
+      ...gaston,
+      roomName: null,
+      place: null,
+      recentWaterings: [],
+    });
     expect(prompt).toContain('qui vit chez ton humain·e.');
     expect(prompt).toContain('Aucun arrosage enregistré');
   });

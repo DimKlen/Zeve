@@ -8,11 +8,12 @@ import { Platform } from 'react-native';
 
 import { useAuthStore } from '@/features/auth/authStore';
 import { plantsKey } from '@/features/garden/api';
+import { gardensKey, type GardenPlace } from '@/features/gardens/api';
 import { rescheduleReminders } from '@/features/notifications/schedule';
 import { supabase } from '@/lib/supabase';
 import type { Light } from '@/plants/careInfo';
 
-import { SPECIES_BY_ID } from '@/plants/species';
+import { SPECIES_BY_ID, type Species } from '@/plants/species';
 
 import { waterEveryDaysOf } from './searchSpecies';
 
@@ -21,6 +22,7 @@ const MAX_SIDE = 1280;
 const QUALITY = 0.7;
 const IDENTIFY_TIMEOUT_MS = 20_000;
 const LAST_ROOM_KEY = 'zeve-last-room';
+const LAST_GARDEN_KEY = 'zeve-last-garden';
 
 export type PickedPhoto = { uri: string; width: number; height: number };
 
@@ -90,14 +92,67 @@ export async function identifySpecies(photoPath: string): Promise<Identification
 /** Pièce par défaut : la dernière utilisée (docs/06 F6). */
 export const loadLastRoom = () => AsyncStorage.getItem(LAST_ROOM_KEY).catch(() => null);
 
+/** Jardin par défaut depuis l'accueil : le dernier où une plante a été ajoutée. */
+export const loadLastGarden = () => AsyncStorage.getItem(LAST_GARDEN_KEY).catch(() => null);
+
+/** Jardin de la nouvelle plante : un jardin existant, ou un jardin créé avec elle. */
+export type GardenChoice =
+  { kind: 'existing'; id: string } | { kind: 'new'; name: string; place: GardenPlace | null };
+
 type CreateInput = {
   speciesId: string;
   source: 'photo' | 'list';
   name: string;
+  garden: GardenChoice;
+  /** Pièce d'un jardin existant (id) ou, pour un nouveau jardin, nom d'une pièce par défaut. */
   roomId: string | null;
+  roomName: string | null;
   light: Light;
   photoPath: string | null;
 };
+
+/** Insère la plante dans son jardin, ou crée jardin et plante ensemble (jamais de jardin vide). */
+async function insertPlant(input: CreateInput, userId: string, species: Species, nickname: string) {
+  const base = {
+    light: input.light,
+    water_every_days: waterEveryDaysOf(species),
+    species_source: input.source,
+  };
+  if (input.garden.kind === 'existing') {
+    const { data, error } = await supabase
+      .from('plants')
+      .insert({
+        ...base,
+        user_id: userId,
+        garden_id: input.garden.id,
+        species_id: species.id,
+        nickname,
+        room_id: input.roomId,
+      })
+      .select('id, garden_id')
+      .single();
+    if (error) throw error;
+    return { plantId: data.id, gardenId: data.garden_id! };
+  }
+  const { name, place } = input.garden;
+  const { data, error } = await supabase.rpc('create_garden_with_plant', {
+    p_name: name,
+    p_species_id: species.id,
+    p_nickname: nickname,
+    p_light: base.light,
+    p_water_every_days: base.water_every_days,
+    p_species_source: base.species_source,
+    p_room_name: input.roomName ?? undefined,
+    p_city: place?.city || undefined,
+    p_country: place?.country || undefined,
+    p_country_code: place?.countryCode ?? undefined,
+    p_latitude: place?.latitude ?? undefined,
+    p_longitude: place?.longitude ?? undefined,
+  });
+  const row = data?.[0];
+  if (error || !row) throw error ?? new Error('Jardin non créé.');
+  return { plantId: row.plant_id, gardenId: row.garden_id };
+}
 
 /** Création de la plante ; la photo est déplacée de tmp/ vers le dossier de la plante. */
 export function useCreatePlant() {
@@ -108,20 +163,8 @@ export function useCreatePlant() {
       const species = SPECIES_BY_ID[input.speciesId];
       if (!userId || !species) throw new Error('Données incomplètes.');
       const nickname = input.name.trim() || species.name;
-      const { data, error } = await supabase
-        .from('plants')
-        .insert({
-          user_id: userId,
-          species_id: species.id,
-          nickname,
-          room_id: input.roomId,
-          light: input.light,
-          water_every_days: waterEveryDaysOf(species),
-          species_source: input.source,
-        })
-        .select('id')
-        .single();
-      if (error) throw error;
+      const { plantId, gardenId } = await insertPlant(input, userId, species, nickname);
+      const data = { id: plantId };
 
       if (input.photoPath) {
         const finalPath = `${userId}/${data.id}/${input.photoPath.split('/').pop()}`;
@@ -132,10 +175,13 @@ export function useCreatePlant() {
         }
       }
       if (input.roomId) await AsyncStorage.setItem(LAST_ROOM_KEY, input.roomId).catch(() => null);
+      await AsyncStorage.setItem(LAST_GARDEN_KEY, gardenId).catch(() => null);
       return { id: data.id, name: nickname, speciesId: species.id };
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: plantsKey(userId) });
+      void queryClient.invalidateQueries({ queryKey: gardensKey(userId) });
+      void queryClient.invalidateQueries({ queryKey: ['rooms', userId] });
       void rescheduleReminders();
     },
   });
@@ -146,10 +192,18 @@ export function useCreateRoom() {
   const queryClient = useQueryClient();
   const userId = useAuthStore((s) => s.session?.user.id);
   return useMutation({
-    mutationFn: async ({ name, position }: { name: string; position: number }) => {
+    mutationFn: async ({
+      name,
+      position,
+      gardenId,
+    }: {
+      name: string;
+      position: number;
+      gardenId: string;
+    }) => {
       const { data, error } = await supabase
         .from('rooms')
-        .insert({ user_id: userId!, name: name.trim(), position })
+        .insert({ user_id: userId!, garden_id: gardenId, name: name.trim(), position })
         .select('id, name')
         .single();
       if (error) throw error;
