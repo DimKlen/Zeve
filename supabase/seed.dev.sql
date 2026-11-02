@@ -63,7 +63,10 @@ begin
     (uid, gaston, now() - interval '17 days'), (uid, gaston, now() - interval '9 days'),
     (uid, basilic, now() - interval '5 days'), (uid, basilic, now() - interval '3 days'),
     (uid, pepite, now() - interval '9 days'), (uid, pepite, now() - interval '3 days'),
-    (uid, frida, now() - interval '9 days'), (uid, frida, now() - interval '4 days'),
+    -- Frida boit plus vite que son rythme de 5 j : arrosée tous les 4 j (suggestion « tous les 4 jours »).
+    (uid, frida, now() - interval '20 days'), (uid, frida, now() - interval '16 days'),
+    (uid, frida, now() - interval '12 days'), (uid, frida, now() - interval '8 days'),
+    (uid, frida, now() - interval '4 days'),
     (uid, olivia, now() - interval '9 days'), (uid, olivia, now() - interval '2 days'),
     (uid, piquant, now() - interval '16 days'), (uid, piquant, now() - interval '2 days');
 
@@ -75,4 +78,8 @@ begin
   values (uid, montreal, 'sansevieria', 'Isis', mtl_salon, 'ombre', 16, 'photo', now() - interval '80 days') returning id into isis;
   insert into public.watering_events (user_id, plant_id, watered_at) values
     (uid, hermes, now() - interval '1 day'), (uid, isis, now() - interval '5 days');
+
+  -- Intervalle attendu de chaque arrosage : le rythme de la plante (apprentissage, migration 0007).
+  update public.watering_events w set expected_days = p.water_every_days
+  from public.plants p where p.id = w.plant_id and w.user_id = uid;
 end $$;
