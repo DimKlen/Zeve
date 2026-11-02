@@ -41,7 +41,7 @@ jobs:
 
       - name: Supabase local (IA et météo simulées, jardin de démo)
         run: |
-          printf 'IDENTIFY_MOCK_SPECIES=monstera\nCHAT_MOCK=1\nWEATHER_MOCK=1\n' > supabase/functions/.env
+          printf 'IDENTIFY_MOCK_SPECIES=monstera\nCHAT_MOCK=1\nWEATHER_MOCK=1\nDISCOVER_MOCK=1\n' > supabase/functions/.env
           npx supabase start -x studio,imgproxy,vector,logflare,supavisor,postgres-meta,realtime
 
       - uses: actions/cache@v4

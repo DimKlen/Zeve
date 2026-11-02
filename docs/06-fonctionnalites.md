@@ -132,3 +132,17 @@ Script `supabase/seed.dev.sql` (ou bouton dev) qui crée les 6 plantes de Camill
   `plant_overview.is_thirsty` reste le calcul brut (rythme fixe) et n'est pas lu par l'app.
 - Local, CI et E2E : `WEATHER_MOCK=1` (météo neutre, aucun effet).
 
+## F16. Mode « Découvrir » (ajout hors design)
+- **Où** : troisième onglet de la barre flottante (Jardin · Découvrir · Réglages). Photographier une plante
+  (appareil photo) ou « Choisir une photo » (galerie) ; rien n'est ajouté au jardin (l'ajout reste réservé au +).
+- **Reconnaissance** : Edge Function `discover-plant` → Pl@ntNet (3 meilleurs candidats : nom commun FR, latin,
+  famille, confiance). Sous 50 % de confiance : « Pas sûr à 100 % » et les autres possibilités en puces.
+- **Fiche découverte** : Gemini en JSON structuré (schéma imposé, validé par `normalizeFacts`) : comestibilité
+  (Comestible / En partie / Toxique / Non comestible / Inconnu, toujours avec « Ne mange jamais une plante
+  identifiée seulement par une app »), origine, usages humains, faune, anecdotes. Au moindre doute : « Inconnu ».
+  Cache partagé `plant_facts` par espèce (quota Gemini) ; lien vers le guide d'entretien si l'espèce est au catalogue.
+- **Quota** : 20 découvertes par jour et par utilisateur (table `discoveries`).
+- **Confidentialité** : la photo envoyée est supprimée après l'identification ; l'historique (10 dernières
+  découvertes) reste sur l'appareil.
+- Local, CI et E2E : `DISCOVER_MOCK=1` (un pissenlit, fiche fixe).
+

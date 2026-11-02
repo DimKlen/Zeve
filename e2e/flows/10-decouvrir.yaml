@@ -1,0 +1,20 @@
+# Mode « Découvrir » (docs/06 F16) : l'onglet, son invitation et l'historique vide.
+# Le parcours photo complet est manuel (11) : l'émulateur n'a ni appareil photo ni galerie.
+appId: com.zeve.app
+name: 10 — Découvrir
+---
+- runFlow:
+    file: ../subflows/login.yaml
+    env:
+      EMAIL: camille@zeve.test
+- extendedWaitUntil:
+    visible: "Mes jardins"
+    timeout: 15000
+- tapOn: "Découvrir"
+- extendedWaitUntil:
+    visible: "Une plante t.intrigue en balade.*"
+    timeout: 10000
+- assertVisible: "Photographier une plante"
+- assertVisible: "Choisir une photo"
+- assertVisible: "Tes dernières découvertes"
+- assertVisible: "Tes découvertes apparaîtront ici."
