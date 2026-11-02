@@ -1,13 +1,17 @@
 // Données du jardin (docs/07 : vue plant_overview) et arrosage optimiste (docs/06 F4).
 import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import * as Haptics from 'expo-haptics';
+import { useMemo } from 'react';
 
 import { showToast } from '@/components/Toast';
 import { useAuthStore } from '@/features/auth/authStore';
+import { dryingLookup, useWeather } from '@/features/gardens/weather';
 import { rescheduleReminders } from '@/features/notifications/schedule';
 import { t } from '@/i18n';
 import type { Database } from '@/lib/database.types';
 import { supabase } from '@/lib/supabase';
+
+import type { WateringEvent } from '@/plants/wateringModel';
 
 import type { GardenPlant } from './gardenRules';
 
@@ -40,7 +44,26 @@ export function toGardenPlant(row: OverviewRow): GardenPlant {
       country: row.garden_country,
       city: row.garden_city,
     },
+    outdoor: !!row.room_outdoor,
+    history: parseHistory(row.watering_history),
+    learnedEveryDays: row.learned_every_days,
+    declined:
+      row.suggestion_declined_days !== null && row.suggestion_declined_count !== null
+        ? { days: row.suggestion_declined_days, count: row.suggestion_declined_count }
+        : null,
+    drying: null,
   };
+}
+
+/** Historique de la vue ({ at, expected }[], plus récent d'abord) → arrosages typés. */
+function parseHistory(value: OverviewRow['watering_history']): WateringEvent[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((item) => {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) return [];
+    const at = typeof item.at === 'string' ? new Date(item.at) : null;
+    const expected = typeof item.expected === 'number' ? item.expected : null;
+    return at ? [{ at, expectedDays: expected }] : [];
+  });
 }
 
 export const plantsKey = (userId: string | undefined) => ['plants', userId] as const;
@@ -54,15 +77,25 @@ async function fetchPlants(): Promise<OverviewRow[]> {
 
 const toGarden = (rows: OverviewRow[]) => rows.map(toGardenPlant);
 
-/** Toutes les plantes de l'utilisateur (le cache est persisté : affichage hors ligne). */
+/**
+ * Toutes les plantes de l'utilisateur (le cache est persisté : affichage hors ligne), avec l'effet
+ * de la météo de leur jardin : la date d'arrosage en tient compte partout (plantStatus).
+ */
 export function usePlants() {
   const userId = useAuthStore((s) => s.session?.user.id);
-  return useQuery({
+  const query = useQuery({
     queryKey: plantsKey(userId),
     queryFn: fetchPlants,
     select: toGarden,
     enabled: !!userId,
   });
+  const { data: weather } = useWeather();
+  const data = useMemo(() => {
+    if (!query.data) return query.data;
+    const drying = dryingLookup(weather);
+    return query.data.map((p) => ({ ...p, drying: drying(p.gardenId, p.outdoor) }));
+  }, [query.data, weather]);
+  return { ...query, data };
 }
 
 /** Une plante, lue dans la liste du jardin (mêmes données optimistes partout). */
@@ -79,7 +112,14 @@ const startOfToday = () => {
 // Arrosage hors ligne (docs/06 F12) : les mutations ont une clé et une fonction enregistrées une
 // fois pour toutes ; sans réseau elles sont mises en pause, persistées avec le cache et rejouées
 // au retour du réseau, même après un redémarrage. Les variables sont donc de simples valeurs JSON.
-type WaterVars = { plantId: string; userId: string; nickname: string; wateredAt: string };
+type WaterVars = {
+  plantId: string;
+  userId: string;
+  nickname: string;
+  wateredAt: string;
+  /** Rythme attendu au moment de l'arrosage (apprentissage du rythme). */
+  expectedDays?: number;
+};
 type UndoVars = { plantId: string; since: string };
 const WATER_KEY = ['water'] as const;
 const UNDO_KEY = ['unwater'] as const;
@@ -87,11 +127,14 @@ const UNDO_KEY = ['unwater'] as const;
 /** À appeler au démarrage, avant la reprise des mutations en pause. */
 export function registerWateringMutations(client: QueryClient) {
   client.setMutationDefaults(WATER_KEY, {
-    mutationFn: async ({ plantId, userId, wateredAt }: WaterVars) => {
+    mutationFn: async ({ plantId, userId, wateredAt, expectedDays }: WaterVars) => {
       // L'heure du tap, pas celle de l'envoi : l'arrosage compte pour le bon jour.
-      const { error } = await supabase
-        .from('watering_events')
-        .insert({ plant_id: plantId, user_id: userId, watered_at: wateredAt });
+      const { error } = await supabase.from('watering_events').insert({
+        plant_id: plantId,
+        user_id: userId,
+        watered_at: wateredAt,
+        expected_days: expectedDays ?? null,
+      });
       if (error) throw error;
     },
   });
@@ -143,6 +186,10 @@ export function useWatering() {
           ...row,
           previous_watered_at: row.last_watered_at,
           last_watered_at: vars.wateredAt,
+          watering_history: [
+            { at: vars.wateredAt, expected: vars.expectedDays ?? null },
+            ...(Array.isArray(row.watering_history) ? row.watering_history : []),
+          ],
         }),
         vars.plantId,
       );
@@ -155,7 +202,22 @@ export function useWatering() {
     mutationKey: UNDO_KEY,
     onMutate: (vars) =>
       optimistic(
-        (row) => ({ ...row, last_watered_at: row.previous_watered_at, previous_watered_at: null }),
+        (row) => ({
+          ...row,
+          last_watered_at: row.previous_watered_at,
+          previous_watered_at: null,
+          watering_history: (Array.isArray(row.watering_history)
+            ? row.watering_history
+            : []
+          ).filter(
+            (item) =>
+              !item ||
+              typeof item !== 'object' ||
+              Array.isArray(item) ||
+              typeof item.at !== 'string' ||
+              new Date(item.at).getTime() < new Date(vars.since).getTime(),
+          ),
+        }),
         vars.plantId,
       ),
     onError: rollback,
@@ -170,6 +232,7 @@ export function useWatering() {
         userId,
         nickname: plant.nickname,
         wateredAt: new Date().toISOString(),
+        expectedDays: plant.waterEveryDays,
       });
     },
     undo: (plant: GardenPlant) =>

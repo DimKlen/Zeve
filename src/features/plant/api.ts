@@ -9,10 +9,16 @@ import { supabase } from '@/lib/supabase';
 
 type PlantUpdate = Pick<
   Database['public']['Tables']['plants']['Update'],
-  'nickname' | 'room_id' | 'water_every_days' | 'archived_at'
+  | 'nickname'
+  | 'room_id'
+  | 'water_every_days'
+  | 'archived_at'
+  | 'learned_every_days'
+  | 'suggestion_declined_days'
+  | 'suggestion_declined_count'
 >;
 
-export type Room = { id: string; name: string; gardenId: string };
+export type Room = { id: string; name: string; gardenId: string; outdoor: boolean };
 
 /** Pièces de l'utilisateur (tous jardins), dans l'ordre choisi. */
 export function useRooms() {
@@ -23,10 +29,15 @@ export function useRooms() {
     queryFn: async (): Promise<Room[]> => {
       const { data, error } = await supabase
         .from('rooms')
-        .select('id, name, garden_id')
+        .select('id, name, garden_id, outdoor')
         .order('position', { ascending: true });
       if (error) throw error;
-      return data.map((r) => ({ id: r.id, name: r.name, gardenId: r.garden_id }));
+      return data.map((r) => ({
+        id: r.id,
+        name: r.name,
+        gardenId: r.garden_id,
+        outdoor: r.outdoor,
+      }));
     },
   });
 }

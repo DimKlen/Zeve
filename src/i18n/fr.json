@@ -69,6 +69,21 @@
     "hint2": "< 1 an",
     "hint3": "1 an et +"
   },
+  "rhythm": {
+    "title": "Son vrai rythme",
+    "suggestMore": "{name} boit plus souvent que prévu : tous les {n} jours plutôt que {current}.",
+    "suggestLess": "{name} a besoin de moins d’eau que prévu : tous les {n} jours plutôt que {current}.",
+    "basis": "D’après tes {count} derniers arrosages.",
+    "adopt": "Adopter",
+    "later": "Plus tard",
+    "adoptedToast": "C’est noté ! Tous les {n} jours pour {name}.",
+    "learned": "Appris d’après tes arrosages : tous les {n} j",
+    "hot": "Plus tôt : il fait chaud à {place}",
+    "dry": "Plus tôt : l’air est sec à {place}",
+    "sunny": "Plus tôt : beaucoup de soleil à {place}",
+    "cool": "Plus tard : il fait frais à {place}",
+    "humid": "Plus tard : temps humide à {place}"
+  },
   "gardens": {
     "defaultBase": "Jardin",
     "homeTitle": "Mes jardins",
@@ -429,6 +444,8 @@
     "nameLabel": "Nom de la pièce",
     "empty": "Pas encore de pièce.",
     "exists": "Cette pièce existe déjà.",
-    "gardenEmpty": "Pas encore de pièce dans ce jardin."
+    "gardenEmpty": "Pas encore de pièce dans ce jardin.",
+    "outdoor": "Pièce extérieure",
+    "outdoorHint": "Balcon, terrasse : la météo de la ville compte davantage."
   }
 }

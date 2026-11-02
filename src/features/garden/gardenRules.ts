@@ -1,6 +1,7 @@
 // Règles du jardin (docs/06 F3) : carte « À arroser aujourd'hui », tri de la grille, sous-titre.
 import { t } from '@/i18n';
 import { plantStatus, thirstLine, type PlantStatus } from '@/plants/plantStatus';
+import type { Drying, WateringEvent } from '@/plants/wateringModel';
 
 export type GardenPlant = {
   id: string;
@@ -28,6 +29,15 @@ export type GardenPlant = {
     country: string | null;
     city: string | null;
   };
+  /** Pièce extérieure (balcon…) : la météo de la ville compte pleinement. */
+  outdoor: boolean;
+  /** Arrosages récents (du plus récent au plus ancien) : apprentissage du rythme. */
+  history: WateringEvent[];
+  /** Rythme appris adopté, et dernière suggestion refusée. */
+  learnedEveryDays: number | null;
+  declined: { days: number; count: number } | null;
+  /** Effet de la météo du jardin, ajouté par usePlants (null : pas de météo). */
+  drying: Drying | null;
 };
 
 export const statusOf = (p: GardenPlant, now = new Date()): PlantStatus => plantStatus(p, now);

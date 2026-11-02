@@ -52,6 +52,17 @@ export function useRoomMutations() {
     },
     onSettled: refresh,
   });
+  const setOutdoor = useMutation({
+    mutationFn: async ({ id, outdoor }: { id: string; outdoor: boolean }) => {
+      const { error } = await supabase.from('rooms').update({ outdoor }).eq('id', id);
+      if (error) throw error;
+    },
+    onSettled: () => {
+      refresh();
+      // La météo pèse plus ou moins sur la date d'arrosage : rappels recalculés.
+      void rescheduleReminders();
+    },
+  });
   const remove = useMutation({
     mutationFn: async (id: string) => {
       // Les plantes de la pièce gardent leur place au jardin (room_id → null, docs/07).
@@ -60,7 +71,7 @@ export function useRoomMutations() {
     },
     onSettled: refresh,
   });
-  return { rename, remove };
+  return { rename, remove, setOutdoor };
 }
 
 /** Export JSON de toutes les données de l'utilisateur (confidentialité, docs/06 F10). */

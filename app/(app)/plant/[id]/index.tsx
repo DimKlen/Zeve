@@ -16,6 +16,7 @@ import { statusOf } from '@/features/garden/gardenRules';
 import { isSouthern } from '@/features/gardens/gardenRules';
 import { MascotScene } from '@/features/plant/MascotScene';
 import { PlantOptionsSheet } from '@/features/plant/PlantOptionsSheet';
+import { RhythmCard } from '@/features/plant/RhythmCard';
 import { SeasonCard } from '@/features/plant/SeasonCard';
 import { CareGuideSheet } from '@/features/plant/CareGuide';
 import { TextButton } from '@/components/TextButton';
@@ -117,6 +118,14 @@ export default function PlantScreen() {
               <IconAir />
             </InfoTile>
           </Rise>
+          {/* Date d'arrosage avancée ou retardée par la météo du jardin : la raison, sinon rien. */}
+          {s.weatherCause && !s.wateredToday && (
+            <Text style={styles.weather} accessibilityLiveRegion="polite">
+              {t(`rhythm.${s.weatherCause}`, {
+                place: plant.gardenPlace.city ?? plant.gardenName,
+              })}
+            </Text>
+          )}
 
           <Rise delay="d2">
             <Button
@@ -140,6 +149,10 @@ export default function PlantScreen() {
               <GrowthSteps stage={s.stage} />
             </Rise>
           )}
+
+          <Rise delay="d3">
+            <RhythmCard plant={plant} />
+          </Rise>
 
           <Rise delay="d3" style={[styles.card, styles.tipCard]}>
             <Text style={styles.overline}>{t('plant.tip')}</Text>
@@ -219,6 +232,7 @@ const useStyles = makeStyles((colors) => ({
     gap: space.ml,
   },
   tiles: { flexDirection: 'row', gap: space.sm },
+  weather: { ...type.caption, color: colors.inkMuted, marginTop: -space.s },
   card: {
     backgroundColor: colors.surface,
     borderRadius: radius.lg,

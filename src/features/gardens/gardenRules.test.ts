@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs';
+import { readdirSync, readFileSync } from 'fs';
 import { join } from 'path';
 
 import type { GardenPlant } from '@/features/garden/gardenRules';
@@ -52,6 +52,11 @@ const plant = (id: string, gardenId: string, lastWatered: number, every = 7): Ga
   gardenId,
   gardenName: gardenId,
   gardenPlace: { latitude: null, countryCode: null, country: null, city: null },
+  outdoor: false,
+  history: [],
+  learnedEveryDays: null,
+  declined: null,
+  drying: null,
 });
 
 describe('defaultGardenName', () => {
@@ -115,11 +120,13 @@ describe('isLastInGarden', () => {
 
 describe('DEFAULT_ROOMS', () => {
   it('correspond aux pièces créées par la base avec chaque jardin', () => {
-    const sql = readFileSync(
-      join(__dirname, '../../../supabase/migrations/0006_gardens.sql'),
-      'utf8',
-    );
-    const body = sql.slice(sql.indexOf('function public.handle_new_garden'));
+    // Dernière définition de handle_new_garden, toutes migrations confondues.
+    const dir = join(__dirname, '../../../supabase/migrations');
+    const sql = readdirSync(dir)
+      .sort()
+      .map((file) => readFileSync(join(dir, file), 'utf8'))
+      .join('\n');
+    const body = sql.slice(sql.lastIndexOf('function public.handle_new_garden'));
     const names = [
       ...body.slice(0, body.indexOf('return new')).matchAll(/new\.id, '([^']+)'/g),
     ].map((m) => m[1]);
