@@ -63,4 +63,5 @@ name: 06 — Ajout par la liste
 - extendedWaitUntil:
     visible: "Lianne est en forme"
     timeout: 10000
-- assertVisible: "Pousse, .*"
+# La carte « Croissance » est masquée (SHOW_GROWTH_CARD) : on vérifie l'espèce et la pièce de la fiche.
+- assertVisible: "Echeveria elegans · .*"
