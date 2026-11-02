@@ -72,11 +72,49 @@ export type Database = {
           },
         ];
       };
+      gardens: {
+        Row: {
+          city: string | null;
+          country: string | null;
+          country_code: string | null;
+          created_at: string;
+          id: string;
+          latitude: number | null;
+          longitude: number | null;
+          name: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          city?: string | null;
+          country?: string | null;
+          country_code?: string | null;
+          created_at?: string;
+          id?: string;
+          latitude?: number | null;
+          longitude?: number | null;
+          name: string;
+          user_id: string;
+        };
+        Update: {
+          city?: string | null;
+          country?: string | null;
+          country_code?: string | null;
+          created_at?: string;
+          id?: string;
+          latitude?: number | null;
+          longitude?: number | null;
+          name?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       plants: {
         Row: {
           archived_at: string | null;
           care_tip: string | null;
           created_at: string;
+          garden_id: string | null;
           id: string;
           light: Database['public']['Enums']['light_exposure'];
           nickname: string;
@@ -92,6 +130,7 @@ export type Database = {
           archived_at?: string | null;
           care_tip?: string | null;
           created_at?: string;
+          garden_id?: string | null;
           id?: string;
           light?: Database['public']['Enums']['light_exposure'];
           nickname: string;
@@ -106,6 +145,7 @@ export type Database = {
           archived_at?: string | null;
           care_tip?: string | null;
           created_at?: string;
+          garden_id?: string | null;
           id?: string;
           light?: Database['public']['Enums']['light_exposure'];
           nickname?: string;
@@ -117,6 +157,13 @@ export type Database = {
           water_every_days?: number;
         };
         Relationships: [
+          {
+            foreignKeyName: 'plants_garden_id_fkey';
+            columns: ['garden_id'];
+            isOneToOne: false;
+            referencedRelation: 'gardens';
+            referencedColumns: ['id'];
+          },
           {
             foreignKeyName: 'plants_room_id_fkey';
             columns: ['room_id'];
@@ -218,6 +265,7 @@ export type Database = {
       };
       rooms: {
         Row: {
+          garden_id: string;
           id: string;
           name: string;
           position: number;
@@ -225,18 +273,28 @@ export type Database = {
         };
         ComputedFields: never;
         Insert: {
+          garden_id: string;
           id?: string;
           name: string;
           position?: number;
           user_id: string;
         };
         Update: {
+          garden_id?: string;
           id?: string;
           name?: string;
           position?: number;
           user_id?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'rooms_garden_id_fkey';
+            columns: ['garden_id'];
+            isOneToOne: false;
+            referencedRelation: 'gardens';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       species: {
         Row: {
@@ -335,6 +393,12 @@ export type Database = {
           days_since_created: number | null;
           days_since_water: number | null;
           form: string;
+          garden_city: string | null;
+          garden_country: string | null;
+          garden_country_code: string | null;
+          garden_id: string | null;
+          garden_latitude: number | null;
+          garden_name: string | null;
           id: string;
           is_thirsty: boolean | null;
           last_watered_at: string | null;
@@ -357,6 +421,13 @@ export type Database = {
         ComputedFields: never;
         Relationships: [
           {
+            foreignKeyName: 'plants_garden_id_fkey';
+            columns: ['garden_id'];
+            isOneToOne: false;
+            referencedRelation: 'gardens';
+            referencedColumns: ['id'];
+          },
+          {
             foreignKeyName: 'plants_room_id_fkey';
             columns: ['room_id'];
             isOneToOne: false;
@@ -374,7 +445,26 @@ export type Database = {
       };
     };
     Functions: {
-      [_ in never]: never;
+      create_garden_with_plant: {
+        Args: {
+          p_city?: string;
+          p_country?: string;
+          p_country_code?: string;
+          p_latitude?: number;
+          p_light: Database['public']['Enums']['light_exposure'];
+          p_longitude?: number;
+          p_name: string;
+          p_nickname: string;
+          p_room_name?: string;
+          p_species_id: string;
+          p_species_source: string;
+          p_water_every_days: number;
+        };
+        Returns: {
+          garden_id: string;
+          plant_id: string;
+        }[];
+      };
     };
     Enums: {
       light_exposure: 'ombre' | 'indirect' | 'soleil';
