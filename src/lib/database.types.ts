@@ -72,6 +72,28 @@ export type Database = {
           },
         ];
       };
+      discoveries: {
+        Row: {
+          created_at: string;
+          id: string;
+          latin: string | null;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          id?: string;
+          latin?: string | null;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          latin?: string | null;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       garden_weather: {
         Row: {
           day: string;
@@ -148,6 +170,37 @@ export type Database = {
           longitude?: number | null;
           name?: string;
           user_id?: string;
+        };
+        Relationships: [];
+      };
+      plant_facts: {
+        Row: {
+          common_name: string | null;
+          created_at: string;
+          facts: NonNullable<Json>;
+          family: string | null;
+          lang: string;
+          latin: string;
+          latin_key: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          common_name?: string | null;
+          created_at?: string;
+          facts: NonNullable<Json>;
+          family?: string | null;
+          lang?: string;
+          latin: string;
+          latin_key: string;
+        };
+        Update: {
+          common_name?: string | null;
+          created_at?: string;
+          facts?: NonNullable<Json>;
+          family?: string | null;
+          lang?: string;
+          latin?: string;
+          latin_key?: string;
         };
         Relationships: [];
       };
