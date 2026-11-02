@@ -98,6 +98,23 @@ export const IconRepot = ({ size = 22, color = '#1F3D2B', strokeWidth = 2 }: P) 
     />
   </S>
 );
+export const IconPin = ({ size = 22, color = '#1F3D2B', strokeWidth = 2 }: P) => (
+  <S size={size}>
+    <Path
+      d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"
+      {...line(color, strokeWidth)}
+    />
+    <Circle cx={12} cy={9.5} r={2.5} {...line(color, strokeWidth)} />
+  </S>
+);
+export const IconShuffle = ({ size = 22, color = '#1F3D2B', strokeWidth = 2 }: P) => (
+  <S size={size}>
+    <Path
+      d="M3 7h4c4 0 6 10 10 10h4M18 14l3 3-3 3M3 17h4c1.5 0 2.7-1.4 3.7-3.2M13.3 10.2C14.3 8.4 15.5 7 17 7h4M18 4l3 3-3 3"
+      {...line(color, strokeWidth)}
+    />
+  </S>
+);
 export const IconCamera = ({ size = 22, color = '#1F3D2B', strokeWidth = 2 }: P) => (
   <S size={size}>
     <Path d="M4 8h3l2-3h6l2 3h3v11H4z" {...line(color, strokeWidth)} />

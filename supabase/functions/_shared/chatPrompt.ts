@@ -14,6 +14,10 @@ export type PlantContext = {
   recentWaterings: string[];
   /** Saison en cours, en toutes lettres (« automne »). */
   season: string;
+  /** Lieu du jardin (« Montréal, Canada »), s'il est connu. */
+  place: string | null;
+  /** Jardin dans l'hémisphère sud. */
+  southern: boolean;
 };
 
 export type ChatAction = { type: 'remind'; days: number; label: string };
@@ -38,8 +42,19 @@ const SEASON_BY_MONTH = [
   'été', 'été', 'automne', 'automne', 'automne', 'hiver',
 ];
 
-/** Saison météorologique de l'hémisphère nord (même découpage que src/plants/seasons.ts). */
-export const seasonNameOf = (date: Date): string => SEASON_BY_MONTH[date.getMonth()]!;
+/** Saison météorologique, décalée de six mois dans l'hémisphère sud (comme src/plants/seasons.ts). */
+export const seasonNameOf = (date: Date, southern = false): string =>
+  SEASON_BY_MONTH[(date.getMonth() + (southern ? 6 : 0)) % 12]!;
+
+// Pays de l'hémisphère sud quand la latitude manque (même liste que src/features/gardens/gardenRules.ts).
+const SOUTHERN_CODES = new Set([
+  'AR', 'AU', 'BO', 'BR', 'BW', 'CL', 'FJ', 'LS', 'MG', 'MU', 'MW', 'MZ', 'NA', 'NC', 'NZ',
+  'PE', 'PF', 'PY', 'RE', 'SZ', 'UY', 'YT', 'ZA', 'ZM', 'ZW',
+]);
+
+/** Hémisphère sud d'après la latitude du jardin, sinon son pays. */
+export const isSouthernPlace = (latitude: number | null, countryCode: string | null) =>
+  latitude !== null ? latitude < 0 : !!countryCode && SOUTHERN_CODES.has(countryCode.toUpperCase());
 
 /** Prompt système de docs/07, adapté à Gemini. */
 export function buildSystemPrompt(p: PlantContext): string {
@@ -50,12 +65,13 @@ export function buildSystemPrompt(p: PlantContext): string {
     ? `Derniers arrosages : ${p.recentWaterings.join(', ')}.`
     : 'Aucun arrosage enregistré pour l’instant.';
   return [
-    `Tu es ${p.nickname}, une plante (${p.speciesName}, ${p.latin}) qui vit ${home}.`,
+    `Tu es ${p.nickname}, une plante (${p.speciesName}, ${p.latin}) qui vit ${home}` +
+      (p.place ? `, à ${p.place}.` : '.'),
     'Tu parles à la première personne, en français, en tutoyant, avec chaleur et simplicité.',
     `Ton état : dernier arrosage il y a ${p.daysSinceWater} jours (rythme idéal : tous les ${p.waterEveryDays} jours), ` +
       `lumière à ton emplacement : ${LIGHT_NAMES[p.light] ?? p.light}, lumière idéale : ${p.lightLabel}, stade dans l'app : ${p.stage}.`,
     waterings,
-    `Saison actuelle : ${p.season} (France, hémisphère nord). Adapte tes conseils à la saison : ` +
+    `Saison actuelle : ${p.season} (hémisphère ${p.southern ? 'sud' : 'nord'}). Adapte tes conseils à la saison et au climat du lieu : ` +
       'arrosage, lumière, emplacement (intérieur ou dehors), engrais, humidité de l’air et température de la pièce.',
     'Réponds en 2 à 5 phrases, avec des conseils concrets et prudents, en texte simple sans Markdown. ' +
       'Si une photo est fournie, décris ce que tu observes avant de conseiller.',

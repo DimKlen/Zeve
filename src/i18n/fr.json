@@ -69,6 +69,48 @@
     "hint2": "< 1 an",
     "hint3": "1 an et +"
   },
+  "gardens": {
+    "defaultBase": "Jardin",
+    "homeTitle": "Mes jardins",
+    "homeCount": "{count} jardins · {thirst}",
+    "plantsOne": "1 plante",
+    "plantsMany": "{n} plantes",
+    "thirstNone": "tout le monde est hydraté",
+    "thirstOne": "1 a soif",
+    "thirstMany": "{n} ont soif",
+    "cardA11y": "{name}, {place}, {plants}, {thirst}",
+    "backA11y": "Retour à mes jardins",
+    "menuA11y": "Options du jardin",
+    "menuRename": "Renommer le jardin",
+    "menuPlace": "Changer le lieu",
+    "menuDelete": "Supprimer le jardin",
+    "deleteConfirm": "Supprimer « {name} » et ses plantes ? Leur historique et leurs messages disparaîtront.",
+    "deleteConfirmOne": "Supprimer « {name} » et sa plante ? Son historique et ses messages disparaîtront.",
+    "deletedToast": "« {name} » a été supprimé",
+    "nameLabel": "Nom du jardin",
+    "label": "Jardin",
+    "newGarden": "Nouveau jardin",
+    "newGardenTitle": "Un nouveau jardin",
+    "newGardenText": "Il sera créé avec cette plante.",
+    "placeTitle": "Où se trouve ce jardin ?",
+    "useLocation": "Utiliser ma position",
+    "locating": "Je cherche où tu es…",
+    "locationDenied": "Position refusée : écris la ville à la main.",
+    "locationFailed": "Position introuvable : écris la ville à la main.",
+    "cityLabel": "Ville",
+    "cityPlaceholder": "Ex. : Montréal",
+    "countryLabel": "Pays",
+    "countryPlaceholder": "Ex. : Canada",
+    "save": "Valider",
+    "savedToast": "C’est noté !",
+    "lastPlantDelete": "{name} est la dernière plante de « {garden} » : le jardin sera supprimé aussi.",
+    "lastPlantMove": "{name} est la dernière plante de « {garden} » : ce jardin sera supprimé.",
+    "move": "Changer de jardin",
+    "moveConfirm": "Déplacer",
+    "movedToast": "{name} a rejoint « {garden} »",
+    "gone": "Ce jardin n’existe plus.",
+    "newGardenHint": "Touche-le pour choisir son lieu."
+  },
   "plant": {
     "backA11y": "Retour au jardin",
     "moreA11y": "Plus d'options",
@@ -308,7 +350,9 @@
     "identifyTimeout": "La reconnaissance prend trop de temps. Choisis-la dans la liste.",
     "addingA11y": "Ajout en cours",
     "changeA11y": "Changer d’espèce",
-    "namePlaceholderDefault": "Ex. : Monty"
+    "namePlaceholderDefault": "Ex. : Monty",
+    "otherName": "Autre nom",
+    "gardenLabel": "Jardin"
   },
   "species": {
     "title": "Choisir une espèce",
@@ -341,7 +385,8 @@
   },
   "permissions": {
     "camera": "Zeve utilise l'appareil photo pour reconnaître tes plantes et les montrer à l'assistant.",
-    "photos": "Zeve accède à tes photos pour reconnaître tes plantes."
+    "photos": "Zeve accède à tes photos pour reconnaître tes plantes.",
+    "location": "Zeve utilise ta position pour situer ton jardin et adapter les conseils de saison."
   },
   "added": {
     "title": "{name} est chez elle !",
@@ -383,6 +428,7 @@
     "plantsMany": "{n} plantes",
     "nameLabel": "Nom de la pièce",
     "empty": "Pas encore de pièce.",
-    "exists": "Cette pièce existe déjà."
+    "exists": "Cette pièce existe déjà.",
+    "gardenEmpty": "Pas encore de pièce dans ce jardin."
   }
 }

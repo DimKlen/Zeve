@@ -13,6 +13,7 @@ import { Screen } from '@/components/Screen';
 import { WaterGauge } from '@/components/WaterGauge';
 import { usePlant, useWatering } from '@/features/garden/api';
 import { statusOf } from '@/features/garden/gardenRules';
+import { isSouthern } from '@/features/gardens/gardenRules';
 import { MascotScene } from '@/features/plant/MascotScene';
 import { PlantOptionsSheet } from '@/features/plant/PlantOptionsSheet';
 import { SeasonCard } from '@/features/plant/SeasonCard';
@@ -149,7 +150,7 @@ export default function PlantScreen() {
           </Rise>
 
           <Rise delay="d4">
-            <SeasonCard speciesId={plant.speciesId} />
+            <SeasonCard speciesId={plant.speciesId} southern={isSouthern(plant.gardenPlace)} />
           </Rise>
 
           <Rise delay="d4">
