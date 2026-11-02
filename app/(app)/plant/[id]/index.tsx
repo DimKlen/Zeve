@@ -16,6 +16,8 @@ import { statusOf } from '@/features/garden/gardenRules';
 import { MascotScene } from '@/features/plant/MascotScene';
 import { PlantOptionsSheet } from '@/features/plant/PlantOptionsSheet';
 import { SeasonCard } from '@/features/plant/SeasonCard';
+import { CareGuideSheet } from '@/features/plant/CareGuide';
+import { TextButton } from '@/components/TextButton';
 import { t } from '@/i18n';
 import { SHOW_GROWTH_CARD } from '@/lib/config';
 import { go, goBack } from '@/motion/transitions';
@@ -32,6 +34,7 @@ export default function PlantScreen() {
   const [drops, setDrops] = useState(0);
   const [justWatered, setJustWatered] = useState(false);
   const [menu, setMenu] = useState(false);
+  const [guide, setGuide] = useState(false);
 
   if (!plant) {
     return (
@@ -140,6 +143,9 @@ export default function PlantScreen() {
           <Rise delay="d3" style={[styles.card, styles.tipCard]}>
             <Text style={styles.overline}>{t('plant.tip')}</Text>
             <Text style={styles.tip}>{plant.tip}</Text>
+            <View style={styles.guideLink}>
+              <TextButton label={t('care.guideOpen')} onPress={() => setGuide(true)} />
+            </View>
           </Rise>
 
           <Rise delay="d4">
@@ -166,6 +172,14 @@ export default function PlantScreen() {
           </Rise>
         </View>
       </ScrollView>
+
+      <CareGuideSheet
+        speciesId={plant.speciesId}
+        name={plant.nickname}
+        waterEveryDays={plant.waterEveryDays}
+        visible={guide}
+        onClose={() => setGuide(false)}
+      />
 
       <PlantOptionsSheet
         key={`${plant.nickname}-${plant.waterEveryDays}-${plant.roomId}`}
@@ -216,6 +230,7 @@ const useStyles = makeStyles((colors) => ({
   overline: { ...type.overline, color: colors.inkMuted },
   since: { ...type.caption, color: colors.inkMuted, flexShrink: 1, textAlign: 'right' },
   tip: { ...type.small, color: colors.ink },
+  guideLink: { alignSelf: 'flex-start', marginBottom: -space.sm },
   chatCard: {
     backgroundColor: colors.sage,
     borderRadius: radius.lg,

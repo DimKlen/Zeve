@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Text, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 
@@ -6,6 +7,7 @@ import { IconCamera, IconSearch } from '@/components/icons';
 import { PressableScale } from '@/components/PressableScale';
 import { Rise } from '@/components/Rise';
 import { Spinner } from '@/components/Spinner';
+import { CareGuideSheet, CareSummary } from '@/features/plant/CareGuide';
 import { t } from '@/i18n';
 import { usePop } from '@/motion/useEnter';
 import { PlantAvatar } from '@/plants/PlantAvatar';
@@ -112,6 +114,7 @@ function SpeciesCard({
   const styles = useStyles();
   const species = SPECIES_BY_ID[speciesId]!;
   const pop = usePop(speciesId, true);
+  const [guide, setGuide] = useState(false);
   return (
     <View style={styles.block}>
       <Text style={styles.label}>{title}</Text>
@@ -131,6 +134,13 @@ function SpeciesCard({
         <ChangeButton onPress={onChange} />
       </Animated.View>
       {unsure && <Text style={styles.unsure}>{t('newPlant.unsure')}</Text>}
+      <CareSummary speciesId={species.id} onOpen={() => setGuide(true)} />
+      <CareGuideSheet
+        speciesId={species.id}
+        name={species.name}
+        visible={guide}
+        onClose={() => setGuide(false)}
+      />
     </View>
   );
 }
