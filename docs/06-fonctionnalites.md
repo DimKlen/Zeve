@@ -164,3 +164,11 @@ Script `supabase/seed.dev.sql` (ou bouton dev) qui crée les 6 plantes de Camill
   (pleine terre, pluie, soleil ou mi-ombre au jardin).
 - **Conifères absents** : aucun des 19 types de dessin ne les représente (CLAUDE.md fixe les 19 types).
 
+## F19. Appui long sur une plante (ajout hors design)
+- Dans la grille d'un jardin, un appui long (vibration légère) ouvre un menu court au nom de la plante :
+  « Changer de jardin » (s'il y en a plusieurs) et « Supprimer la plante ». C'est le menu « … » de la fiche
+  (`PlantOptionsSheet`, props `only` et `initialView`) : même déplacement, même suppression, même avertissement
+  « dernière plante du jardin ».
+- Lecteurs d'écran : mêmes actions en `accessibilityActions` sur la carte ; le tap simple ouvre la fiche.
+- Si la dernière plante d'un jardin est retirée depuis l'écran de ce jardin, l'app revient à l'accueil.
+

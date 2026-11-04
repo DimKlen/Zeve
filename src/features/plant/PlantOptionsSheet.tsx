@@ -17,7 +17,9 @@ import { makeStyles, space, type } from '@/theme';
 
 import { useUpdatePlant, useWateringHistory } from './api';
 
-type View_ = 'menu' | 'rename' | 'garden' | 'interval' | 'history' | 'delete';
+type View_ = 'menu' | PlantAction;
+/** Actions du menu « … » d'une plante. */
+export type PlantAction = 'rename' | 'garden' | 'interval' | 'history' | 'delete';
 
 type Props = {
   plant: GardenPlant;
@@ -25,6 +27,10 @@ type Props = {
   onClose: () => void;
   /** Après suppression : retour au jardin. */
   onDeleted: () => void;
+  /** Actions proposées (appui long sur une carte : déplacer, supprimer) ; toutes par défaut. */
+  only?: PlantAction[];
+  /** Ouvre directement une action (actions d'accessibilité de la carte). */
+  initialView?: PlantAction;
 };
 
 const MENU: { view: Exclude<View_, 'menu'>; key: string; danger?: boolean }[] = [
@@ -45,9 +51,16 @@ const dayFormat = new Intl.DateTimeFormat('fr-FR', {
 /**
  * Menu « … » de la fiche (non maquetté, docs/04 §8) : feuille du bas, lignes au style des Réglages.
  */
-export function PlantOptionsSheet({ plant, visible, onClose, onDeleted }: Props) {
+export function PlantOptionsSheet({
+  plant,
+  visible,
+  onClose,
+  onDeleted,
+  only,
+  initialView,
+}: Props) {
   const styles = useStyles();
-  const [view, setView] = useState<View_>('menu');
+  const [view, setView] = useState<View_>(initialView ?? 'menu');
   const [name, setName] = useState(plant.nickname);
   const [every, setEvery] = useState(plant.waterEveryDays);
   const update = useUpdatePlant();
@@ -70,7 +83,9 @@ export function PlantOptionsSheet({ plant, visible, onClose, onDeleted }: Props)
   // Retirer la dernière plante d'un jardin le supprime (jamais de jardin vide) : on le dit avant.
   const last = isLastInGarden(plant, plants);
   // « Changer de jardin » seulement s'il y a un autre jardin.
-  const menu = MENU.filter((item) => item.view !== 'garden' || gardens.length > 1);
+  const menu = MENU.filter(
+    (item) => (!only || only.includes(item.view)) && (item.view !== 'garden' || gardens.length > 1),
+  );
 
   const close = () => {
     onClose();
@@ -103,6 +118,12 @@ export function PlantOptionsSheet({ plant, visible, onClose, onDeleted }: Props)
 
   return (
     <BottomSheet visible={visible} onClose={close}>
+      {/* Menu court (appui long sur une carte) : on rappelle de quelle plante il s'agit. */}
+      {view === 'menu' && only && (
+        <Text style={styles.title} accessibilityRole="header">
+          {plant.nickname}
+        </Text>
+      )}
       {view === 'menu' &&
         menu.map((item, i) => (
           <Pressable
@@ -242,6 +263,7 @@ export function PlantOptionsSheet({ plant, visible, onClose, onDeleted }: Props)
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 const useStyles = makeStyles((colors) => ({
+  title: { ...type.sectionTitle, color: colors.forest, paddingBottom: space.xs },
   row: {
     minHeight: 52,
     flexDirection: 'row',

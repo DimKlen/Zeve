@@ -16,10 +16,14 @@ type Props = {
   now: Date;
   delay: keyof typeof riseDelay;
   onPress: (plant: GardenPlant) => void;
+  /** Appui long (et actions d'accessibilité) : menu court déplacer / supprimer. */
+  onMenu?: (plant: GardenPlant, action?: 'garden' | 'delete') => void;
+  /** Plusieurs jardins : « Changer de jardin » proposé. */
+  canMove?: boolean;
 };
 
 /** Carte du jardin (docs/02 §7 PlantCard, docs/04 §7). */
-function PlantCardBase({ plant, now, delay, onPress }: Props) {
+function PlantCardBase({ plant, now, delay, onPress, onMenu, canMove = false }: Props) {
   const colors = useColors();
   const styles = useStyles();
   const s = statusOf(plant, now);
@@ -28,6 +32,20 @@ function PlantCardBase({ plant, now, delay, onPress }: Props) {
     <Rise delay={delay} style={styles.cell}>
       <PressableScale
         onPress={() => onPress(plant)}
+        onLongPress={onMenu ? () => onMenu(plant) : undefined}
+        // Lecteurs d'écran : l'appui long est invisible, les mêmes actions sont proposées ici.
+        accessibilityActions={
+          onMenu
+            ? [
+                ...(canMove ? [{ name: 'garden', label: t('gardens.move') }] : []),
+                { name: 'delete', label: t('plant.menuDelete') },
+              ]
+            : undefined
+        }
+        onAccessibilityAction={(e) => {
+          const action = e.nativeEvent.actionName;
+          if (onMenu && (action === 'garden' || action === 'delete')) onMenu(plant, action);
+        }}
         accessibilityRole="button"
         accessibilityLabel={`${plant.nickname}, ${plant.speciesName}, ${t(`stage.${s.stage}`)}, ${status}`}
         style={styles.card}
