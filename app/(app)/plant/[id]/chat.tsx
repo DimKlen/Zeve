@@ -1,5 +1,6 @@
 import { useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { useCallback, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useCallback, useEffect, useState } from 'react';
 import { FlatList, KeyboardAvoidingView, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -14,6 +15,7 @@ import { TextField } from '@/components/TextField';
 import { showToast } from '@/components/Toast';
 import { TypingDots } from '@/components/TypingDots';
 import {
+  chatKey,
   ChatError,
   createReminder,
   useChat,
@@ -22,6 +24,8 @@ import {
   type SendInput,
 } from '@/features/chat/api';
 import { setChatOpen } from '@/features/chat/replyNotification';
+import { checkFollowup, followupKey } from '@/features/followups/api';
+import { rescheduleReminders } from '@/features/notifications/schedule';
 import { buildThread, type ThreadItem } from '@/features/chat/thread';
 import { usePlant } from '@/features/garden/api';
 import { statusOf } from '@/features/garden/gardenRules';
@@ -49,6 +53,16 @@ export default function ChatScreen() {
       return () => setChatOpen(id, false);
     }, [id]),
   );
+  // Suivi de soins échu : la plante prend des nouvelles en arrivant sur le fil (F22).
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    void checkFollowup(id).then((checked) => {
+      if (!checked) return;
+      void queryClient.invalidateQueries({ queryKey: chatKey(id) });
+      void queryClient.invalidateQueries({ queryKey: followupKey(id) });
+      void rescheduleReminders();
+    });
+  }, [id, queryClient]);
   const [draft, setDraft] = useState('');
   const [pending, setPending] = useState<Pending | null>(null);
   const [failure, setFailure] = useState<Failure | null>(null);

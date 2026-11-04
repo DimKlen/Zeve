@@ -92,6 +92,7 @@ describe('extractAction', () => {
     expect(extractAction(reply)).toEqual({
       content: 'Arrose bien aujourd’hui.\nJe te redis dans quelques jours.',
       actions: [{ type: 'remind', days: 3, label: 'Me rappeler dans 3 jours' }],
+      followup: null,
     });
   });
 
@@ -100,6 +101,7 @@ describe('extractAction', () => {
     expect(extractAction(reply)).toEqual({
       content: 'Coucou.',
       actions: [{ type: 'remind', days: 1, label: 'Me rappeler dans 1 jour' }],
+      followup: null,
     });
   });
 
@@ -108,6 +110,40 @@ describe('extractAction', () => {
     expect(extractAction('Une {accolade} dans le texte.')).toEqual({
       content: 'Une {accolade} dans le texte.',
       actions: [],
+      followup: null,
+    });
+  });
+});
+
+describe('extractAction : suivi de soins', () => {
+  it('sort le suivi du texte et retire le bouton « Me rappeler »', () => {
+    const reply = [
+      'Passe un coton imbibé d’alcool sur chaque tache.',
+      '{"action":{"type":"remind","days":3,"label":"Me rappeler dans 3 jours"}}',
+      '{"action":{"type":"followup","days":7,"topic":"les cochenilles"}}',
+    ].join(String.fromCharCode(10));
+    expect(extractAction(reply)).toEqual({
+      content: 'Passe un coton imbibé d’alcool sur chaque tache.',
+      actions: [],
+      followup: { type: 'followup', days: 7, topic: 'les cochenilles' },
+    });
+  });
+
+  it('reconnaît la clôture et ignore un suivi invalide', () => {
+    expect(
+      extractAction('Bravo !' + String.fromCharCode(10) + '{"action":{"type":"followup_done"}}')
+        .followup,
+    ).toEqual({
+      type: 'followup_done',
+    });
+    expect(
+      extractAction(
+        'Ok.' + String.fromCharCode(10) + '{"action":{"type":"followup","days":90,"topic":"x"}}',
+      ),
+    ).toEqual({
+      content: 'Ok.',
+      actions: [],
+      followup: null,
     });
   });
 });

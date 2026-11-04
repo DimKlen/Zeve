@@ -14,6 +14,7 @@ erDiagram
   plants ||--o{ watering_events : "arrosée"
   plants ||--o{ chat_messages : "discute"
   plants ||--o{ reminders : "rappels"
+  plants ||--o{ plant_followups : "suivis de soins"
 ```
 | Table | Champs clés |
 |---|---|
@@ -27,6 +28,7 @@ erDiagram
 | `watering_events` | user_id, plant_id, watered_at, expected_days (rythme attendu à ce moment) |
 | `chat_messages` | user_id, plant_id, role, content, photo_path, actions (jsonb), created_at |
 | `reminders` | user_id, plant_id, due_at, message, sent_at |
+| `plant_followups` | user_id, plant_id, topic (« les cochenilles »), due_at, status (open / resolved / expired), checks (0–3), created_at — un seul `open` par plante (index unique partiel), RLS sur user_id + propriété de la plante (docs/06 F22) |
 | vue `plant_overview` | plante + espèce (exposition idéale : species_light, light_label) + jardin (nom, lieu) + last_watered_at, days_since_water, days_since_created, is_thirsty (security_invoker → respecte la RLS) |
 
 Le catalogue d'espèces existe **aussi** dans l'app (`reference/plants/species.ts`) pour l'affichage hors-ligne et les dessins. La table sert aux Edge Functions et à l'intégrité référentielle. Les deux doivent rester synchronisés (test qui compare les ids).
@@ -66,6 +68,8 @@ Si un suivi dans quelques jours est utile, termine par une ligne JSON seule :
 {"action":{"type":"remind","days":N,"label":"Me rappeler dans N jours"}}
 ```
 La fonction extrait la ligne JSON éventuelle vers `actions` et la retire du texte.
+
+**Suivi de soins (docs/06 F22)** — règles pures dans `supabase/functions/_shared/followup.ts`. Le prompt ajoute l'action `{"action":{"type":"followup","days":N,"topic":"les cochenilles"}}` (problèmes de santé seulement, remplace le bouton « Me rappeler ») et, si un suivi est ouvert, son sujet et la clôture `{"action":{"type":"followup_done"}}`. Après la réponse, la fonction crée, replanifie ou clôt le suivi et renvoie `followup: 'insert' | 'update' | 'resolve' | null`. Entrée `{ plantId, check: true }` (ouverture du fil) : si le suivi est échu, ajoute le message de la plante, `checks + 1`, nouvelle échéance à 3 jours ; après 3 prises de nouvelles, `expired`. Renvoie `{ checked }`. `CHAT_MOCK` : un message qui contient « cochenille » ouvre un suivi à 7 jours ; « ça va mieux » / « disparu » le clôt.
 
 ### `delete-account` (POST, JWT requis)
 Supprime les objets Storage de l'utilisateur, puis `auth.admin.deleteUser(uid)` (cascade sur les tables).

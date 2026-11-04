@@ -193,3 +193,15 @@ Non maquetté. Quand la réponse de `plant-chat` arrive alors que la personne n'
 - rien si la personne lit ce fil (écran de chat affiché, app au premier plan) ni si les notifications sont refusées ; indépendant du réglage « Rappels d'arrosage ».
 
 Limite : la réponse est attendue par l'app. Si l'app est **fermée** (ou suspendue par le système avant la fin de la requête), aucune notification ne part. Un envoi depuis le serveur (push) serait nécessaire : hors périmètre.
+
+## F22. Suivi de soins (ajout hors design)
+
+Non maquetté. Quand on parle à la plante d'un **problème de santé** (nuisibles, maladie, champignon, pourriture) et qu'elle conseille un traitement, elle planifie d'elle-même un suivi :
+
+- le modèle termine sa réponse par `{"action":{"type":"followup","days":N,"topic":"les cochenilles"}}` ; pas de suivi pour l'arrosage, la lumière ou un rempotage ; un suivi remplace le bouton « Me rappeler » ;
+- table `plant_followups` (sujet, échéance, statut `open` / `resolved` / `expired`, nombre de prises de nouvelles) : **un seul suivi ouvert par plante** ; un nouveau conseil replanifie celui qui existe ;
+- à l'échéance, notification locale **à l'heure des rappels** : « Comment va Gaston depuis le traitement contre les cochenilles ? » ; la toucher ouvre le chat (`kind: 'followup'`) ; échéance passée sans ouverture de l'app → le prochain créneau à venir ;
+- en ouvrant le fil après l'échéance, la plante écrit d'elle-même : « Petit point sur les cochenilles : on a commencé le traitement il y a 7 jours. Comment tu me trouves ? … » ; sans réponse, elle redemande 3 jours plus tard ;
+- le modèle **clôt** le suivi quand c'est réglé (`followup_done`) ou le **replanifie** ; après 3 prises de nouvelles, il expire ;
+- fiche : sous « Une question sur Gaston ? », « Suivi en cours : cochenilles · prochain point le 8 nov. » (« on fait le point aujourd'hui » une fois échu) ;
+- désactiver les rappels annule aussi ces notifications ; elles sont replanifiées avec les autres (`rescheduleReminders`) ; suppression de la plante ou du compte : suivis supprimés en cascade.

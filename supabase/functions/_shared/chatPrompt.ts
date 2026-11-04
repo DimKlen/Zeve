@@ -1,6 +1,8 @@
 // Chat avec la plante (docs/06 F8, docs/07 plant-chat) : prompt, historique, action « me rappeler ».
 // Module pur, sans API Deno : partagé par l'Edge Function plant-chat et testé par Jest.
 
+import { parseFollowup, type FollowupAction } from './followup.ts';
+
 export type PlantContext = {
   nickname: string;
   speciesName: string;
@@ -126,10 +128,15 @@ export function buildSystemPrompt(p: PlantContext): string {
 
 const MAX_REMIND_DAYS = 60;
 
-/** Retire la ligne JSON d'action éventuelle du texte et la renvoie à part. */
-export function extractAction(reply: string): { content: string; actions: ChatAction[] } {
+/** Retire les lignes JSON d'action du texte et les renvoie à part (rappel, suivi de soins). */
+export function extractAction(reply: string): {
+  content: string;
+  actions: ChatAction[];
+  followup: FollowupAction | null;
+} {
   const lines = reply.trim().split('\n');
-  const actions: ChatAction[] = [];
+  let actions: ChatAction[] = [];
+  let followup: FollowupAction | null = null;
   const kept: string[] = [];
   for (const line of lines) {
     const raw = line.trim();
@@ -140,18 +147,27 @@ export function extractAction(reply: string): { content: string; actions: ChatAc
       try {
         const parsed = JSON.parse(trimmed) as { action?: Partial<ChatAction> };
         const a = parsed.action;
+        const f = parseFollowup(a);
+        if (f) {
+          followup = f;
+          continue;
+        }
         const days = Math.round(Number(a?.days));
         if (a?.type === 'remind' && days >= 1 && days <= MAX_REMIND_DAYS) {
           actions.push({ type: 'remind', days, label: `Me rappeler dans ${days} jour${days > 1 ? 's' : ''}` });
           continue;
         }
+        // Action inconnue ou invalide : la ligne JSON ne s'affiche pas pour autant.
+        if (a && typeof a === 'object') continue;
       } catch {
         // Pas du JSON : on garde la ligne telle quelle.
       }
     }
     kept.push(line);
   }
-  return { content: kept.join('\n').trim(), actions };
+  // Un suivi remplace le bouton « Me rappeler » : la plante reviendra d'elle-même.
+  if (followup?.type === 'followup') actions = [];
+  return { content: kept.join('\n').trim(), actions, followup };
 }
 
 /** Historique → contenus Gemini (assistant = « model ») ; les anciennes photos deviennent un repère texte. */

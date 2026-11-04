@@ -473,5 +473,10 @@
     "shadeHeat": "Il fait chaud : protège-la du soleil de l’après-midi.",
     "dryAir": "Le chauffage assèche l’air : brumise ses feuilles ou pose son pot sur des billes d’argile humides.",
     "humidSucculent": "L’air est très humide : espace les arrosages et garde-la dans une pièce aérée."
+  },
+  "followup": {
+    "notifBody": "Comment va {name} depuis le traitement contre {topic} ?",
+    "line": "Suivi en cours : {topic} · prochain point le {date}",
+    "lineDue": "Suivi en cours : {topic} · on fait le point aujourd’hui"
   }
 }

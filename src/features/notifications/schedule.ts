@@ -6,6 +6,9 @@ import { useAuthStore } from '@/features/auth/authStore';
 import { supabase } from '@/lib/supabase';
 import { dryingLookup, fetchWeatherRows, groupWeather } from '@/features/gardens/weather';
 
+import { planFollowups } from '@/features/followups/plan';
+
+import { FOLLOWUP_KIND } from './kinds';
 import { planDailyReminders } from './reminderPlan';
 
 export const DAILY_KIND = 'daily';
@@ -36,13 +39,18 @@ async function cancelKind(kind: string) {
 async function reschedule(): Promise<void> {
   const userId = useAuthStore.getState().session?.user.id;
   if (!userId) return;
-  const [{ data: profile }, { data: rows }, weatherRows] = await Promise.all([
+  const [{ data: profile }, { data: rows }, weatherRows, { data: followups }] = await Promise.all([
     supabase.from('profiles').select('reminders_enabled, reminder_time').eq('id', userId).single(),
     supabase
       .from('plant_overview')
       .select('id, nickname, species_id, created_at, water_every_days, last_watered_at, garden_id'),
     // Même date d'arrosage que la jauge : météo du jardin comprise (hors ligne : rythme fixe).
     fetchWeatherRows().catch(() => []),
+    // Suivis de soins ouverts (F22) : une notification chacun, à l'heure des rappels.
+    supabase
+      .from('plant_followups')
+      .select('plant_id, topic, due_at, plants(nickname)')
+      .eq('status', 'open'),
   ]);
   const drying = dryingLookup(groupWeather(weatherRows));
   if (!profile) return;
@@ -52,6 +60,7 @@ async function reschedule(): Promise<void> {
     return;
   }
   await cancelKind(DAILY_KIND);
+  await cancelKind(FOLLOWUP_KIND);
   const permission = await Notifications.getPermissionsAsync();
   if (!permission.granted) return;
   const plan = planDailyReminders(
@@ -74,6 +83,31 @@ async function reschedule(): Promise<void> {
         data: { kind: DAILY_KIND, plantId: reminder.plantId },
       },
       trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: reminder.date },
+    });
+  }
+  const planned = planFollowups(
+    (followups ?? []).flatMap((f) =>
+      f.plants
+        ? [
+            {
+              plantId: f.plant_id,
+              nickname: f.plants.nickname,
+              topic: f.topic,
+              dueAt: new Date(f.due_at),
+            },
+          ]
+        : [],
+    ),
+    profile.reminder_time,
+  );
+  for (const followup of planned) {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: followup.title,
+        body: followup.body,
+        data: { kind: FOLLOWUP_KIND, plantId: followup.plantId },
+      },
+      trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: followup.date },
     });
   }
 }
