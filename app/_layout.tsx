@@ -10,12 +10,12 @@ import {
   useFonts,
 } from '@expo-google-fonts/figtree';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
-import { Stack } from 'expo-router';
+import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import * as SystemUI from 'expo-system-ui';
 import * as WebBrowser from 'expo-web-browser';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -49,6 +49,22 @@ export default function RootLayout() {
     Figtree_600SemiBold,
     Figtree_700Bold,
   });
+  // Thème du conteneur de navigation : sans lui, React Navigation peint son blanc par défaut
+  // derrière les écrans (éclair blanc à chaque transition en mode sombre).
+  const navTheme = useMemo(() => {
+    const base = scheme === 'dark' ? DarkTheme : DefaultTheme;
+    return {
+      ...base,
+      colors: {
+        ...base.colors,
+        background: colors.bg,
+        card: colors.bg,
+        border: colors.line,
+        primary: colors.forest,
+        text: colors.ink,
+      },
+    };
+  }, [scheme, colors]);
   const ready = (fontsLoaded || fontError !== null) && schemeReady;
 
   // Session Supabase restaurée et suivie pendant toute la vie de l'app (docs/06 F1).
@@ -76,23 +92,25 @@ export default function RootLayout() {
         <SafeAreaProvider>
           <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
           {/* Transitions maison (docs/03) : la pile native n'anime rien. */}
-          <Stack
-            screenOptions={{
-              headerShown: false,
-              animation: 'none',
-              contentStyle: styles.content,
-            }}
-          >
-            {/* index en premier : sur natif, le premier écran déclaré sert d'écran initial. */}
-            <Stack.Screen name="index" />
-            <Stack.Screen name="(auth)" />
-            <Stack.Screen name="auth/callback" />
-            <Stack.Screen name="(onboarding)/reminders" />
-            <Stack.Screen name="(app)" />
-            <Stack.Screen name="dev/plants" />
-            <Stack.Screen name="dev/kitchen" />
-            <Stack.Screen name="dev/icon" />
-          </Stack>
+          <ThemeProvider value={navTheme}>
+            <Stack
+              screenOptions={{
+                headerShown: false,
+                animation: 'none',
+                contentStyle: styles.content,
+              }}
+            >
+              {/* index en premier : sur natif, le premier écran déclaré sert d'écran initial. */}
+              <Stack.Screen name="index" />
+              <Stack.Screen name="(auth)" />
+              <Stack.Screen name="auth/callback" />
+              <Stack.Screen name="(onboarding)/reminders" />
+              <Stack.Screen name="(app)" />
+              <Stack.Screen name="dev/plants" />
+              <Stack.Screen name="dev/kitchen" />
+              <Stack.Screen name="dev/icon" />
+            </Stack>
+          </ThemeProvider>
           <ToastHost />
         </SafeAreaProvider>
       </GestureHandlerRootView>

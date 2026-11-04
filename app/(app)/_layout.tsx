@@ -27,12 +27,13 @@ const refreshReminders = () => void rescheduleReminders();
 
 /** App connectée et onboardée : rappels recalculés, taps sur les notifications, météo des jardins. */
 function ConnectedApp() {
+  const styles = useStyles();
   useNotificationTaps();
   // La date d'arrosage suit la météo : nouveaux rappels quand elle change.
   useWeatherRefresh(refreshReminders);
 
   return (
-    <Stack screenOptions={{ headerShown: false, animation: 'none' }}>
+    <Stack screenOptions={{ headerShown: false, animation: 'none', contentStyle: styles.screen }}>
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="new-plant" options={{ presentation: 'fullScreenModal' }} />
     </Stack>
@@ -41,4 +42,5 @@ function ConnectedApp() {
 
 const useStyles = makeStyles((colors) => ({
   blank: { flex: 1, backgroundColor: colors.bg },
+  screen: { backgroundColor: colors.bg },
 }));
