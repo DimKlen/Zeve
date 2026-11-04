@@ -37,6 +37,14 @@ const json = (body: unknown, status = 200) =>
 const stageOf = (days: number) => (days < 90 ? 'Pousse' : days < 365 ? 'Jeune' : 'Adulte');
 const shortDate = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short' });
 
+/** « 4 °C, 82 % d'humidité » : météo du moment du jardin (gardens.weather_now). */
+function todayWeatherLine(value: unknown): string | null {
+  const w = value as { temp?: unknown; humidity?: unknown } | null | undefined;
+  if (!w || typeof w.temp !== 'number') return null;
+  const temp = `${Math.round(w.temp)} °C`;
+  return typeof w.humidity === 'number' ? `${temp}, ${Math.round(w.humidity)} % d’humidité` : temp;
+}
+
 /** « 6 °C en moyenne, 80 % d'humidité » sur les 3 derniers jours connus (jusqu'à aujourd'hui). */
 function recentWeatherLine(
   weather: { day: string; tempMean: number | null; humidity: number | null }[],
@@ -125,6 +133,9 @@ Deno.serve(async (req) => {
     humidity: w.humidity_mean,
   }));
   const drying = dryingFromWeather(weather);
+  const { data: gardenNow } = plant.garden_id
+    ? await supabase.from('gardens').select('weather_now').eq('id', plant.garden_id).maybeSingle()
+    : { data: null };
   const due = dueInfo(
     {
       waterEveryDays: plant.water_every_days,
@@ -161,6 +172,7 @@ Deno.serve(async (req) => {
           : `dans ${due.daysUntilNext} jours`,
     learnedEveryDays: learned.stable ? learned.estimate : null,
     recentWeather: recentWeatherLine(weather),
+    todayWeather: todayWeatherLine(gardenNow?.weather_now),
   });
 
   // Message courant : texte + photo réelle (image en ligne) si fournie.

@@ -3,6 +3,7 @@ import {
   geocodeUrl,
   mockDaily,
   parseDaily,
+  parseCurrent,
   parseGeocode,
 } from '../../../supabase/functions/_shared/openMeteo';
 import { dryingFromWeather } from '@/plants/wateringModel';
@@ -16,6 +17,8 @@ describe('Open-Meteo', () => {
     expect(url.searchParams.get('forecast_days')).toBe('7');
     expect(url.searchParams.get('timezone')).toBe('auto');
     expect(url.searchParams.get('daily')).toContain('et0_fao_evapotranspiration');
+    expect(url.searchParams.get('daily')).toContain('temperature_2m_min');
+    expect(url.searchParams.get('current')).toBe('temperature_2m,relative_humidity_2m');
   });
 
   it('géocode une ville, filtrée par pays si connu', () => {
@@ -31,6 +34,7 @@ describe('Open-Meteo', () => {
         daily: {
           time: ['2026-11-01', '2026-11-02'],
           temperature_2m_mean: [4.2, null],
+          temperature_2m_min: [-1.5],
           relative_humidity_2m_mean: [81, 77],
           sunshine_duration: [18000, 0],
           et0_fao_evapotranspiration: [0.9, 1.1],
@@ -44,6 +48,7 @@ describe('Open-Meteo', () => {
         garden_id: 'g1',
         day: '2026-11-01',
         temp_mean: 4.2,
+        temp_min: -1.5,
         humidity_mean: 81,
         sunshine_hours: 5,
         et0_mm: 0.9,
@@ -53,6 +58,7 @@ describe('Open-Meteo', () => {
         garden_id: 'g1',
         day: '2026-11-02',
         temp_mean: null,
+        temp_min: null,
         humidity_mean: 77,
         sunshine_hours: 0,
         et0_mm: 1.1,
@@ -60,6 +66,20 @@ describe('Open-Meteo', () => {
       },
     ]);
     expect(parseDaily({ error: true }, 'g1')).toEqual([]);
+  });
+
+  it('lit la météo du moment, sans inventer une humidité absente', () => {
+    expect(parseCurrent({ current: { temperature_2m: 3.96, relative_humidity_2m: 81.6 } })).toEqual(
+      {
+        temp: 4,
+        humidity: 82,
+      },
+    );
+    expect(parseCurrent({ current: { temperature_2m: -2.04 } })).toEqual({
+      temp: -2,
+      humidity: null,
+    });
+    expect(parseCurrent({})).toBeNull();
   });
 
   it('lit le premier résultat du géocodage', () => {

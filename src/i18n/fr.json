@@ -195,14 +195,13 @@
     "everyShort": "Tous les {n} j",
     "tempShort": "{min}–{max} °C",
     "water": "Arrosage",
-    "light": "Lumière",
+    "light": "Exposition et emplacement",
     "climate": "Humidité et température",
     "soil": "Terre",
     "pot": "Pot",
     "feed": "Engrais",
     "repot": "Rempotage",
     "waterText": "Tous les {n} jours environ, quand le dessus de la terre est sec. Un peu moins en hiver.",
-    "light": "Exposition et emplacement",
     "lightOmbre": "Mi-ombre : à quelques mètres d’une fenêtre, ou derrière un voilage.",
     "lightIndirect": "Lumière vive, sans soleil direct : près d’une fenêtre, mais pas collée à la vitre.",
     "lightSoleil": "Plein soleil : devant une fenêtre au sud ou à l’ouest, ou dehors en été.",
@@ -448,5 +447,18 @@
     "openSheet": "Ouvrir la feuille",
     "thirsty": "A soif",
     "water": "Arroser"
+  },
+  "weather": {
+    "chipA11y": "Météo à {place} : {temp} degrés, {humidity} pour cent d’humidité",
+    "chip": "{temp} °C · {humidity} %",
+    "chipNoHumidity": "{temp} °C",
+    "today": "Aujourd’hui à {place} : {temp} °C, {humidity} % d’humidité",
+    "todayNoHumidity": "Aujourd’hui à {place} : {temp} °C",
+    "label": "Météo du jour",
+    "bringInside": "Il va geler : rentre-la à l’abri avant la nuit.",
+    "awayFromWindow": "Il fait froid dehors : éloigne-la des vitres la nuit.",
+    "shadeHeat": "Il fait chaud : protège-la du soleil de l’après-midi.",
+    "dryAir": "Le chauffage assèche l’air : brumise ses feuilles ou pose son pot sur des billes d’argile humides.",
+    "humidSucculent": "L’air est très humide : espace les arrosages et garde-la dans une pièce aérée."
   }
 }

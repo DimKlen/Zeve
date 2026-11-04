@@ -3,7 +3,16 @@
 // une fois et enregistrée sur le jardin. Local, CI, E2E : WEATHER_MOCK=1 (météo neutre).
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
-import { forecastUrl, geocodeUrl, mockDaily, parseDaily, parseGeocode } from '../_shared/openMeteo.ts';
+import {
+  forecastUrl,
+  geocodeUrl,
+  MOCK_NOW,
+  mockDaily,
+  parseCurrent,
+  parseDaily,
+  parseGeocode,
+  type WeatherNow,
+} from '../_shared/openMeteo.ts';
 
 const TIMEOUT_MS = 10_000;
 /** Pas plus d'un appel par jardin toutes les 3 h. */
@@ -57,8 +66,10 @@ Deno.serve(async (req) => {
       if (last && now - new Date(last.fetched_at).getTime() < FRESH_MS) continue;
 
       let rows;
+      let current: WeatherNow | null;
       if (mock) {
         rows = mockDaily(garden.id, new Date());
+        current = MOCK_NOW;
       } else {
         let { latitude, longitude } = garden;
         if ((latitude === null || longitude === null) && garden.city) {
@@ -69,7 +80,9 @@ Deno.serve(async (req) => {
           }
         }
         if (latitude === null || longitude === null) continue;
-        rows = parseDaily(await getJson(forecastUrl(latitude, longitude)), garden.id);
+        const body = await getJson(forecastUrl(latitude, longitude));
+        rows = parseDaily(body, garden.id);
+        current = parseCurrent(body);
       }
       if (!rows.length) continue;
       const fetchedAt = new Date().toISOString();
@@ -77,6 +90,13 @@ Deno.serve(async (req) => {
         .from('garden_weather')
         .upsert(rows.map((r) => ({ ...r, fetched_at: fetchedAt })));
       if (!upsertError) updated += 1;
+      // Météo du moment, affichée sur le jardin et la fiche.
+      if (current) {
+        await supabase
+          .from('gardens')
+          .update({ weather_now: current, weather_at: fetchedAt })
+          .eq('id', garden.id);
+      }
     } catch (e) {
       // Un jardin en échec n'empêche pas les autres ; l'app garde le cache existant.
       console.error('garden-weather', garden.id, e instanceof Error ? e.message : e);

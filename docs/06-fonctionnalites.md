@@ -142,3 +142,15 @@ Script `supabase/seed.dev.sql` (ou bouton dev) qui crée les 6 plantes de Camill
   découvertes) reste sur l'appareil.
 - Local, CI et E2E : `DISCOVER_MOCK=1` (un pissenlit, fiche fixe).
 
+## F17. Météo du jardin visible et conseils du jour (ajout hors design)
+- `garden-weather` enregistre aussi la météo du moment (`gardens.weather_now` : température, humidité) et la
+  minimale du jour (`garden_weather.temp_min`, gel annoncé).
+- **Affichage** : puce « 8 °C · 71 % » à côté du lieu dans l'en-tête d'un jardin ; sur la fiche, carte Saison :
+  « Aujourd'hui à Paris : 8 °C, 71 % d'humidité ». Rien sans lieu.
+- **Conseils** : `src/plants/weatherAdvice.ts` compare la météo du lieu (maintenant + minimales des 3 prochains
+  jours) aux besoins de l'espèce (`climateOf`) : rentrer avant le gel (plante qui sort l'été, hors hiver),
+  éloigner des vitres quand il fait froid dehors (≤ 10 °C ou proche du minimum de l'espèce, rustiques exceptées),
+  protéger de la chaleur, air sec du chauffage (espèces qui aiment l'humidité), succulente par temps très humide.
+  Au plus 2 ; chacun remplace le conseil de saison du même sujet (« Emplacement · Météo du jour »).
+- Le chat reçoit la météo du moment.
+

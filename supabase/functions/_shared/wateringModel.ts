@@ -32,6 +32,8 @@ export type DailyWeather = {
   et0: number | null;
   tempMean: number | null;
   humidity: number | null;
+  /** Minimale du jour (°C) : gel annoncé. */
+  tempMin?: number | null;
 };
 
 export type WateringEvent = { at: Date; expectedDays: number | null };

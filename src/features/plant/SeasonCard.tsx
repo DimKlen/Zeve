@@ -11,12 +11,15 @@ import {
 } from '@/components/icons';
 import { t } from '@/i18n';
 import { climateOf, seasonalAdvice, seasonOf } from '@/plants/seasons';
+import { weatherAdvice, type AdviceTopic, type WeatherNow } from '@/plants/weatherAdvice';
 import { makeStyles, radius, space, type, useColors } from '@/theme';
 
 type Props = {
   speciesId: string;
   /** Jardin dans l'hémisphère sud : saisons inversées. */
   southern?: boolean;
+  /** Météo réelle du jardin : ligne « Aujourd'hui à … » et conseils du jour. */
+  weather?: { now: WeatherNow | null; forecastMin: number | null; place: string | null } | null;
   now?: Date;
 };
 
@@ -27,12 +30,15 @@ const degrees = (n: number) => (n < 0 ? `−${-n}` : String(n));
  * Carte « Saison » de la fiche (non maquettée, même style que « Bon à savoir ») : saison en cours,
  * humidité et température idéales, puis les conseils de la saison pour cette espèce.
  */
-export function SeasonCard({ speciesId, southern = false, now = new Date() }: Props) {
+export function SeasonCard({ speciesId, southern = false, weather, now = new Date() }: Props) {
   const colors = useColors();
   const styles = useStyles();
   const season = seasonOf(now, southern);
   const climate = climateOf(speciesId);
   const advice = seasonalAdvice(speciesId, season);
+  // Conseils d'après la météo réelle : ils remplacent le conseil de saison du même sujet.
+  const today = weatherAdvice(climate, weather?.now ?? null, weather?.forecastMin ?? null, season);
+  const todayFor = (topic: AdviceTopic) => today.find((a) => a.replaces === topic);
   const icon = colors.forest2;
 
   const rows: { key: string; label: string; text: string; icon: ReactElement }[] = [
@@ -61,14 +67,41 @@ export function SeasonCard({ speciesId, southern = false, now = new Date() }: Pr
       icon: <IconSprout size={18} color={icon} />,
     },
   ];
-  if (advice.humidity) {
+  if (advice.humidity || todayFor('humidity')) {
     rows.push({
       key: 'air',
       label: t('season.air'),
-      text: t(`season.${advice.humidity}`),
+      text: advice.humidity ? t(`season.${advice.humidity}`) : '',
       icon: <IconAir size={18} color={icon} />,
     });
   }
+  const TOPIC: Record<string, AdviceTopic> = {
+    water: 'water',
+    light: 'light',
+    place: 'place',
+    air: 'humidity',
+  };
+  for (const row of rows) {
+    const replaced = TOPIC[row.key] && todayFor(TOPIC[row.key]!);
+    if (replaced) {
+      row.label = `${row.label} · ${t('weather.label')}`;
+      row.text = t(`weather.${replaced.key}`);
+    }
+  }
+  const nowWeather = weather?.now;
+  const todayLine =
+    nowWeather && weather?.place
+      ? nowWeather.humidity === null
+        ? t('weather.todayNoHumidity', {
+            place: weather.place,
+            temp: degrees(Math.round(nowWeather.temp)),
+          })
+        : t('weather.today', {
+            place: weather.place,
+            temp: degrees(Math.round(nowWeather.temp)),
+            humidity: nowWeather.humidity,
+          })
+      : null;
 
   return (
     <View style={styles.card}>
@@ -78,6 +111,7 @@ export function SeasonCard({ speciesId, southern = false, now = new Date() }: Pr
           {t('season.now', { season: t(`season.nowNames.${season}`) })}
         </Text>
       </View>
+      {todayLine && <Text style={styles.today}>{todayLine}</Text>}
 
       <View style={styles.stats}>
         <View
@@ -149,6 +183,7 @@ const useStyles = makeStyles((colors) => ({
   },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
   overline: { ...type.overline, color: colors.inkMuted },
+  today: { ...type.small, fontFamily: type.label.fontFamily, color: colors.forest },
   now: { ...type.caption, color: colors.inkMuted, flexShrink: 1, textAlign: 'right' },
   stats: { flexDirection: 'row', gap: space.sm },
   stat: {

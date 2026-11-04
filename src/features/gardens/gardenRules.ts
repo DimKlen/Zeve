@@ -3,6 +3,7 @@ import type { GardenPlant } from '@/features/garden/gardenRules';
 import { statusOf } from '@/features/garden/gardenRules';
 import { t } from '@/i18n';
 import { normalize } from '@/plants/plantStatus';
+import type { WeatherNow } from '@/plants/weatherAdvice';
 
 export type Garden = {
   id: string;
@@ -13,6 +14,8 @@ export type Garden = {
   latitude: number | null;
   longitude: number | null;
   createdAt: Date;
+  /** Météo du moment (Open-Meteo), null sans lieu ou avant le premier relevé. */
+  weatherNow: WeatherNow | null;
 };
 
 /**

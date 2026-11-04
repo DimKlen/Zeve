@@ -29,6 +29,7 @@ export function groupWeather(rows: WeatherRow[]): WeatherByGarden {
       et0: r.et0_mm,
       tempMean: r.temp_mean,
       humidity: r.humidity_mean,
+      tempMin: r.temp_min,
     });
   }
   return out;
@@ -90,4 +91,19 @@ export function useWeatherRefresh(onRefreshed: () => void) {
       cancelled = true;
     };
   }, [userId, client, onRefreshed]);
+}
+
+/** Minimale annoncée sur les prochains jours (aujourd'hui compris), null si inconnue : gel. */
+export function forecastMin(
+  days: DailyWeather[] | undefined,
+  now = new Date(),
+  span = 3,
+): number | null {
+  if (!days) return null;
+  const from = dayKey(now);
+  const to = dayKey(new Date(now.getFullYear(), now.getMonth(), now.getDate() + span - 1));
+  const mins = days.flatMap((d) =>
+    d.day >= from && d.day <= to && typeof d.tempMin === 'number' ? [d.tempMin] : [],
+  );
+  return mins.length ? Math.min(...mins) : null;
 }

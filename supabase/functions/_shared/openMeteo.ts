@@ -3,11 +3,15 @@
 
 export const DAILY_VARIABLES = [
   'temperature_2m_mean',
+  'temperature_2m_min',
   'relative_humidity_2m_mean',
   'sunshine_duration',
   'et0_fao_evapotranspiration',
   'precipitation_sum',
 ] as const;
+
+/** Météo du moment, affichée sur le jardin et la fiche. */
+export const CURRENT_VARIABLES = ['temperature_2m', 'relative_humidity_2m'] as const;
 
 /** 30 jours passés (normale du lieu, apprentissage) + 7 jours de prévisions. */
 export const PAST_DAYS = 30;
@@ -18,6 +22,7 @@ export function forecastUrl(latitude: number, longitude: number): string {
     latitude: latitude.toFixed(4),
     longitude: longitude.toFixed(4),
     daily: DAILY_VARIABLES.join(','),
+    current: CURRENT_VARIABLES.join(','),
     past_days: String(PAST_DAYS),
     forecast_days: String(FORECAST_DAYS),
     timezone: 'auto',
@@ -35,6 +40,7 @@ export type WeatherRowInput = {
   garden_id: string;
   day: string;
   temp_mean: number | null;
+  temp_min: number | null;
   humidity_mean: number | null;
   sunshine_hours: number | null;
   et0_mm: number | null;
@@ -60,6 +66,7 @@ export function parseDaily(body: unknown, gardenId: string): WeatherRowInput[] {
         garden_id: gardenId,
         day,
         temp_mean: num(daily.temperature_2m_mean, i),
+        temp_min: num(daily.temperature_2m_min, i),
         humidity_mean: num(daily.relative_humidity_2m_mean, i),
         sunshine_hours: sunshine === null ? null : Math.round((sunshine / 3600) * 10) / 10,
         et0_mm: num(daily.et0_fao_evapotranspiration, i),
@@ -87,6 +94,7 @@ export function mockDaily(gardenId: string, today: Date): WeatherRowInput[] {
       garden_id: gardenId,
       day,
       temp_mean: 18,
+      temp_min: 14,
       humidity_mean: 60,
       sunshine_hours: 5,
       et0_mm: 3,
@@ -95,3 +103,21 @@ export function mockDaily(gardenId: string, today: Date): WeatherRowInput[] {
   }
   return rows;
 }
+
+/** Météo du moment d'un jardin (gardens.weather_now). */
+export type WeatherNow = { temp: number; humidity: number | null };
+
+/** Bloc « current » de la réponse → météo du moment, ou null si absente. */
+export function parseCurrent(body: unknown): WeatherNow | null {
+  const current = (body as { current?: Record<string, unknown> } | null)?.current;
+  const temp = current?.temperature_2m;
+  if (typeof temp !== 'number' || !Number.isFinite(temp)) return null;
+  const humidity = current?.relative_humidity_2m;
+  return {
+    temp: Math.round(temp * 10) / 10,
+    humidity: typeof humidity === 'number' && Number.isFinite(humidity) ? Math.round(humidity) : null,
+  };
+}
+
+/** Météo du moment simulée (WEATHER_MOCK=1), cohérente avec mockDaily. */
+export const MOCK_NOW: WeatherNow = { temp: 18, humidity: 60 };

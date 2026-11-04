@@ -13,7 +13,9 @@ import { Screen } from '@/components/Screen';
 import { WaterGauge } from '@/components/WaterGauge';
 import { usePlant, useWatering } from '@/features/garden/api';
 import { statusOf } from '@/features/garden/gardenRules';
+import { useGardens } from '@/features/gardens/api';
 import { isSouthern } from '@/features/gardens/gardenRules';
+import { forecastMin, useWeather } from '@/features/gardens/weather';
 import { MascotScene } from '@/features/plant/MascotScene';
 import { PlantOptionsSheet } from '@/features/plant/PlantOptionsSheet';
 import { RhythmCard } from '@/features/plant/RhythmCard';
@@ -32,6 +34,9 @@ export default function PlantScreen() {
   const styles = useStyles();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: plant, isSuccess } = usePlant(id);
+  // Météo réelle du jardin de la plante (carte Saison).
+  const { data: gardens } = useGardens();
+  const { data: weather } = useWeather();
   const { water, undo } = useWatering();
   const [drops, setDrops] = useState(0);
   const [justWatered, setJustWatered] = useState(false);
@@ -118,7 +123,8 @@ export default function PlantScreen() {
             </InfoTile>
           </Rise>
           {/* Date d'arrosage avancée ou retardée par la météo du jardin : la raison, sinon rien. */}
-          {s.weatherCause && !s.wateredToday && (
+          {/* « Plus tard » n'a pas de sens pour une plante qui a déjà soif. */}
+          {s.weatherCause && !s.wateredToday && !(s.thirsty && s.weatherShift > 0) && (
             <Text style={styles.weather} accessibilityLiveRegion="polite">
               {t(`rhythm.${s.weatherCause}`, {
                 place: plant.gardenPlace.city ?? plant.gardenName,
@@ -162,7 +168,15 @@ export default function PlantScreen() {
           </Rise>
 
           <Rise delay="d4">
-            <SeasonCard speciesId={plant.speciesId} southern={isSouthern(plant.gardenPlace)} />
+            <SeasonCard
+              speciesId={plant.speciesId}
+              southern={isSouthern(plant.gardenPlace)}
+              weather={{
+                now: gardens?.find((g) => g.id === plant.gardenId)?.weatherNow ?? null,
+                forecastMin: forecastMin(weather?.[plant.gardenId]),
+                place: plant.gardenPlace.city,
+              }}
+            />
           </Rise>
 
           <Rise delay="d4">
