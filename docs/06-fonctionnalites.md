@@ -154,3 +154,13 @@ Script `supabase/seed.dev.sql` (ou bouton dev) qui crée les 6 plantes de Camill
   Au plus 2 ; chacun remplace le conseil de saison du même sujet (« Emplacement · Météo du jour »).
 - Le chat reçoit la météo du moment.
 
+## F18. Catalogue élargi : arbres, fruitiers, herbes sauvages et mauvaises herbes (ajout hors design)
+- Migration `0011_catalogue_sauvages.sql` : 104 espèces de plus (324 en tout) — arbres et arbustes de jardin,
+  fruitiers, herbes sauvages utiles (ortie, plantain, pâquerette…) et mauvaises herbes (chiendent, liseron, rumex…).
+- Catégorie « Sauvages » (contrainte SQL, `CATEGORIES`, puce de la liste) ; type affiché « Herbe sauvage ».
+- `weed` (« Mauvaise herbe », en base et dans l'app : `pull` ou `roots`) : signalé dans la liste et en tête du guide
+  d'entretien avec la façon de la contenir.
+- `hardy` (plantes de pleine terre) : climat rustique (dehors toute l'année, jusqu'à −15 °C) et guide de jardin
+  (pleine terre, pluie, soleil ou mi-ombre au jardin).
+- **Conifères absents** : aucun des 19 types de dessin ne les représente (CLAUDE.md fixe les 19 types).
+

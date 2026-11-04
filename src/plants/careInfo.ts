@@ -3,7 +3,7 @@ import type { PlantForm } from './plantForms.generated';
 
 export type Light = 'ombre' | 'indirect' | 'soleil';
 export type Category =
-  'feuillage' | 'succulentes' | 'aromatiques' | 'fleurs' | 'arbres' | 'retombantes';
+  'feuillage' | 'succulentes' | 'aromatiques' | 'fleurs' | 'arbres' | 'retombantes' | 'sauvages';
 export type FormInfo = {
   label: string;
   cat: Category;
@@ -196,4 +196,5 @@ export const CATEGORIES: { id: Category | 'all'; label: string }[] = [
   { id: 'fleurs', label: 'Fleuries' },
   { id: 'arbres', label: 'Arbres & palmiers' },
   { id: 'retombantes', label: 'Retombantes' },
+  { id: 'sauvages', label: 'Sauvages' },
 ];

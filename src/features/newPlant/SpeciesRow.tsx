@@ -18,7 +18,8 @@ const CHECK = 28;
 function SpeciesRowBase({ species, selected, onPress }: Props) {
   const colors = useColors();
   const styles = useStyles();
-  const label = typeLabel(species);
+  // Mauvaise herbe signalée sobrement, à la suite du type.
+  const label = species.weed ? `${typeLabel(species)} · ${t('care.weed')}` : typeLabel(species);
   return (
     <PressableScale
       onPress={() => onPress(species)}

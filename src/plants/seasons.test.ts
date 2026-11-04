@@ -88,3 +88,10 @@ describe('seasonalAdvice', () => {
     expect(seasonalAdvice('echeveria', 'winter').humidity).toBeNull();
   });
 });
+
+describe('plantes rustiques de pleine terre', () => {
+  it('passent l’hiver dehors, même dessinées comme une plante d’intérieur', () => {
+    expect(climateOf('ortie')).toMatchObject({ outdoors: 'year', min: -15 });
+    expect(climateOf('basilic').outdoors).toBe('summer');
+  });
+});

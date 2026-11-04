@@ -67,7 +67,17 @@ export const SPECIES_GUIDE: Record<string, Partial<CareGuide>> = {
   lierre: { pot: 'potDrained' },
 };
 
+/** Pleine terre (arbres, fruitiers, herbes sauvages) ; une mauvaise herbe ne se nourrit pas. */
+const GROUND: Partial<CareGuide> = { soil: 'soilGarden', pot: 'potGround', repot: 'repotGround' };
+const WEED: Partial<CareGuide> = { feed: 'feedNone' };
+
 export function careGuideOf(speciesId: string): CareGuide {
-  const form = SPECIES_BY_ID[speciesId]?.form ?? 'monstera';
-  return { ...FORM_GUIDE[form], ...SPECIES_GUIDE[speciesId] };
+  const species = SPECIES_BY_ID[speciesId];
+  const form = species?.form ?? 'monstera';
+  return {
+    ...FORM_GUIDE[form],
+    ...(species?.hardy ? GROUND : {}),
+    ...(species?.weed ? WEED : {}),
+    ...SPECIES_GUIDE[speciesId],
+  };
 }

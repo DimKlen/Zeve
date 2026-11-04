@@ -27,3 +27,15 @@ describe('careGuideOf', () => {
     expect(careGuideOf('tillandsia')).toMatchObject({ soil: 'soilNone', pot: 'potNone' });
   });
 });
+
+describe('plantes de pleine terre et mauvaises herbes', () => {
+  it('un arbre se plante en pleine terre ; une mauvaise herbe ne se nourrit pas', () => {
+    expect(careGuideOf('chene')).toMatchObject({
+      soil: 'soilGarden',
+      pot: 'potGround',
+      repot: 'repotGround',
+    });
+    expect(careGuideOf('chiendent').feed).toBe('feedNone');
+    expect(careGuideOf('monstera').soil).toBe('soilAroid');
+  });
+});
