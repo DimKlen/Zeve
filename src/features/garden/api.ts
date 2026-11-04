@@ -26,9 +26,6 @@ export function toGardenPlant(row: OverviewRow): GardenPlant {
     speciesId: row.species_id!,
     speciesName: row.species_name!,
     latin: row.latin!,
-    roomId: row.room_id,
-    roomName: row.room_name,
-    light: row.light!,
     lightLabel: row.light_label!,
     air: row.air!,
     tip: row.tip ?? '',
@@ -44,7 +41,6 @@ export function toGardenPlant(row: OverviewRow): GardenPlant {
       country: row.garden_country,
       city: row.garden_city,
     },
-    outdoor: !!row.room_outdoor,
     history: parseHistory(row.watering_history),
     learnedEveryDays: row.learned_every_days,
     declined:
@@ -65,6 +61,8 @@ function parseHistory(value: OverviewRow['watering_history']): WateringEvent[] {
     return at ? [{ at, expectedDays: expected }] : [];
   });
 }
+
+export const wateringKey = (plantId: string) => ['watering', plantId] as const;
 
 export const plantsKey = (userId: string | undefined) => ['plants', userId] as const;
 
@@ -93,7 +91,7 @@ export function usePlants() {
   const data = useMemo(() => {
     if (!query.data) return query.data;
     const drying = dryingLookup(weather);
-    return query.data.map((p) => ({ ...p, drying: drying(p.gardenId, p.outdoor) }));
+    return query.data.map((p) => ({ ...p, drying: drying(p.gardenId) }));
   }, [query.data, weather]);
   return { ...query, data };
 }
@@ -171,8 +169,11 @@ export function useWatering() {
     if (context?.previous) queryClient.setQueryData(key, context.previous);
     showToast(t('toast.offline'));
   };
-  const settle = () => {
+  // Le menu « Historique d'arrosage » garde sa propre requête : sans ce rafraîchissement, elle
+  // restait sur la liste lue avant l'arrosage (vide pour une plante jamais arrosée).
+  const settle = (_data: unknown, _error: unknown, vars: { plantId: string }) => {
     void queryClient.invalidateQueries({ queryKey: key });
+    void queryClient.invalidateQueries({ queryKey: wateringKey(vars.plantId) });
     void rescheduleReminders();
   };
 

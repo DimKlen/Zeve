@@ -2,7 +2,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useAuthStore } from '@/features/auth/authStore';
-import { plantsKey } from '@/features/garden/api';
+import { plantsKey, wateringKey } from '@/features/garden/api';
 import { rescheduleReminders } from '@/features/notifications/schedule';
 import type { Database } from '@/lib/database.types';
 import { supabase } from '@/lib/supabase';
@@ -10,7 +10,6 @@ import { supabase } from '@/lib/supabase';
 type PlantUpdate = Pick<
   Database['public']['Tables']['plants']['Update'],
   | 'nickname'
-  | 'room_id'
   | 'water_every_days'
   | 'archived_at'
   | 'learned_every_days'
@@ -18,35 +17,13 @@ type PlantUpdate = Pick<
   | 'suggestion_declined_count'
 >;
 
-export type Room = { id: string; name: string; gardenId: string; outdoor: boolean };
-
-/** Pièces de l'utilisateur (tous jardins), dans l'ordre choisi. */
-export function useRooms() {
-  const userId = useAuthStore((s) => s.session?.user.id);
-  return useQuery({
-    queryKey: ['rooms', userId],
-    enabled: !!userId,
-    queryFn: async (): Promise<Room[]> => {
-      const { data, error } = await supabase
-        .from('rooms')
-        .select('id, name, garden_id, outdoor')
-        .order('position', { ascending: true });
-      if (error) throw error;
-      return data.map((r) => ({
-        id: r.id,
-        name: r.name,
-        gardenId: r.garden_id,
-        outdoor: r.outdoor,
-      }));
-    },
-  });
-}
-
 /** Derniers arrosages d'une plante (historique du menu). */
 export function useWateringHistory(plantId: string, enabled: boolean) {
   return useQuery({
-    queryKey: ['watering', plantId],
+    queryKey: wateringKey(plantId),
     enabled,
+    // Toujours relue à l'ouverture du menu : un arrosage vient peut-être d'être enregistré.
+    staleTime: 0,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('watering_events')
@@ -60,7 +37,7 @@ export function useWateringHistory(plantId: string, enabled: boolean) {
   });
 }
 
-/** Renommer, changer de pièce, de rythme ou archiver (= supprimer du jardin). */
+/** Renommer, changer de rythme ou archiver (= supprimer du jardin). */
 export function useUpdatePlant() {
   const queryClient = useQueryClient();
   const userId = useAuthStore((s) => s.session?.user.id);
