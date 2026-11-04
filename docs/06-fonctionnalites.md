@@ -172,3 +172,15 @@ Script `supabase/seed.dev.sql` (ou bouton dev) qui crée les 6 plantes de Camill
 - Lecteurs d'écran : mêmes actions en `accessibilityActions` sur la carte ; le tap simple ouvre la fiche.
 - Si la dernière plante d'un jardin est retirée depuis l'écran de ce jardin, l'app revient à l'accueil.
 
+
+## F20. « Mes jardins » en carrés clôturés (ajout hors design)
+
+Non maquetté. Avec deux jardins ou plus, l'accueil montre chaque jardin comme un **carré vu de dessus**, 2 par ligne, à la place de l'ancienne carte en ligne (`GardenCard`, supprimée) :
+
+- pelouse sauge (`sage`) entourée d'une clôture en bois dessinée en SVG (deux traverses `fence`, poteaux `fencePost` ; jetons ajoutés aux deux palettes) ;
+- jusqu'à **10 plantes** (`PlantAvatar`), en rangs légèrement décalés comme plantées à la main (`plotLayout`, déterministe : un jardin garde la même allure) ; elles rapetissent quand le jardin se remplit ; au-delà de 10, un badge « +N » posé sur le coin de la clôture ;
+- sous le carré : nom, lieu, « 6 plantes · 2 ont soif » avec la pastille de soif ;
+- les plantes se balancent avec un décalage de 430 ms entre elles (`swayDelayMs`), **seulement** pour les carrés visibles à l'écran et quand l'onglet Jardin est affiché ; rien ne bouge si « Réduire les animations » est actif ;
+- lecteurs d'écran : un seul bouton par jardin, même libellé qu'avant (« Paris 1, Paris, France, 6 plantes, 2 ont soif ») ; le dessin est masqué.
+
+Deux mises en page ont été comparées (captures `docs/captures/jardins-clotures`) : rangs alignés (`*-rows`) et rangs décalés (`*-grove`). La seconde est retenue : plus vivante, et elle ne répète pas la grille des cartes de plantes.

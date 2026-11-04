@@ -33,6 +33,8 @@ type Props = {
   bob?: boolean; // flottement vertical 6 px
   /** Décalage du flottement (trio de connexion : -1.1 s / -2.2 s, passés en positif). */
   bobDelayMs?: number;
+  /** Décalage du balancement (plantes d'un même jardin qui ne bougent pas en même temps). */
+  swayDelayMs?: number;
   showDrops?: boolean; // déclenche l'animation des gouttes (arrosage)
 };
 
@@ -55,6 +57,7 @@ function PlantAvatarBase({
   sway = true,
   bob = false,
   bobDelayMs = 0,
+  swayDelayMs = 0,
   showDrops = false,
 }: Props) {
   const reduced = useReducedMotion();
@@ -70,9 +73,12 @@ function PlantAvatarBase({
       return;
     }
     rot.value = -SWAY_DEG;
-    rot.value = withRepeat(withTiming(SWAY_DEG, { duration: 2250, easing: EASE_IN_OUT }), -1, true);
+    rot.value = withDelay(
+      swayDelayMs,
+      withRepeat(withTiming(SWAY_DEG, { duration: 2250, easing: EASE_IN_OUT }), -1, true),
+    );
     return () => cancelAnimation(rot);
-  }, [sway, reduced, rot]);
+  }, [sway, swayDelayMs, reduced, rot]);
   const swayStyle = useAnimatedStyle(() => ({ transform: [{ rotate: `${rot.value}deg` }] }));
 
   // changement d'humeur : inclinaison −9° ↔ 0°, 600 ms

@@ -29,6 +29,8 @@ export const lightColors = {
   sagePale: '#E9EFDF', // bouton « Prendre une photo »
   sageLine: '#A9B79A', // pointillé du bouton photo
   sageDash: '#8DAA80', // pointillé photo dans le chat
+  fence: '#C9A06B', // clôture des jardins (lattes et traverses)
+  fencePost: '#A87F4C', // poteaux de la clôture
 
   // Lignes & bordures
   line: '#E2D9C6', // séparateurs d'en-tête, bordures d'étapes
@@ -105,6 +107,8 @@ export const darkColors: Palette = {
   sagePale: '#1F2E24',
   sageLine: '#5E7A58',
   sageDash: '#5E7A58',
+  fence: '#8A6B45',
+  fencePost: '#6E5335',
 
   line: '#2E3A31',
   lineSoft: '#26302A',
