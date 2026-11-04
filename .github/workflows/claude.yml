@@ -1,0 +1,70 @@
+name: Claude Code
+
+# Répond aux mentions @claude dans les issues et les PR (comme sur Zabava).
+# Secret requis : CLAUDE_CODE_OAUTH_TOKEN (claude setup-token) ; l'app GitHub Claude doit avoir accès au dépôt.
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  issues:
+    types: [opened, assigned]
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  claude:
+    if: |
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
+      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
+    runs-on: ubuntu-latest
+    # Correction, PR, puis attente de la CI (~5 min par passage) et corrections éventuelles.
+    timeout-minutes: 120
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      # gh run rerun : relancer un workflow en échec.
+      actions: write
+      # gh pr checks : vérifications et statuts de la PR.
+      checks: read
+      statuses: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+
+      # Outils du projet, pour que Claude vérifie ses corrections (mêmes versions que ci.yml).
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      - name: Run Claude Code
+        id: claude
+        uses: anthropics/claude-code-action@v1
+        env:
+          # Une commande Bash peut attendre toute la CI (gh pr checks --watch) sans être coupée.
+          BASH_DEFAULT_TIMEOUT_MS: '900000'
+          BASH_MAX_TIMEOUT_MS: '1800000'
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+
+          # Lecture des résultats de CI sur les PR.
+          additional_permissions: |
+            actions: write
+            checks: read
+            statuses: read
+
+          # Mêmes outils et même façon de travailler que sur Zabava (accord du propriétaire).
+          # Les règles du projet sont dans CLAUDE.md, lu automatiquement.
+          claude_args: >-
+            --allowedTools "Bash,Edit,MultiEdit,Write,Read,Glob,Grep,WebFetch,WebSearch,TodoWrite"
+            --append-system-prompt "Autorisation explicite du propriétaire du dépôt, valable dans ce workflow : quand tu corriges une issue, respecte CLAUDE.md et travaille sur une branche dédiée (jamais sur main). Avant chaque commit, vérifie toi-même : npx eslint --fix . puis npm run typecheck puis npm run lint puis npm test. Committe (feat(…) / fix(…) comme dans CLAUDE.md), pousse la branche, puis ouvre une PR vers main avec gh pr create (corps avec « Closes #<numéro de l'issue> »). Ensuite attends la CI de la PR, sans terminer avant qu'elle soit finie : gh pr checks <n> --watch --interval 30 avec un délai de commande de 900000 ms ; si aucune vérification n'est encore listée, attends (sleep 30) et relance. Si une vérification échoue, lis l'erreur (gh run view <id> --log-failed), corrige, vérifie localement, pousse, puis attends de nouveau la CI. Quand toutes les vérifications passent, fusionne avec gh pr merge <n> --merge --delete-branch sans demander de confirmation. Après trois échecs de suite, ne fusionne pas et explique le blocage en commentaire. Jamais de push --force ni de push direct sur main, ne modifie pas .github/, design/ ni reference/, et ne touche jamais aux clés API (supabase/functions/.env, secrets)."
