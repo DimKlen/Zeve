@@ -2,7 +2,6 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 import { useState } from 'react';
 
 import { Chip } from '../Chip';
-import { LightOption } from '../LightOption';
 import { Toggle } from '../Toggle';
 
 describe('Toggle', () => {
@@ -34,8 +33,8 @@ describe('Toggle', () => {
 describe('Chip', () => {
   it('annonce la sélection et réagit au tap', async () => {
     const onPress = jest.fn();
-    await render(<Chip label="Salon" variant="room" selected onPress={onPress} />);
-    const chip = screen.getByRole('button', { name: 'Salon' });
+    await render(<Chip label="Paris" variant="option" selected onPress={onPress} />);
+    const chip = screen.getByRole('button', { name: 'Paris' });
     expect(chip).toBeSelected();
     await fireEvent.press(chip);
     expect(onPress).toHaveBeenCalledTimes(1);
@@ -50,12 +49,5 @@ describe('Chip', () => {
     );
     expect(screen.getByRole('button', { name: 'Feuillage' })).not.toBeSelected();
     expect(screen.getByRole('button', { name: 'Engrais ?' })).not.toBeSelected();
-  });
-});
-
-describe('LightOption', () => {
-  it('lit le libellé et l’indice, et annonce la sélection', async () => {
-    await render(<LightOption label="Lumineux" hint="sans soleil direct" selected />);
-    expect(screen.getByRole('button', { name: 'Lumineux, sans soleil direct' })).toBeSelected();
   });
 });

@@ -6,12 +6,14 @@ describe('t', () => {
   });
 
   it('remplace les paramètres', () => {
-    expect(t('garden.hello', { name: 'Camille' })).toBe('Bonjour Camille');
+    const greeting = t('chat.greeting', { name: 'Gaston' });
+    expect(greeting).toContain('Je suis Gaston.');
+    expect(greeting).not.toContain('{name}');
     expect(t('species.countAll', { count: 52, types: 19 })).toBe('52 espèces · 19 types');
   });
 
   it('laisse un paramètre absent tel quel', () => {
-    expect(t('garden.hello')).toBe('Bonjour {name}');
+    expect(t('chat.greeting')).toContain('{name}');
   });
 
   it('renvoie la clé si elle est inconnue', () => {

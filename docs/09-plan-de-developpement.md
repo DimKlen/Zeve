@@ -23,7 +23,7 @@ Rappel pour chaque phase : lire `CLAUDE.md`, les docs citées, ouvrir les captur
 
 ## Phase 1 — Design system & mascotte
 **Objectif** : tous les composants de `docs/02 §7`, les animations de `docs/03`, la mascotte `PlantAvatar` et la planche des dessins.
-- Composants : Button (primary/sun/secondary/disabled + chargement), TextButton, IconButton, ProviderButton, Card, Chip (3 variantes), LightOption, TextField (+ recherche), Toggle, Toast (store + entrée/sortie), BottomSheet, TabBar, InfoTile, WaterGauge, GrowthSteps, ChatBubble, TypingDots, Spinner, AddedBadge, Rise, Screen (entrée fwd/back/up/fade/zoom + réduction des mouvements).
+- Composants : Button (primary/sun/secondary/disabled + chargement), TextButton, IconButton, ProviderButton, Card, Chip (3 variantes), AssistantAvatar, TextField (+ recherche), Toggle, Toast (store + entrée/sortie), BottomSheet, TabBar, InfoTile, WaterGauge, GrowthSteps, ChatBubble, TypingDots, Spinner, AddedBadge, Rise, Screen (entrée fwd/back/up/fade/zoom + réduction des mouvements).
 - `PlantAvatar` (feuillage animé séparé du pot, visage simple/complet, blink, bob, gouttes) + tests de `drawPlant` (nombre d'éléments par stade).
 - Écran `app/dev/plants.tsx` = planche des dessins (19 × 3) + page « Kitchen sink » listant chaque composant dans tous ses états.
 - `src/motion/transitions.ts` : table de `docs/03 §2` et helper `go(route, params)` qui choisit l'animation.

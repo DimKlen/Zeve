@@ -212,10 +212,8 @@ export type Database = {
           garden_id: string | null;
           id: string;
           learned_every_days: number | null;
-          light: Database['public']['Enums']['light_exposure'];
           nickname: string;
           photo_path: string | null;
-          room_id: string | null;
           species_id: string;
           species_source: string | null;
           suggestion_declined_count: number | null;
@@ -231,10 +229,8 @@ export type Database = {
           garden_id?: string | null;
           id?: string;
           learned_every_days?: number | null;
-          light?: Database['public']['Enums']['light_exposure'];
           nickname: string;
           photo_path?: string | null;
-          room_id?: string | null;
           species_id: string;
           species_source?: string | null;
           suggestion_declined_count?: number | null;
@@ -249,10 +245,8 @@ export type Database = {
           garden_id?: string | null;
           id?: string;
           learned_every_days?: number | null;
-          light?: Database['public']['Enums']['light_exposure'];
           nickname?: string;
           photo_path?: string | null;
-          room_id?: string | null;
           species_id?: string;
           species_source?: string | null;
           suggestion_declined_count?: number | null;
@@ -266,13 +260,6 @@ export type Database = {
             columns: ['garden_id'];
             isOneToOne: false;
             referencedRelation: 'gardens';
-            referencedColumns: ['id'];
-          },
-          {
-            foreignKeyName: 'plants_room_id_fkey';
-            columns: ['room_id'];
-            isOneToOne: false;
-            referencedRelation: 'rooms';
             referencedColumns: ['id'];
           },
           {
@@ -363,42 +350,6 @@ export type Database = {
             columns: ['plant_id'];
             isOneToOne: false;
             referencedRelation: 'plants';
-            referencedColumns: ['id'];
-          },
-        ];
-      };
-      rooms: {
-        Row: {
-          garden_id: string;
-          id: string;
-          name: string;
-          outdoor: boolean;
-          position: number;
-          user_id: string;
-        };
-        ComputedFields: never;
-        Insert: {
-          garden_id: string;
-          id?: string;
-          name: string;
-          outdoor?: boolean;
-          position?: number;
-          user_id: string;
-        };
-        Update: {
-          garden_id?: string;
-          id?: string;
-          name?: string;
-          outdoor?: boolean;
-          position?: number;
-          user_id?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 'rooms_garden_id_fkey';
-            columns: ['garden_id'];
-            isOneToOne: false;
-            referencedRelation: 'gardens';
             referencedColumns: ['id'];
           },
         ];
@@ -514,14 +465,10 @@ export type Database = {
           last_watered_at: string | null;
           latin: string;
           learned_every_days: number | null;
-          light: Database['public']['Enums']['light_exposure'];
           light_label: string;
           nickname: string;
           photo_path: string | null;
           previous_watered_at: string | null;
-          room_id: string | null;
-          room_name: string | null;
-          room_outdoor: boolean | null;
           species_id: string;
           species_light: string;
           species_name: string;
@@ -543,13 +490,6 @@ export type Database = {
             referencedColumns: ['id'];
           },
           {
-            foreignKeyName: 'plants_room_id_fkey';
-            columns: ['room_id'];
-            isOneToOne: false;
-            referencedRelation: 'rooms';
-            referencedColumns: ['id'];
-          },
-          {
             foreignKeyName: 'plants_species_id_fkey';
             columns: ['species_id'];
             isOneToOne: false;
@@ -566,11 +506,9 @@ export type Database = {
           p_country?: string;
           p_country_code?: string;
           p_latitude?: number;
-          p_light: Database['public']['Enums']['light_exposure'];
           p_longitude?: number;
           p_name: string;
           p_nickname: string;
-          p_room_name?: string;
           p_species_id: string;
           p_species_source: string;
           p_water_every_days: number;
@@ -582,7 +520,7 @@ export type Database = {
       };
     };
     Enums: {
-      light_exposure: 'ombre' | 'indirect' | 'soleil';
+      [_ in never]: never;
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -696,8 +634,6 @@ export const Constants = {
     Enums: {},
   },
   public: {
-    Enums: {
-      light_exposure: ['ombre', 'indirect', 'soleil'],
-    },
+    Enums: {},
   },
 } as const;

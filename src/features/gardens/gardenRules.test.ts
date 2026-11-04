@@ -1,10 +1,6 @@
-import { readdirSync, readFileSync } from 'fs';
-import { join } from 'path';
-
 import type { GardenPlant } from '@/features/garden/gardenRules';
 
 import {
-  DEFAULT_ROOMS,
   defaultGardenName,
   isLastInGarden,
   isSouthern,
@@ -39,9 +35,6 @@ const plant = (id: string, gardenId: string, lastWatered: number, every = 7): Ga
   speciesId: 'monstera',
   speciesName: 'Monstera',
   latin: 'Monstera deliciosa',
-  roomId: null,
-  roomName: null,
-  light: 'indirect',
   lightLabel: 'Vive, indirecte',
   air: 'Humide',
   tip: '',
@@ -52,7 +45,6 @@ const plant = (id: string, gardenId: string, lastWatered: number, every = 7): Ga
   gardenId,
   gardenName: gardenId,
   gardenPlace: { latitude: null, countryCode: null, country: null, city: null },
-  outdoor: false,
   history: [],
   learnedEveryDays: null,
   declined: null,
@@ -115,21 +107,5 @@ describe('isLastInGarden', () => {
     const plants = [plant('a', 'paris', 1), plant('b', 'paris', 1), plant('c', 'mtl', 1)];
     expect(isLastInGarden(plants[0]!, plants)).toBe(false);
     expect(isLastInGarden(plants[2]!, plants)).toBe(true);
-  });
-});
-
-describe('DEFAULT_ROOMS', () => {
-  it('correspond aux pièces créées par la base avec chaque jardin', () => {
-    // Dernière définition de handle_new_garden, toutes migrations confondues.
-    const dir = join(__dirname, '../../../supabase/migrations');
-    const sql = readdirSync(dir)
-      .sort()
-      .map((file) => readFileSync(join(dir, file), 'utf8'))
-      .join('\n');
-    const body = sql.slice(sql.lastIndexOf('function public.handle_new_garden'));
-    const names = [
-      ...body.slice(0, body.indexOf('return new')).matchAll(/new\.id, '([^']+)'/g),
-    ].map((m) => m[1]);
-    expect(names).toEqual([...DEFAULT_ROOMS]);
   });
 });

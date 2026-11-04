@@ -55,7 +55,6 @@ export default function PlantScreen() {
   }
 
   const s = statusOf(plant);
-  const latinRoom = plant.roomName ? `${plant.latin} · ${plant.roomName}` : plant.latin;
 
   const toggleWater = () => {
     if (s.wateredToday) {
@@ -87,7 +86,7 @@ export default function PlantScreen() {
               {plant.nickname}
             </Text>
             <Text style={styles.latin} numberOfLines={1}>
-              {latinRoom}
+              {plant.latin}
             </Text>
           </View>
           <IconButton
@@ -196,7 +195,7 @@ export default function PlantScreen() {
       />
 
       <PlantOptionsSheet
-        key={`${plant.nickname}-${plant.waterEveryDays}-${plant.roomId}`}
+        key={`${plant.nickname}-${plant.waterEveryDays}`}
         plant={plant}
         visible={menu}
         onClose={() => setMenu(false)}

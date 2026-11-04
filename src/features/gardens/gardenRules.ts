@@ -15,9 +15,6 @@ export type Garden = {
   createdAt: Date;
 };
 
-/** Pièces créées avec chaque jardin (même liste que handle_new_garden, migration 0006). */
-export const DEFAULT_ROOMS = ['Salon', 'Chambre', 'Cuisine', 'Salle de bain', 'Balcon'] as const;
-
 /**
  * Nom par défaut : « <Ville> <n> », n étant le premier numéro libre pour cette ville
  * (« Montréal 1 », « Montréal 2 »…). Sans ville : « Jardin <n> ».

@@ -35,7 +35,7 @@ Chaque section : capture(s) de référence (`design/screens/`), route expo-route
 **Non implémenté par l'app** (page web Google / feuille Apple). Ce que la maquette fixe :
 - Les permissions demandées sont **uniquement** : nom, photo de profil, adresse e-mail (scopes Google `openid email profile` ; Apple `name email`).
 - Apple : l'utilisateur peut **masquer son e-mail** → l'app doit accepter une adresse relais `…@privaterelay.appleid.com` et l'afficher telle quelle dans Réglages.
-- Le prénom (`given_name`, ou nom complet Apple au 1er login uniquement) alimente « Bonjour Camille ». Sans prénom : « Bonjour » seul et « Bienvenue ! ».
+- Le prénom (`given_name`, ou nom complet Apple au 1er login uniquement) alimente « Bienvenue, Camille ! » (onboarding) ; sans prénom : « Bienvenue ! ». L'accueil n'affiche plus de « Bonjour ».
 
 ## 5. Connexion en cours — `05-connexion-en-cours.png`
 **Route** `app/(auth)/connecting.tsx`. Centré, gap 26.
@@ -56,7 +56,7 @@ Chaque section : capture(s) de référence (`design/screens/`), route expo-route
 ## 7. Mon jardin — `07-jardin.png`, `07b-jardin-tout-arrose.png`, `07c-jardin-toast.png`
 **Route** `app/(app)/(tabs)/index.tsx`. Scroll vertical, padding 60 22 120, gap 20. Barre de nav visible.
 - **En-tête** (rangée, espace entre) :
-  - Colonne gap 4 : « Bonjour Camille » 600 15 muted ; « Mon jardin » title 32 forest ; « 6 plantes · 2 ont soif aujourd'hui » 15 muted (`thirstLine` : « 1 a soif aujourd'hui », « tout le monde est hydraté »).
+  - Colonne gap 4 : « Mon jardin » title 32 forest ; « 6 plantes · 2 ont soif aujourd'hui » 15 muted (`thirstLine` : « 1 a soif aujourd'hui », « tout le monde est hydraté »).
   - **Bouton +** rond 48 `sun` avec ombre, icône + 22 trait 2.4 forest, a11y « Ajouter une plante » → Nouvelle plante (up). C'est **le seul point d'entrée** de l'ajout.
 - **Carte « À arroser aujourd'hui »** (rise d1) — affichée si au moins une plante a soif ou a été arrosée aujourd'hui après avoir eu soif : fond `butter` (couleur réglable), r 24, padding 18, gap 12. Titre : goutte 18 + « À arroser aujourd'hui » 700 15 forest. Une `TodoRow` par plante concernée (triées par jours sans eau décroissants). Tap « J'ai arrosé » → arrosage (voir 06) → badge « ✓ Arrosé » + toast « {Nom} te dit merci ! ».
 - « Toutes mes plantes » 700 15 forest (marge haute 4).
@@ -72,7 +72,7 @@ Chaque section : capture(s) de référence (`design/screens/`), route expo-route
 
 ## 8. Fiche plante — `08-fiche-plante-assoiffee.png`, `08b-…-arrosee.png`, `08c-…-pousse.png`, `08d-…-jeune.png`
 **Route** `app/(app)/plant/[id].tsx`. Scroll vertical. Pas de barre de nav.
-- **En-tête** (padding 54 18 0, rangée espace entre) : bouton rond 44 `surface` retour (a11y « Retour au jardin ») ; au centre nom (plantName 22 forest) et « {latin} · {pièce} » (13 italique muted) ; bouton rond 44 « Plus d'options » (3 points) → menu (non maquetté, feuille du bas : Renommer, Changer de pièce, Modifier le rythme d'arrosage, Historique d'arrosage, Supprimer la plante — mêmes styles que Réglages).
+- **En-tête** (padding 54 18 0, rangée espace entre) : bouton rond 44 `surface` retour (a11y « Retour au jardin ») ; au centre nom (plantName 22 forest) et « {latin} » (13 italique muted) ; bouton rond 44 « Plus d'options » (3 points) → menu (non maquetté, feuille du bas : Renommer, Changer de jardin, Modifier le rythme d'arrosage, Historique d'arrosage, Supprimer la plante — mêmes styles que Réglages).
 - **Scène** (h 290) :
   - Halo : disque 250 centré, haut à 30 ; `butter` si soif, `sage` sinon (transition 600 ms).
   - Bulle de la mascotte : en haut à gauche (14, 22), max 170, `surface`, r 18/18/18/4, padding 10/12, 14 interligne 1.35, ombre bubble, pop à chaque changement. Textes : voir `moodBubble` (« J'ai un peu soif… (9 j sans eau) », « Merci ! Prochain arrosage dans 8 j. », « Tout va bien, prochain arrosage dans 3 j. »).
@@ -86,7 +86,7 @@ Chaque section : capture(s) de référence (`design/screens/`), route expo-route
 
 ## 9. Chat IA — `09-chat-ia.png`, `09b-chat-ia-reponse-en-cours.png`
 **Route** `app/(app)/plant/[id]/chat.tsx`. Clavier : `KeyboardAvoidingView` (le champ remonte).
-- **En-tête** (padding 54 18 14, bordure basse 1 `line`, gap 12) : retour 44 ; avatar rond 44 `sage` contenant la plante (sans visage, taille actuelle) ; « {Nom} » 700 16 forest + « Assistant plantes · connaît son historique » 13 muted.
+- **En-tête** (padding 54 18 14, bordure basse 1 `line`, gap 12) : retour 44 ; avatar rond 44 `sage` contenant la plante (sans visage, taille actuelle) ; « {Nom} » 700 16 forest (plus de sous-titre). Les bulles de l'assistant portent l'avatar `AssistantAvatar` (petite plante en pot qui parle, 32 px) ; l'état vide du chat l'affiche en grand (96 px) au-dessus de la salutation.
 - **Fil** (flex 1, ancré en bas, padding 18, gap 12) : « Aujourd'hui » 12 muted centré (séparateurs de date « Hier », « 12 oct. ») ; bulles (voir composant `ChatBubble`) ; photo envoyée = vignette 190×150 r 20/20/6/20 ; réponse de l'assistant avec action éventuelle « Me rappeler dans 3 jours » (crée un rappel + toast « Rappel prévu dans 3 jours ») ; indicateur de saisie (3 points) pendant la génération.
 - **Suggestions** (défilement horizontal, padding 0 18 10, gap 8) : chips `butter` h 40 : « Faut-il rempoter ? », « Meilleur emplacement », « Engrais ? ». Tap = envoie la question.
 - **Saisie** (padding 8 14 30, gap 8) : bouton 48 `sage` appareil photo (a11y « Prendre une photo » → caméra ou galerie) ; champ pilule h 48 « Pose ta question… » ; bouton 48 `forest` flèche (a11y « Envoyer »). Envoi au retour clavier.
@@ -100,7 +100,6 @@ Chaque section : capture(s) de référence (`design/screens/`), route expo-route
 - **Préférences** (rise d2) : carte r 24 lignes séparées par 1 `lineSoft` :
   - « Rappels d'arrosage » 600 15 + « Quand une plante a soif » 13 muted + `Toggle` (a11y switch). Activer sans permission système → redemande / ouvre les réglages du téléphone.
   - « Heure du rappel » → « 9 h 00 » (sélecteur d'heure natif).
-  - « Mes pièces » → nombre (écran de gestion des pièces, non maquetté : liste avec ajout/renommage/suppression, même style de lignes). Dernière ligne de la carte (pas de séparateur).
 - **Compte** (rise d3) : « Confidentialité » + chevron (page : export des données, suppression du compte — obligatoire stores) ; « Se déconnecter » 700 15 #A23B1F → confirmation native → Connexion (back).
 - Pied (non maquetté, discret) : version de l'app 12 muted centrée.
 
@@ -115,8 +114,6 @@ Chaque section : capture(s) de référence (`design/screens/`), route expo-route
   - *Espèce connue* (pop) : libellé « Espèce reconnue sur ta photo » ou « Espèce choisie » ; carte `surface` r 20 padding 10 gap 12 : vignette 72×76 r 16 `well` avec la plante **Adulte** 66 px (visage simple, sway) ; nom 700 16, latin 13 italique, type 12 #3F5A45 ; bouton « Changer » (contour 1.5 #CFC6B2, h 44, pilule) → Liste des espèces (fwd).
   - Reconnaissance incertaine (confiance < 0.6, non maquetté) : même carte + bandeau 13 #8A5A00 « Pas sûr à 100 % — vérifie avec “Changer”. »
 - **Son petit nom** : champ h 50, placeholder « Ex. : {nom de l'espèce} » ; vide à la validation → nom de l'espèce.
-- **Pièce** : chips h 44 pour chaque pièce de l'utilisateur (Salon, Chambre, Cuisine, Salle de bain, Balcon) ; sélection unique (forest/texte crème) ; dernière chip « + Pièce » (non maquettée) pour en créer une.
-- **Lumière à cet endroit** : 3 options h 64 : « Ombre / loin des fenêtres », « Lumineux / sans soleil direct », « Plein soleil / derrière la vitre ». Conseil sous les options (13 #8A5A00, rise) selon `LIGHT_TIPS[préférée>choisie]`.
 - **Pied** (padding 10 18 34) : bouton primary pleine largeur « Ajouter au jardin » (h 56, icône + 20 à gauche) — désactivé tant qu'aucune espèce n'est choisie (fond #B9B4A6, texte #2E3530 « Choisis d’abord son espèce »), transition de fond 300 ms. Tap → création de la plante → Plante ajoutée (up). Pendant l'enregistrement : libellé remplacé par les 3 points animés.
 
 ## 12. Liste des espèces — `12-liste-especes.png`, `12b-…-recherche.png`, `12c-…-succulentes.png`, `12d-…-aucun-resultat.png`

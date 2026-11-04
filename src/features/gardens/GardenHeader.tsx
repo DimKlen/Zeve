@@ -6,8 +6,6 @@ import { t } from '@/i18n';
 import { a11y, makeStyles, space, type } from '@/theme';
 
 type Props = {
-  /** « Bonjour Camille » (accueil seulement). */
-  hello?: string;
   title: string;
   /** « Montréal, Canada ». */
   place?: string;
@@ -19,7 +17,7 @@ type Props = {
 };
 
 /** En-tête de l'accueil et d'un jardin : titres à gauche, « … » et + à droite (docs/04 §7). */
-export function GardenHeader({ hello, title, place, subtitle, onBack, onMenu, onAdd }: Props) {
+export function GardenHeader({ title, place, subtitle, onBack, onMenu, onAdd }: Props) {
   const styles = useStyles();
   const actions = (
     <View style={styles.actions}>
@@ -40,7 +38,6 @@ export function GardenHeader({ hello, title, place, subtitle, onBack, onMenu, on
   );
   const titles = (
     <View style={styles.titles}>
-      {!!hello && <Text style={styles.hello}>{hello}</Text>}
       <Text
         style={styles.title}
         accessibilityRole="header"
@@ -83,7 +80,6 @@ const useStyles = makeStyles((colors) => ({
   bar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   actions: { flexDirection: 'row', alignItems: 'center', gap: space.s },
   titles: { gap: space.xxs, flexShrink: 1 },
-  hello: { ...type.bodyS, fontFamily: type.cardTitle.fontFamily, color: colors.inkMuted },
   title: { ...type.title, color: colors.forest },
   place: { ...type.caption, color: colors.inkMuted },
   subtitle: { ...type.bodyS, color: colors.inkMuted },

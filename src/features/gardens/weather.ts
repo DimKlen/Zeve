@@ -55,16 +55,15 @@ export function useWeather() {
   });
 }
 
-/** Effet séchant par jardin et par exposition, calculé une fois par jeu de données. */
+/** Effet séchant par jardin, calculé une fois par jeu de données. */
 export function dryingLookup(weather: WeatherByGarden | undefined) {
   const cache = new Map<string, Drying | null>();
-  return (gardenId: string, outdoor: boolean): Drying | null => {
-    const key = `${gardenId}:${outdoor}`;
-    if (!cache.has(key)) {
+  return (gardenId: string): Drying | null => {
+    if (!cache.has(gardenId)) {
       const days = weather?.[gardenId];
-      cache.set(key, days ? dryingFromWeather(days, outdoor) : null);
+      cache.set(gardenId, days ? dryingFromWeather(days) : null);
     }
-    return cache.get(key) ?? null;
+    return cache.get(gardenId) ?? null;
   };
 }
 

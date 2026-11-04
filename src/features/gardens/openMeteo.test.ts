@@ -80,7 +80,6 @@ describe('Open-Meteo', () => {
         tempMean: r.temp_mean,
         humidity: r.humidity_mean,
       })),
-      true,
     );
     expect(Object.values(drying!).every((d) => d.factor === 1)).toBe(true);
   });

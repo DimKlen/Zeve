@@ -30,7 +30,7 @@ src/
     icons.tsx              # ← reference/icons.tsx
     Screen.tsx             # conteneur racine : fond, safe areas, animation d'entrée
     Button.tsx, IconButton.tsx, ProviderButton.tsx, TextButton.tsx
-    Card.tsx, Chip.tsx, LightOption.tsx, TextField.tsx, Toggle.tsx
+    Card.tsx, Chip.tsx, AssistantAvatar.tsx, TextField.tsx, Toggle.tsx
     Toast.tsx (+ store), BottomSheet.tsx, TabBar.tsx
     InfoTile.tsx, WaterGauge.tsx, GrowthSteps.tsx, ChatBubble.tsx, TypingDots.tsx
     Spinner.tsx, Rise.tsx (wrapper d'entrée en cascade)

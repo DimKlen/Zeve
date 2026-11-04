@@ -40,9 +40,7 @@ async function reschedule(): Promise<void> {
     supabase.from('profiles').select('reminders_enabled, reminder_time').eq('id', userId).single(),
     supabase
       .from('plant_overview')
-      .select(
-        'id, nickname, species_id, created_at, water_every_days, last_watered_at, garden_id, room_outdoor',
-      ),
+      .select('id, nickname, species_id, created_at, water_every_days, last_watered_at, garden_id'),
     // Même date d'arrosage que la jauge : météo du jardin comprise (hors ligne : rythme fixe).
     fetchWeatherRows().catch(() => []),
   ]);
@@ -64,7 +62,7 @@ async function reschedule(): Promise<void> {
       createdAt: new Date(r.created_at!),
       waterEveryDays: r.water_every_days!,
       lastWateredAt: r.last_watered_at ? new Date(r.last_watered_at) : null,
-      drying: r.garden_id ? drying(r.garden_id, !!r.room_outdoor) : null,
+      drying: r.garden_id ? drying(r.garden_id) : null,
     })),
     profile.reminder_time,
   );

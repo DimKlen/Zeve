@@ -52,10 +52,10 @@ const mean = (values: number[]) => values.reduce((a, b) => a + b, 0) / values.le
 
 /**
  * Effet de la météo jour par jour, rapporté à la normale du lieu (moyenne de la période connue).
- * Dehors, la plante subit tout l'écart ; à l'intérieur, seulement INDOOR_WEIGHT.
+ * Les plantes sont suivies comme des plantes d'intérieur : seulement INDOOR_WEIGHT de l'écart.
  * Null si la météo est trop maigre pour en tirer quoi que ce soit.
  */
-export function dryingFromWeather(weather: DailyWeather[], outdoor: boolean): Drying | null {
+export function dryingFromWeather(weather: DailyWeather[]): Drying | null {
   const known = weather.filter((w) => w.et0 !== null && w.et0 > 0);
   if (known.length < MIN_WEATHER_DAYS) return null;
   const baseEt0 = mean(known.map((w) => w.et0!));
@@ -63,7 +63,7 @@ export function dryingFromWeather(weather: DailyWeather[], outdoor: boolean): Dr
   const hums = weather.flatMap((w) => (w.humidity === null ? [] : [w.humidity]));
   const baseTemp = temps.length ? mean(temps) : null;
   const baseHum = hums.length ? mean(hums) : null;
-  const weight = outdoor ? 1 : INDOOR_WEIGHT;
+  const weight = INDOOR_WEIGHT;
   const out: Drying = {};
   for (const w of known) {
     const raw = clamp(w.et0! / baseEt0, FACTOR_RANGE);

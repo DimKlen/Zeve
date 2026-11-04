@@ -20,7 +20,6 @@ export type ScreenKey =
   | 'newPlant'
   | 'species'
   | 'added'
-  | 'rooms'
   | 'privacy'
   | 'devPlants'
   | 'devKitchen';
@@ -42,7 +41,6 @@ const ROUTES: Record<ScreenKey, (p: Params) => Href> = {
   newPlant: () => '/new-plant',
   species: () => '/new-plant/species',
   added: () => '/new-plant/added',
-  rooms: () => '/settings/rooms',
   privacy: () => '/settings/privacy',
   devPlants: () => '/dev/plants',
   devKitchen: () => '/dev/kitchen',
@@ -83,7 +81,6 @@ export const TRANSITIONS: Partial<Record<`${ScreenKey}>${ScreenKey}`, ScreenAnim
   'added>plant': 'zoom',
   'added>newPlant': 'up',
   'settings>login': 'back',
-  'settings>rooms': 'fwd',
   'settings>privacy': 'fwd',
 };
 

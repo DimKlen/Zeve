@@ -41,10 +41,9 @@ export const type = {
   cardTitle: { fontFamily: fonts.bodySemi, fontSize: 16 },
   sectionTitle: { fontFamily: fonts.bodyBold, fontSize: 15 },
   // Compléments relevés dans le prototype (composants de la Phase 1).
-  buttonS: { fontFamily: fonts.bodySemi, fontSize: 14 }, // « J'ai arrosé » (ligne), chips pièce/suggestion, toast, valeur de tuile
+  buttonS: { fontFamily: fonts.bodySemi, fontSize: 14 }, // « J'ai arrosé » (ligne), chips choix/suggestion, toast, valeur de tuile
   textButton: { fontFamily: fonts.bodySemi, fontSize: 15 }, // « Continuer avec un e-mail »
   stepLabel: { fontFamily: fonts.bodyBold, fontSize: 13 }, // étapes de croissance
-  lightHint: { fontFamily: fonts.bodyMedium, fontSize: 12 }, // indice des choix de lumière
   tab: { fontFamily: fonts.bodyBold, fontSize: 14 }, // libellés de la barre de nav
   badge: { fontFamily: fonts.bodyBold, fontSize: 11 }, // badges de stade
   hint: { fontFamily: fonts.body, fontSize: 11 }, // indices des étapes de croissance
@@ -145,8 +144,7 @@ export const control = {
   smallButton: 44, // « J'ai arrosé » de la carte, « Changer »
   chip: 38, // catégories
   suggestion: 40, // suggestions de chat
-  roomChip: 44,
-  lightOption: 64,
+  optionChip: 44,
   navHeight: 64,
   navWidth: 340, // 3 onglets (Jardin, Découvrir, Réglages) ; 240 à l'origine pour 2
   navItem: 52,

@@ -124,7 +124,7 @@ Deno.serve(async (req) => {
     tempMean: w.temp_mean,
     humidity: w.humidity_mean,
   }));
-  const drying = dryingFromWeather(weather, !!plant.room_outdoor);
+  const drying = dryingFromWeather(weather);
   const due = dueInfo(
     {
       waterEveryDays: plant.water_every_days,
@@ -144,10 +144,9 @@ Deno.serve(async (req) => {
     nickname: plant.nickname,
     speciesName: plant.species_name,
     latin: plant.latin,
-    roomName: plant.room_name,
     daysSinceWater: plant.days_since_water,
     waterEveryDays: plant.water_every_days,
-    light: plant.light,
+    light: plant.species_light,
     lightLabel: plant.light_label,
     stage: stageOf(plant.days_since_created),
     recentWaterings: (waterings ?? []).map((w) => shortDate.format(new Date(w.watered_at))),

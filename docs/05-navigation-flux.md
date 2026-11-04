@@ -23,11 +23,10 @@ app/
     new-plant/index.tsx       # Nouvelle plante (presentation: 'fullScreenModal')
     new-plant/species.tsx     # Liste des espèces
     new-plant/added.tsx       # Plante ajoutée
-    settings/rooms.tsx        # Mes pièces (non maquetté)
     settings/privacy.tsx      # Confidentialité (non maquetté)
   dev/plants.tsx              # Planche des dessins (dev uniquement)
 ```
-L'état de création (espèce, source, nom, pièce, lumière, photo) vit dans un store Zustand `useNewPlantDraft` partagé par `new-plant/*`, réinitialisé à chaque ouverture depuis le + du jardin et après « Ajouter une autre plante ».
+L'état de création (espèce, source, nom, jardin, photo) vit dans un store Zustand `useNewPlantDraft` partagé par `new-plant/*`, réinitialisé à chaque ouverture depuis le + du jardin et après « Ajouter une autre plante ».
 
 ## Carte des écrans
 ```mermaid
@@ -57,7 +56,7 @@ flowchart TD
 2. **Lien magique** : Connexion → e-mail → envoi → toast → ouverture du lien → Connexion en cours → Bienvenue → Jardin.
 3. **Arrosage quotidien** : Jardin → « J'ai arrosé » sur Gaston → badge ✓ + toast → carte Gaston redressée → sous-titre « 1 a soif aujourd'hui ».
 4. **Arrosage depuis la fiche + annulation** : Jardin → Gaston (zoom) → J'ai arrosé (gouttes, humeur) → « annuler » → retour état assoiffé.
-5. **Ajout par photo** : + → Nouvelle plante → Prendre une photo → reconnue → nom → pièce → lumière → Ajouter au jardin → Plante ajoutée → Voir sa fiche (stade Pousse).
+5. **Ajout par photo** : + → Nouvelle plante → Prendre une photo → reconnue → nom → jardin → Ajouter au jardin → Plante ajoutée → Voir sa fiche (stade Pousse).
 6. **Ajout par liste** : + → Choisir dans la liste → recherche « fic » → Figuier lyre → Nouvelle plante (Espèce choisie) → Changer → Cactus & succulentes → Echeveria → Ajouter au jardin.
 7. **Chat** : Fiche → Une question → suggestion « Engrais ? » → points → réponse.
 8. **Déconnexion** : Réglages → Se déconnecter → confirmer → Connexion.

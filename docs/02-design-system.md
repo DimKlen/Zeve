@@ -70,7 +70,7 @@ Paquets : `@expo-google-fonts/bricolage-grotesque` (500, 700) et `@expo-google-f
 | body | Figtree 400 | 16 / 1.45 | | Textes d'onboarding, champs |
 | bodyS | Figtree 400 | 15 / 1.4 | | Sous-titres, bulles de chat, lignes de réglages (600) |
 | small | Figtree 400 | 14 / 1.45 | | Bulle mascotte, « Bon à savoir », permissions |
-| caption | Figtree 400 | 13 | | Pièce · jours sans eau, noms latins (italique), libellés de champs (600) |
+| caption | Figtree 400 | 13 | | Jours sans eau, noms latins (italique), libellés de champs (600) |
 | micro | Figtree 400 | 12 | | Mentions légales, aide sous CTA, indices |
 | overline | Figtree 600 | 12, MAJUSCULES | +0.06em | EAU, LUMIÈRE, AIR, CROISSANCE, BON À SAVOIR |
 | button | Figtree 700 | 16 | | CTA pleine largeur |
@@ -113,12 +113,11 @@ pilule = hauteur/2 pour tous les boutons et chips · 14 (étapes, vignette de li
 | `ProviderButton` | Google / Apple, h 56, r 28 (voir §6). |
 | `Card` | `surface`, r 22, padding 12/14/14. |
 | `PlantCard` | Carte du jardin : puits `well` h 104 r 16 contenant `PlantAvatar` 86 px ; badge de stade en haut à gauche (h 22, r 11, fond rgba(251,248,241,.85), Figtree 700 11 #3A453C) ; nom (600 16), nom courant (12 italique muted), statut avec pastille 8 px. |
-| `TodoRow` | Fond rgba(251,248,241,.7), r 16, padding 10/10/10/14 ; nom 600 16 + « Pièce · 9 j sans eau » 13 muted ; bouton « J'ai arrosé » (h 44, r 22, forest, texte 600 14) ou badge « ✓ Arrosé » (#2F5A3A, pop). |
+| `TodoRow` | Fond rgba(251,248,241,.7), r 16, padding 10/10/10/14 ; nom 600 16 + « 9 j sans eau » (« Jardin · 9 j sans eau » à plusieurs jardins) 13 muted ; bouton « J'ai arrosé » (h 44, r 22, forest, texte 600 14) ou badge « ✓ Arrosé » (#2F5A3A, pop). |
 | `InfoTile` | `surface`, r 18, padding 12, gap 8 : overline, contenu (jauge ou icône 22), valeur 600 14. |
 | `WaterGauge` | Piste h 8 r 4 `track`, remplissage `water`, largeur animée 800 ms. |
 | `GrowthSteps` | 3 cases (gouttière 8) r 14, padding 10/8 : icône pousse 16/20/24, libellé 700 13, indice 11. Actuelle : fond `forest` texte `bg` ; passée : fond `sage` ; future : fond `bg` + bordure `line`. |
-| `Chip` | h 38 r 19 bordure 1.5 ; sélectionnée `forest`/texte `bg`, sinon `surface`/bordure `inputBorder`. Variante pièce h 44 r 22. Variante suggestion h 40 r 20 fond `butter` sans bordure. |
-| `LightOption` | h 64 r 16 bordure 1.5 ; sélectionnée fond `butter` bordure `sunDeep` ; libellé 600 13 + indice 500 12 muted. |
+| `Chip` | h 38 r 19 bordure 1.5 ; sélectionnée `forest`/texte `bg`, sinon `surface`/bordure `inputBorder`. Variante choix h 44 r 22 (jardins, candidats). Variante suggestion h 40 r 20 fond `butter` sans bordure. |
 | `TextField` | h 50 (52 e-mail, 48 recherche/chat) r 16 (pilule pour e-mail, recherche, chat) bordure 1.5 `inputBorder` fond `surface` padding 0 16, Figtree 16 (15). Libellé au-dessus 600 13 muted, gap 8. Recherche : icône loupe à 16 px du bord, padding gauche 44. |
 | `Toggle` | 56×34 r 17 padding 3, fond `forest2` (actif) / `strongBorder`, bouton blanc 28 + ombre, transition 250 ms. `accessibilityRole="switch"`. |
 | `Toast` | En haut (top `insets.top`), marges 22, min h 48, r 24, padding 12/16, fond `ink`, texte 600 14 `bg`, icône coche jaune 18. Entrée 400 ms, visible 2.6 s. Un seul à la fois. |
@@ -129,4 +128,4 @@ pilule = hauteur/2 pour tous les boutons et chips · 14 (étapes, vignette de li
 | `AddedBadge` | Disque Ø 170 fond `bg`, bordure 6 `sun`, plante taille Pousse 130 px alignée en bas (écran « Plante ajoutée »), entrée pop. |
 | `PlantAvatar` | Voir `docs/10-dessins-plantes.md`. |
 | `SpeciesRow` | h ≥ 72, padding 6/10, r 18 ; vignette 54×58 r 14 `well` avec plante 50 px (taille Jeune, sans visage) ; nom 700 15, latin 13 italique, type 12 `forestText` ; sélectionnée fond `sage` + pastille coche 28 `forest`. |
-| `ScreenHeader` | Bouton retour 44 + titre (subTitle) gap 12 ; variante centrée (fiche) : retour / nom + latin·pièce / options. |
+| `ScreenHeader` | Bouton retour 44 + titre (subTitle) gap 12 ; variante centrée (fiche) : retour / nom + latin / options. |

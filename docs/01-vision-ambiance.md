@@ -12,7 +12,7 @@
 1. **Vivant** : les plantes ont un visage, une humeur (contente / assoiffée), se balancent doucement, clignent des yeux, et grandissent (Pousse → Jeune → Adulte) au fil des mois passés dans l'app. Esprit Tamagotchi, sans culpabilisation.
 2. **Simple** : une action principale par écran. Le geste quotidien tient en un tap.
 3. **Sans friction** : ajouter une plante = une photo (l'espèce est reconnue) ou un choix dans une liste de 52 espèces, en moins d'une minute.
-4. **Bienveillant et utile** : l'assistant IA connaît l'historique de la plante (dernier arrosage, espèce, pièce, lumière) et répond en langage simple.
+4. **Bienveillant et utile** : l'assistant IA connaît l'historique de la plante (dernier arrosage, espèce, lumière) et répond en langage simple.
 
 ## Ambiance visuelle
 - **Lumineuse, douce, naturelle** : fond crème (#F3EEE3), cartes ivoire (#FBF8F1), verts forêt profonds (#1F3D2B), touches de jaune soleil (#E8B931) et de beurre (#F6E3A6), sauge pâle (#DCE8CF).

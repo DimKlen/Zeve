@@ -1,10 +1,9 @@
-// Réglages (docs/06 F10) : préférences du profil, pièces, export des données, suppression du compte.
+// Réglages (docs/06 F10) : préférences du profil, export des données, suppression du compte.
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Platform, Share } from 'react-native';
 
 import { useAuthStore } from '@/features/auth/authStore';
 import { profileKey, type Profile } from '@/features/auth/profile';
-import { plantsKey } from '@/features/garden/api';
 import { cancelAllReminders, rescheduleReminders } from '@/features/notifications/schedule';
 import { queryClient } from '@/lib/queryClient';
 import { supabase } from '@/lib/supabase';
@@ -37,53 +36,9 @@ export function useUpdateProfile() {
   });
 }
 
-/** Pièces (écran « Mes pièces », non maquetté) : renommer, supprimer. */
-export function useRoomMutations() {
-  const client = useQueryClient();
-  const userId = useAuthStore((s) => s.session?.user.id);
-  const refresh = () => {
-    void client.invalidateQueries({ queryKey: ['rooms', userId] });
-    void client.invalidateQueries({ queryKey: plantsKey(userId) });
-  };
-  const rename = useMutation({
-    mutationFn: async ({ id, name }: { id: string; name: string }) => {
-      const { error } = await supabase.from('rooms').update({ name: name.trim() }).eq('id', id);
-      if (error) throw error;
-    },
-    onSettled: refresh,
-  });
-  const setOutdoor = useMutation({
-    mutationFn: async ({ id, outdoor }: { id: string; outdoor: boolean }) => {
-      const { error } = await supabase.from('rooms').update({ outdoor }).eq('id', id);
-      if (error) throw error;
-    },
-    onSettled: () => {
-      refresh();
-      // La météo pèse plus ou moins sur la date d'arrosage : rappels recalculés.
-      void rescheduleReminders();
-    },
-  });
-  const remove = useMutation({
-    mutationFn: async (id: string) => {
-      // Les plantes de la pièce gardent leur place au jardin (room_id → null, docs/07).
-      const { error } = await supabase.from('rooms').delete().eq('id', id);
-      if (error) throw error;
-    },
-    onSettled: refresh,
-  });
-  return { rename, remove, setOutdoor };
-}
-
 /** Export JSON de toutes les données de l'utilisateur (confidentialité, docs/06 F10). */
 export async function exportMyData(): Promise<void> {
-  const tables = [
-    'profiles',
-    'rooms',
-    'plants',
-    'watering_events',
-    'chat_messages',
-    'reminders',
-  ] as const;
+  const tables = ['profiles', 'plants', 'watering_events', 'chat_messages', 'reminders'] as const;
   const results = await Promise.all(tables.map((table) => supabase.from(table).select('*')));
   const failed = results.find((r) => r.error);
   if (failed?.error) throw failed.error;

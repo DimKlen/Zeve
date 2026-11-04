@@ -7,19 +7,19 @@ import { control, space, type, useColors } from '@/theme';
 import { PressableScale } from './PressableScale';
 import { useColorTransition } from './useColorTransition';
 
-type Variant = 'category' | 'room' | 'suggestion';
+type Variant = 'category' | 'option' | 'suggestion';
 
 type Props = {
   label: string;
   onPress?: () => void;
   selected?: boolean;
-  /** category : h 38 (liste d'espèces) · room : h 44 (pièces) · suggestion : h 40 fond butter (chat). */
+  /** category : h 38 (liste d'espèces) · option : h 44 (choix : jardins, candidats) · suggestion : h 40 fond butter (chat). */
   variant?: Variant;
 };
 
 const HEIGHT: Record<Variant, number> = {
   category: control.chip,
-  room: control.roomChip,
+  option: control.optionChip,
   suggestion: control.suggestion,
 };
 
@@ -47,7 +47,7 @@ export function Chip({ label, onPress, selected = false, variant = 'category' }:
       accessibilityRole="button"
       accessibilityLabel={label}
       accessibilityState={suggestion ? undefined : { selected }}
-      hitSlop={height < control.roomChip ? (control.roomChip - height) / 2 : undefined}
+      hitSlop={height < control.optionChip ? (control.optionChip - height) / 2 : undefined}
       style={[
         styles.base,
         { height, borderRadius: height / 2, borderWidth: suggestion ? 0 : 1.5 },

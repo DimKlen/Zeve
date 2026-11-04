@@ -38,7 +38,7 @@ export const duration = {
   spin: 1100,
   typingDot: 1200,
   typingStagger: 200,
-  chip: 200, // fond des chips, pièces, choix de lumière
+  chip: 200, // fond des chips
   tab: 250, // fond et couleur de l'onglet
   toastOut: 200,
   fade: 200,

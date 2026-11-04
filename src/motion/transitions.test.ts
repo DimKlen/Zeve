@@ -35,7 +35,7 @@ describe('transitionFor', () => {
 
   it('fait un fondu sans écran d’origine et va de l’avant par défaut', () => {
     expect(transitionFor(null, 'garden')).toBe('fade');
-    expect(transitionFor('chat', 'rooms')).toBe('fwd');
+    expect(transitionFor('chat', 'privacy')).toBe('fwd');
   });
 });
 

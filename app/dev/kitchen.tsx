@@ -21,7 +21,6 @@ import {
 } from '@/components/icons';
 import { IconButton } from '@/components/IconButton';
 import { InfoTile } from '@/components/InfoTile';
-import { LightOption } from '@/components/LightOption';
 import { ProviderButton } from '@/components/ProviderButton';
 import { Rise } from '@/components/Rise';
 import { Screen } from '@/components/Screen';
@@ -41,12 +40,7 @@ import { CATEGORIES } from '@/plants/careInfo';
 import { layout, makeStyles, space, type, useColors } from '@/theme';
 
 // Page « kitchen sink » (Phase 1) : chaque composant dans tous ses états, pour la comparaison visuelle.
-const ROOMS = ['Salon', 'Chambre', 'Cuisine'];
-const LIGHTS = [
-  { id: 'ombre', label: t('newPlant.lightShade'), hint: t('newPlant.lightShadeHint') },
-  { id: 'indirect', label: t('newPlant.lightBright'), hint: t('newPlant.lightBrightHint') },
-  { id: 'soleil', label: t('newPlant.lightSun'), hint: t('newPlant.lightSunHint') },
-];
+const CHOICES = ['Paris 1', 'Montréal 1', 'Lyon 1'];
 
 export default function DevKitchenScreen() {
   const colors = useColors();
@@ -57,8 +51,7 @@ export default function DevKitchenScreen() {
   const [drops, setDrops] = useState(0);
   const [reminders, setReminders] = useState(true);
   const [category, setCategory] = useState('all');
-  const [room, setRoom] = useState(ROOMS[0]!);
-  const [light, setLight] = useState('indirect');
+  const [choice, setChoice] = useState(CHOICES[0]!);
   const [sheet, setSheet] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -227,31 +220,19 @@ export default function DevKitchenScreen() {
             ))}
           </ScrollView>
           <View style={styles.wrap}>
-            {ROOMS.map((r) => (
+            {CHOICES.map((r) => (
               <Chip
                 key={r}
                 label={r}
-                variant="room"
-                selected={room === r}
-                onPress={() => setRoom(r)}
+                variant="option"
+                selected={choice === r}
+                onPress={() => setChoice(r)}
               />
             ))}
           </View>
           <View style={styles.wrap}>
             {tList('chat.suggestions').map((s) => (
               <Chip key={s} label={s} variant="suggestion" />
-            ))}
-          </View>
-          <View style={styles.lights}>
-            {LIGHTS.map((l) => (
-              <View key={l.id} style={styles.light}>
-                <LightOption
-                  label={l.label}
-                  hint={l.hint}
-                  selected={light === l.id}
-                  onPress={() => setLight(l.id)}
-                />
-              </View>
             ))}
           </View>
           <View style={styles.toggleRow}>
@@ -319,7 +300,7 @@ export default function DevKitchenScreen() {
       </ScrollView>
 
       <BottomSheet visible={sheet} onClose={() => setSheet(false)}>
-        {['menuRename', 'menuRoom', 'menuInterval', 'menuHistory'].map((k) => (
+        {['menuRename', 'menuInterval', 'menuHistory'].map((k) => (
           <TextButton key={k} label={t(`plant.${k}`)} onPress={() => setSheet(false)} />
         ))}
         <TextButton
@@ -357,8 +338,6 @@ const useStyles = makeStyles((colors) => ({
   trio: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'center', gap: space.s },
   wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: space.s },
   chips: { gap: space.s },
-  lights: { flexDirection: 'row', gap: space.s },
-  light: { flex: 1 },
   toggleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   toggleLabel: { ...type.bodyS, fontFamily: type.cardTitle.fontFamily, color: colors.ink },
   tiles: { flexDirection: 'row', gap: space.sm },
