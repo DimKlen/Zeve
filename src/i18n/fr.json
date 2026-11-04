@@ -92,6 +92,7 @@
     "thirstOne": "1 a soif",
     "thirstMany": "{n} ont soif",
     "cardA11y": "{name}, {place}, {plants}, {thirst}",
+    "morePlants": "+{n}",
     "backA11y": "Retour à mes jardins",
     "menuA11y": "Options du jardin",
     "menuRename": "Renommer le jardin",
