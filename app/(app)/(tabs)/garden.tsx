@@ -60,6 +60,7 @@ export default function HomeScreen() {
       <GardenHeader
         title={single.garden.name}
         place={placeLabel(single.garden)}
+        weather={single.garden.weatherNow}
         subtitle={gardenSubtitle(single.plants, now)}
         onMenu={() => setMenu(true)}
         onAdd={addPlant}

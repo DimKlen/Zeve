@@ -25,6 +25,8 @@ export type PlantContext = {
   learnedEveryDays?: number | null;
   /** Météo récente du jardin (« 6 °C en moyenne, 80 % d'humidité »), si connue. */
   recentWeather?: string | null;
+  /** Météo du moment chez la plante (« 4 °C, 82 % d'humidité »), si connue. */
+  todayWeather?: string | null;
 };
 
 export type ChatAction = { type: 'remind'; days: number; label: string };
@@ -106,6 +108,7 @@ export function buildSystemPrompt(p: PlantContext): string {
     ...(p.learnedEveryDays && p.learnedEveryDays !== p.waterEveryDays
       ? [`D'après ses arrosages, ton humain·e t'arrose plutôt tous les ${p.learnedEveryDays} jours.`]
       : []),
+    ...(p.todayWeather ? [`Météo en ce moment chez toi : ${p.todayWeather}.`] : []),
     ...(p.recentWeather ? [`Météo de ces derniers jours chez toi : ${p.recentWeather}.`] : []),
     `Saison actuelle : ${p.season} (hémisphère ${p.southern ? 'sud' : 'nord'}). Adapte tes conseils à la saison et au climat du lieu : ` +
       'arrosage, lumière, emplacement (intérieur ou dehors), engrais, humidité de l’air et température ambiante.',

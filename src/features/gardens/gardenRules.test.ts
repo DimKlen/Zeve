@@ -26,6 +26,7 @@ const garden = (
   latitude: null,
   longitude: null,
   createdAt: daysAgo(created),
+  weatherNow: null,
   ...place,
 });
 

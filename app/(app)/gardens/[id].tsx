@@ -39,6 +39,7 @@ export default function GardenDetailScreen() {
         <GardenHeader
           title={garden?.name ?? ''}
           place={garden ? placeLabel(garden) : undefined}
+          weather={garden?.weatherNow}
           subtitle={own.length ? gardenSubtitle(own, now) : undefined}
           onBack={goBack}
           onMenu={garden ? () => setMenu(true) : undefined}

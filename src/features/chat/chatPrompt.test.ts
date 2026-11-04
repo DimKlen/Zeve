@@ -47,6 +47,13 @@ describe('buildSystemPrompt', () => {
     expect(seasonNameOf(new Date(2026, 10, 1))).toBe('automne');
   });
 
+  it('donne la météo du moment quand elle est connue', () => {
+    expect(buildSystemPrompt({ ...gaston, todayWeather: '4 °C, 82 % d’humidité' })).toContain(
+      'Météo en ce moment chez toi : 4 °C, 82 % d’humidité.',
+    );
+    expect(buildSystemPrompt(gaston)).not.toContain('Météo en ce moment');
+  });
+
   it('se passe de lieu et d’arrosages', () => {
     const prompt = buildSystemPrompt({ ...gaston, place: null, recentWaterings: [] });
     expect(prompt).toContain('qui vit chez ton humain·e.');

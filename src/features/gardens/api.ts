@@ -9,6 +9,8 @@ import { rescheduleReminders } from '@/features/notifications/schedule';
 import type { Database } from '@/lib/database.types';
 import { supabase } from '@/lib/supabase';
 
+import type { WeatherNow } from '@/plants/weatherAdvice';
+
 import type { Garden } from './gardenRules';
 
 type GardenRow = Database['public']['Tables']['gardens']['Row'];
@@ -24,7 +26,15 @@ export const toGarden = (row: GardenRow): Garden => ({
   latitude: row.latitude,
   longitude: row.longitude,
   createdAt: new Date(row.created_at),
+  weatherNow: parseWeatherNow(row.weather_now),
 });
+
+/** gardens.weather_now ({ temp, humidity }) → météo du moment, ou null si absente ou invalide. */
+export function parseWeatherNow(value: GardenRow['weather_now']): WeatherNow | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  if (typeof value.temp !== 'number') return null;
+  return { temp: value.temp, humidity: typeof value.humidity === 'number' ? value.humidity : null };
+}
 
 /** Lieu d'un jardin (création ou modification). */
 export type GardenPlace = {
