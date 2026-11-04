@@ -1,5 +1,5 @@
 import { useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ScrollView, Text } from 'react-native';
 
 import { Screen } from '@/components/Screen';
@@ -32,6 +32,12 @@ export default function GardenDetailScreen() {
     go('newPlant');
   };
   const backHome = () => go('garden', { replace: true, anim: 'back' });
+  // Dernière plante supprimée ou déplacée (appui long, fiche) : le jardin n'existe plus.
+  const seen = useRef(false);
+  useEffect(() => {
+    if (garden) seen.current = true;
+    else if (seen.current && isSuccess) go('garden', { replace: true, anim: 'back' });
+  }, [garden, isSuccess]);
 
   return (
     <Screen name="gardenDetail" edges={['top']}>

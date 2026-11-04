@@ -1,9 +1,12 @@
-import { useCallback } from 'react';
+import * as Haptics from 'expo-haptics';
+import { useCallback, useState } from 'react';
 import { Text, View } from 'react-native';
 
 import { t } from '@/i18n';
 import type { riseDelay } from '@/motion';
 import { go } from '@/motion/transitions';
+import { useGardens } from '@/features/gardens/api';
+import { PlantOptionsSheet } from '@/features/plant/PlantOptionsSheet';
 import { a11y, makeStyles, space, type } from '@/theme';
 
 import { useWatering } from './api';
@@ -20,6 +23,19 @@ export function GardenPlants({ plants, now }: { plants: GardenPlant[]; now: Date
   const sorted = sortGarden(plants, now);
   const todo = todoList(plants, now);
   const openPlant = useCallback((plant: GardenPlant) => go('plant', { id: plant.id }), []);
+  // Appui long : menu court (déplacer, supprimer), le même que le « … » de la fiche.
+  const { data: gardens } = useGardens();
+  const canMove = (gardens?.length ?? 0) > 1;
+  const [menu, setMenu] = useState<{ plant: GardenPlant; action?: 'garden' | 'delete' } | null>(
+    null,
+  );
+  const [open, setOpen] = useState(false);
+  // Mémoïsé par le React Compiler.
+  const openMenu = (plant: GardenPlant, action?: 'garden' | 'delete') => {
+    if (!action) void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setMenu({ plant, action });
+    setOpen(true);
+  };
 
   return (
     <>
@@ -41,12 +57,25 @@ export function GardenPlants({ plants, now }: { plants: GardenPlant[]; now: Date
                 now={now}
                 delay={DELAYS[Math.min(r * 2 + c, DELAYS.length - 1)]!}
                 onPress={openPlant}
+                onMenu={openMenu}
+                canMove={canMove}
               />
             ))}
             {row.length === 1 && <View style={styles.filler} />}
           </View>
         ))}
       </View>
+      {menu && (
+        <PlantOptionsSheet
+          key={`${menu.plant.id}-${menu.action ?? 'menu'}`}
+          plant={menu.plant}
+          only={['garden', 'delete']}
+          initialView={menu.action}
+          visible={open}
+          onClose={() => setOpen(false)}
+          onDeleted={() => setOpen(false)}
+        />
+      )}
     </>
   );
 }
