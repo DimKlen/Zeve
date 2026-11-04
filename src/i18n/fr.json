@@ -184,6 +184,7 @@
     "photoSentA11y": "Photo envoyée",
     "remindAction": "Me rappeler dans {days} jours",
     "galleryA11y": "Choisir une photo",
+    "replyNotifTitle": "{name} t’a répondu",
     "remindNotifTitle": "{name}",
     "remindNotifBody": "Tu te souviens ? Tu voulais prendre de mes nouvelles.",
     "inputA11y": "Message"

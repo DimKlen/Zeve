@@ -5,13 +5,13 @@ import { AppState, Platform } from 'react-native';
 import { go } from '@/motion/transitions';
 
 import { rescheduleReminders } from './schedule';
+import { targetOf } from './target';
 
 function open(response: Notifications.NotificationResponse | null) {
   if (!response) return;
-  const plantId = response.notification.request.content.data?.plantId;
-  // Une plante → sa fiche (zoom) ; plusieurs → le jardin (docs/05 « Liens profonds »).
-  if (typeof plantId === 'string' && plantId) go('plant', { id: plantId, anim: 'zoom' });
-  else go('garden', { anim: 'fade' });
+  const target = targetOf(response.notification.request.content.data);
+  if (target.to === 'garden') go('garden', { anim: 'fade' });
+  else go(target.to, { id: target.id, anim: target.to === 'plant' ? 'zoom' : undefined });
 }
 
 /**

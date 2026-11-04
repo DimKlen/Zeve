@@ -184,3 +184,12 @@ Non maquetté. Avec deux jardins ou plus, l'accueil montre chaque jardin comme u
 - lecteurs d'écran : un seul bouton par jardin, même libellé qu'avant (« Paris 1, Paris, France, 6 plantes, 2 ont soif ») ; le dessin est masqué.
 
 Deux mises en page ont été comparées (captures `docs/captures/jardins-clotures`) : rangs alignés (`*-rows`) et rangs décalés (`*-grove`). La seconde est retenue : plus vivante, et elle ne répète pas la grille des cartes de plantes.
+## F21. Notification quand la plante a répondu (ajout hors design)
+
+Non maquetté. Quand la réponse de `plant-chat` arrive alors que la personne n'est plus sur ce fil (autre écran de l'app, ou app en arrière-plan), une **notification locale** immédiate la prévient :
+
+- titre « Gaston t’a répondu », corps = début de la réponse (sans Markdown, une ligne, coupé à un mot vers 110 caractères, « … ») ;
+- toucher la notification ouvre le chat de la plante (`kind: 'chatReply'`, routé par `useNotificationTaps` → `targetOf`) ;
+- rien si la personne lit ce fil (écran de chat affiché, app au premier plan) ni si les notifications sont refusées ; indépendant du réglage « Rappels d'arrosage ».
+
+Limite : la réponse est attendue par l'app. Si l'app est **fermée** (ou suspendue par le système avant la fin de la requête), aucune notification ne part. Un envoi depuis le serveur (push) serait nécessaire : hors périmètre.
