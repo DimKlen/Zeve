@@ -1,5 +1,5 @@
-import { useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { useCallback, useState } from 'react';
 import { FlatList, KeyboardAvoidingView, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -21,6 +21,7 @@ import {
   useSendMessage,
   type SendInput,
 } from '@/features/chat/api';
+import { setChatOpen } from '@/features/chat/replyNotification';
 import { buildThread, type ThreadItem } from '@/features/chat/thread';
 import { usePlant } from '@/features/garden/api';
 import { statusOf } from '@/features/garden/gardenRules';
@@ -40,7 +41,14 @@ export default function ChatScreen() {
   const insets = useSafeAreaInsets();
   const { data: plant } = usePlant(id);
   const { data: messages = [] } = useChat(id);
-  const send = useSendMessage(id);
+  const send = useSendMessage(id, plant?.nickname);
+  // Fil affiché : pas de notification pour ses réponses (F21).
+  useFocusEffect(
+    useCallback(() => {
+      setChatOpen(id, true);
+      return () => setChatOpen(id, false);
+    }, [id]),
+  );
   const [draft, setDraft] = useState('');
   const [pending, setPending] = useState<Pending | null>(null);
   const [failure, setFailure] = useState<Failure | null>(null);

@@ -12,6 +12,7 @@ import { t } from '@/i18n';
 import type { Database } from '@/lib/database.types';
 import { supabase } from '@/lib/supabase';
 
+import { notifyChatReply } from './replyNotification';
 import type { ChatAction, ChatMessage } from './thread';
 
 type Row = Database['public']['Tables']['chat_messages']['Row'];
@@ -80,12 +81,15 @@ export class ChatError extends Error {
   }
 }
 
-/** Envoi d'un message ; la photo est envoyée d'abord (une seule fois, même si on réessaie). */
-export function useSendMessage(plantId: string) {
+/**
+ * Envoi d'un message ; la photo est envoyée d'abord (une seule fois, même si on réessaie).
+ * Si la personne a quitté le fil entre-temps, la réponse arrive en notification (F21).
+ */
+export function useSendMessage(plantId: string, nickname?: string) {
   const queryClient = useQueryClient();
   const userId = useAuthStore((s) => s.session?.user.id);
   return useMutation({
-    mutationFn: async (input: SendInput): Promise<SendInput> => {
+    mutationFn: async (input: SendInput): Promise<SendInput & { reply: string | null }> => {
       let photoPath = input.photoPath;
       if (input.photo && !photoPath) {
         photoPath = await uploadPhoto(
@@ -93,7 +97,7 @@ export function useSendMessage(plantId: string) {
           `${userId}/${plantId}/chat/${Crypto.randomUUID()}.jpg`,
         );
       }
-      const { error } = await supabase.functions.invoke('plant-chat', {
+      const { data, error } = await supabase.functions.invoke<{ content?: string }>('plant-chat', {
         body: { plantId, text: input.text, photoPath },
       });
       if (error) {
@@ -103,9 +107,12 @@ export function useSendMessage(plantId: string) {
             : null;
         throw new ChatError(body?.error === 'quota' ? 'quota' : 'failed', photoPath);
       }
-      return { ...input, photoPath };
+      return { ...input, photoPath, reply: data?.content ?? null };
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: chatKey(plantId) }),
+    onSuccess: async ({ reply }) => {
+      if (reply && nickname) await notifyChatReply({ id: plantId, nickname }, reply);
+      await queryClient.invalidateQueries({ queryKey: chatKey(plantId) });
+    },
   });
 }
 
