@@ -378,6 +378,7 @@ export type Database = {
           name: string;
           tip: string;
           water_every_days: number;
+          weed: boolean;
         };
         ComputedFields: never;
         Insert: {
@@ -394,6 +395,7 @@ export type Database = {
           name: string;
           tip: string;
           water_every_days: number;
+          weed?: boolean;
         };
         Update: {
           air?: string;
@@ -409,6 +411,7 @@ export type Database = {
           name?: string;
           tip?: string;
           water_every_days?: number;
+          weed?: boolean;
         };
         Relationships: [];
       };
