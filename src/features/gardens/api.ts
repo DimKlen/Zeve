@@ -60,7 +60,6 @@ export function useRefreshGardens() {
   return () => {
     void client.invalidateQueries({ queryKey: gardensKey(userId) });
     void client.invalidateQueries({ queryKey: plantsKey(userId) });
-    void client.invalidateQueries({ queryKey: ['rooms', userId] });
   };
 }
 
@@ -106,35 +105,14 @@ export function useDeleteGarden() {
   });
 }
 
-/**
- * Déplace une plante vers un autre jardin. Sa pièce suit si le jardin d'arrivée en a une du même
- * nom, sinon elle reste sans pièce. Le jardin de départ disparaît s'il était sa dernière plante.
- */
+/** Déplace une plante vers un autre jardin ; le jardin de départ disparaît s'il était sa dernière plante. */
 export function useMovePlant() {
   const refresh = useRefreshGardens();
   return useMutation({
-    mutationFn: async ({
-      plantId,
-      gardenId,
-      roomName,
-    }: {
-      plantId: string;
-      gardenId: string;
-      roomName: string | null;
-    }) => {
-      let roomId: string | null = null;
-      if (roomName) {
-        const { data } = await supabase
-          .from('rooms')
-          .select('id')
-          .eq('garden_id', gardenId)
-          .eq('name', roomName)
-          .maybeSingle();
-        roomId = data?.id ?? null;
-      }
+    mutationFn: async ({ plantId, gardenId }: { plantId: string; gardenId: string }) => {
       const { error } = await supabase
         .from('plants')
-        .update({ garden_id: gardenId, room_id: roomId })
+        .update({ garden_id: gardenId })
         .eq('id', plantId);
       if (error) throw error;
     },

@@ -12,7 +12,6 @@ import { signOut } from '@/features/auth/auth';
 import { useProfile } from '@/features/auth/profile';
 import { requestReminderPermission } from '@/features/notifications/permissions';
 import { formatTime } from '@/features/notifications/reminderPlan';
-import { useRooms } from '@/features/plant/api';
 import { useUpdateProfile } from '@/features/settings/api';
 import { TimePickerSheet } from '@/features/settings/TimePickerSheet';
 import { t } from '@/i18n';
@@ -32,7 +31,6 @@ export default function SettingsScreen() {
   const colors = useColors();
   const styles = useStyles();
   const { data: profile } = useProfile();
-  const { data: rooms } = useRooms();
   const update = useUpdateProfile();
   const [timeSheet, setTimeSheet] = useState(false);
   const dark = useSchemeStore((st) => st.scheme === 'dark');
@@ -123,11 +121,6 @@ export default function SettingsScreen() {
               label={t('settings.reminderTime')}
               value={formatTime(reminderTime)}
               onPress={() => setTimeSheet(true)}
-            />
-            <SettingsRow
-              label={t('settings.rooms')}
-              value={rooms ? String(rooms.length) : ''}
-              onPress={() => go('rooms')}
               last
             />
           </SettingsCard>

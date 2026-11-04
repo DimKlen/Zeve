@@ -1,4 +1,3 @@
-import type { Light } from '@/plants/careInfo';
 import { create } from 'zustand';
 
 import type { GardenChoice } from './api';
@@ -16,10 +15,6 @@ export type Draft = {
   suggestedName: string | null;
   /** Jardin choisi ; null tant que les jardins ne sont pas chargés. */
   garden: GardenChoice | null;
-  roomId: string | null;
-  /** Pièce par défaut d'un nouveau jardin (créée avec lui). */
-  roomName: string | null;
-  light: Light;
   status: 'idle' | 'recognizing';
   /** Demande de la liste des espèces (aucun résultat → « Prendre une photo »). */
   wantsPhoto: boolean;
@@ -35,9 +30,6 @@ const EMPTY: Draft = {
   name: '',
   suggestedName: null,
   garden: null,
-  roomId: null,
-  roomName: null,
-  light: 'indirect',
   status: 'idle',
   wantsPhoto: false,
   created: null,

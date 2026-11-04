@@ -9,9 +9,7 @@ export type GardenPlant = {
   speciesId: string;
   speciesName: string;
   latin: string;
-  roomId: string | null;
-  roomName: string | null;
-  light: 'ombre' | 'indirect' | 'soleil';
+  /** Exposition idéale de l'espèce (fiche technique), ex. « Vive, indirecte ». */
   lightLabel: string;
   air: string;
   tip: string;
@@ -29,8 +27,6 @@ export type GardenPlant = {
     country: string | null;
     city: string | null;
   };
-  /** Pièce extérieure (balcon…) : la météo de la ville compte pleinement. */
-  outdoor: boolean;
   /** Arrosages récents (du plus récent au plus ancien) : apprentissage du rythme. */
   history: WateringEvent[];
   /** Rythme appris adopté, et dernière suggestion refusée. */

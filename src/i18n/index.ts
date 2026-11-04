@@ -14,7 +14,7 @@ function lookup(key: string): string | readonly string[] | Dict | undefined {
   return node;
 }
 
-/** Texte de l'interface : `t('garden.hello', { name: 'Camille' })` → « Bonjour Camille ». */
+/** Texte de l'interface : `t('chat.greeting', { name: 'Gaston' })` → « Salut ! Je suis Gaston. … ». */
 export function t(key: string, params?: Params): string {
   const value = lookup(key);
   if (typeof value !== 'string') return key;

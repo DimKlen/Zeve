@@ -74,7 +74,7 @@ La barre de navigation **ne s'anime pas** entre Jardin et Réglages (elle reste 
 | **fond de bouton** | 300 ms (jaune → sauge après arrosage ; gris → vert quand l'espèce est choisie) | Bouton arroser, « Ajouter au jardin » |
 | **interrupteur** | fond + position du bouton, 250 ms | Rappels d'arrosage |
 | **onglet** | fond et couleur de l'onglet, 250 ms | Barre de nav |
-| **chips / pièces / lumière** | fond et couleur, 200 ms | Création, liste d'espèces |
+| **chips / choix** | fond et couleur, 200 ms | Création, liste d'espèces |
 | **haptique** | `Haptics.impactAsync(Light)` sur « J'ai arrosé », sélection d'espèce, onglets ; `notificationAsync(Success)` quand une plante est ajoutée ; `Warning` sur erreur | — |
 
 ## 5. Boucles (« la plante est vivante »)

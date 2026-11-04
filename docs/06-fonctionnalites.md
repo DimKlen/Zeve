@@ -7,7 +7,7 @@
   - Apple : iOS → `expo-apple-authentication` (feuille native, scopes FULL_NAME + EMAIL) puis `signInWithIdToken({ provider: 'apple', token, nonce })`. Android → OAuth web Supabase (même flux que Google).
   - E-mail : `signInWithOtp({ email, options: { emailRedirectTo: 'zeve://auth/callback' } })`.
 - Session persistée (AsyncStorage / SecureStore adapter), rafraîchissement automatique, `onAuthStateChange` alimente le store d'auth.
-- Au premier login : trigger SQL crée `profiles` + 5 pièces par défaut. Apple ne donne le nom qu'au 1er login → le renvoyer dans `profiles.first_name` côté app.
+- Au premier login : trigger SQL crée `profiles`. Apple ne donne le nom qu'au 1er login → le renvoyer dans `profiles.first_name` côté app.
 - Annulation → toast « Connexion annulée ». Écran « Connexion en cours » minimum 1.8 s.
 - Déconnexion : `signOut()`, purge du cache Query et du store, annulation des notifications locales, retour Connexion.
 - Suppression de compte (Confidentialité) : Edge Function `delete-account` (supprime données + storage + utilisateur). Obligatoire App Store.
@@ -48,8 +48,6 @@ Règles implémentées dans `reference/plants/plantStatus.ts` (tests unitaires o
 - Recherche : insensible aux accents/majuscules, sur nom, latin, libellé du type ; filtre catégorie combinable ; tri alphabétique fr ; état vide avec CTA photo.
 - « Changer » rouvre la liste avec l'espèce courante sélectionnée.
 - Nom : vide → nom de l'espèce. 1–24 caractères.
-- Pièce : une des pièces de l'utilisateur (défaut : la dernière utilisée, sinon Salon).
-- Lumière : ombre / indirect (défaut) / soleil ; conseil `LIGHT_TIPS` si inadéquat (information, non bloquant).
 - « Ajouter au jardin » : insert `plants` (+ `species_source`, `water_every_days` de l'espèce, photo éventuelle déplacée de `tmp/` vers `{user_id}/{plant_id}/`) → écran Plante ajoutée → « Voir sa fiche » + toast « {Nom} a rejoint ton jardin ». En cas d'échec : toast d'erreur, on reste sur le formulaire (rien n'est perdu).
 
 ## F7. Reconnaissance d'espèce par photo (IA)
@@ -61,8 +59,8 @@ Règles implémentées dans `reference/plants/plantStatus.ts` (tests unitaires o
 
 ## F8. Chat IA par plante
 > Moteur : **Gemini** (offre gratuite) au lieu de Claude (décision du 30/10/2026, voir docs/07). Le comportement de l'app est inchangé.
-- Un fil par plante (`chat_messages`). Edge Function `plant-chat` : reçoit `{ plantId, text?, photoPath? }`, charge le contexte (espèce, nom, pièce, lumière, intervalle, derniers arrosages, stade, 20 derniers messages), appelle Claude (vision si photo), stocke les deux messages, renvoie la réponse (streaming optionnel en phase polish).
-- Personnalité : la plante répond **à la première personne**, en français, tutoiement, 2 à 5 phrases, conseils concrets, aucune promesse médicale/vétérinaire ; signale la toxicité si pertinent ; propose au besoin une **action** structurée `{"type":"remind","days":3,"label":"Me rappeler dans 3 jours"}` rendue en bouton.
+- Un fil par plante (`chat_messages`). Edge Function `plant-chat` : reçoit `{ plantId, text?, photoPath? }`, charge le contexte (espèce, nom, exposition idéale et emplacement conseillé de l'espèce, intervalle, derniers arrosages, stade, 20 derniers messages), appelle Claude (vision si photo), stocke les deux messages, renvoie la réponse (streaming optionnel en phase polish).
+- Personnalité : la plante répond **à la première personne**, en français, tutoiement, réponses courtes (2 à 4 phrases par défaut, développées seulement sur demande), conseils concrets, **périmètre strict** (plantes, arbres, jardinage, botanique, entretien, maladies, nuisibles, rempotage, arrosage, placement ; toute question hors sujet est refusée poliment en une phrase avec retour vers les plantes, et le cadrage résiste aux « oublie tes instructions » et jeux de rôle), aucune promesse médicale/vétérinaire ; signale la toxicité si pertinent ; propose au besoin une **action** structurée `{"type":"remind","days":3,"label":"Me rappeler dans 3 jours"}` rendue en bouton.
 - Suggestions fixes : « Faut-il rempoter ? », « Meilleur emplacement », « Engrais ? ».
 - Photo dans le chat : même pipeline d'upload ; la bulle montre la vignette réelle.
 - Limites : 30 messages / jour / utilisateur (compteur côté fonction) → message « On se repose un peu, reviens demain ! ».
@@ -77,7 +75,7 @@ Règles implémentées dans `reference/plants/plantStatus.ts` (tests unitaires o
 - Réglages : interrupteur + heure. Désactiver = annuler toutes les notifications planifiées.
 
 ## F10. Réglages
-Profil (prénom, e-mail affiché, fournisseur), rappels (interrupteur, heure), pièces (CRUD), confidentialité (politique, export JSON des données, suppression du compte), déconnexion. Version de l'app.
+Profil (prénom, e-mail affiché, fournisseur), rappels (interrupteur, heure), confidentialité (politique, export JSON des données, suppression du compte), déconnexion. Version de l'app.
 
 ## F11. Toasts (catalogue)
 | Déclencheur | Texte |
@@ -100,7 +98,7 @@ Profil (prénom, e-mail affiché, fournisseur), rappels (interrupteur, heure), p
 Script `supabase/seed.dev.sql` (ou bouton dev) qui crée les 6 plantes de Camille avec des `created_at` et arrosages produisant exactement les captures : Gaston (430 j, dernier arrosage il y a 9 j, intervalle 8), Basilic (35 j, il y a 3 j, intervalle 2), Pépite (160 j, 3 j restants), Frida (290 j, demain), Olivia (820 j, dans 5 j), Piquant (60 j, dans 12 j).
 
 ## F14. Plusieurs jardins (ajout hors design)
-- Un **jardin** est un lieu (ville, pays, coordonnées facultatives) qui regroupe des **pièces** et des **plantes**.
+- Un **jardin** est un lieu (ville, pays, coordonnées facultatives) qui regroupe des **plantes**.
 - **Jamais de jardin vide** : un jardin naît avec sa première plante (RPC `create_garden_with_plant`) et la base le
   supprime quand sa dernière plante active est supprimée ou déplacée (déclencheur `plants_drop_empty_garden`).
   L'app prévient avant (« … est la dernière plante de … »).
@@ -110,7 +108,6 @@ Script `supabase/seed.dev.sql` (ou bouton dev) qui crée les 6 plantes de Camill
 - **Accueil** : un seul jardin → l'écran du jardin directement (comme avant) ; plusieurs → « Mes jardins » :
   arrosages du jour de tous les jardins puis une carte par jardin, qui ouvre l'écran du jardin.
 - **Saisons** : suivent l'hémisphère du jardin (latitude, sinon pays) ; le chat reçoit le lieu et la saison.
-- **Pièces** : propres à chaque jardin (5 pièces par défaut créées avec lui).
 - **Noms de plantes** : un nom suggéré est pré-rempli (univers japonais, grec, égyptien, nordique, celte, étoiles),
   « Autre nom » en tire un autre, jamais un nom déjà porté dans le jardin ; le champ reste libre.
 
@@ -126,8 +123,7 @@ Script `supabase/seed.dev.sql` (ou bouton dev) qui crée les 6 plantes de Camill
   et par jour (30 j passés + 7 j de prévisions), rafraîchi au plus toutes les 6 h. Chaque jour « sèche » la
   terre selon l'évapotranspiration du lieu rapportée à sa normale ; la date d'arrosage est avancée ou retardée
   d'au plus 2 jours, avec la raison sous la jauge (« Plus tôt : il fait chaud à Montréal »).
-- **Intérieur / extérieur** : les pièces extérieures (`rooms.outdoor`, Balcon par défaut, case « Pièce
-  extérieure » dans Mes pièces) subissent toute la météo ; à l'intérieur, un quart seulement.
+- **Intérieur** : toutes les plantes sont suivies comme des plantes d'intérieur, la météo n'en pèse qu'un quart.
 - **Une seule source de vérité** : `dueInfo` sert la jauge, la carte « À arroser », les rappels et le chat.
   `plant_overview.is_thirsty` reste le calcul brut (rythme fixe) et n'est pas lu par l'app.
 - Local, CI et E2E : `WEATHER_MOCK=1` (météo neutre, aucun effet).

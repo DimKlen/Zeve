@@ -45,5 +45,5 @@ tags:
 - extendedWaitUntil:
     visible: "Lianne est en forme"
     timeout: 10000
-# La carte « Croissance » est masquée (SHOW_GROWTH_CARD) : on vérifie l'espèce et la pièce de la fiche.
-- assertVisible: "Monstera deliciosa · .*"
+# La carte « Croissance » est masquée (SHOW_GROWTH_CARD) : on vérifie l'espèce de la fiche.
+- assertVisible: "Monstera deliciosa"

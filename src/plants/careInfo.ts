@@ -197,13 +197,3 @@ export const CATEGORIES: { id: Category | 'all'; label: string }[] = [
   { id: 'arbres', label: 'Arbres & palmiers' },
   { id: 'retombantes', label: 'Retombantes' },
 ];
-
-// Conseil affiché sous « Lumière à cet endroit » quand l'exposition choisie ne convient pas à l'espèce.
-// Clé = `${lumière préférée}>${lumière choisie}`.
-export const LIGHT_TIPS: Record<string, string> = {
-  'ombre>soleil': 'Le soleil direct risque de brûler ses feuilles.',
-  'indirect>soleil': 'Le soleil direct peut brûler ses feuilles. Un voilage aide.',
-  'indirect>ombre': 'Un peu sombre pour elle : sa croissance va ralentir.',
-  'soleil>ombre': 'Trop sombre : elle a besoin de soleil pour bien pousser.',
-  'soleil>indirect': 'Elle sera plus belle avec un peu de soleil direct.',
-};

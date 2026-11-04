@@ -67,12 +67,12 @@ describe('learnRhythm', () => {
     const hot: Record<number, Partial<DailyWeather>> = {};
     for (let n = -20; n <= 0; n += 1) hot[n] = { et0: 6 };
     const normal = weather();
-    const drying = dryingFromWeather(
-      normal.map((w, i) => ({ ...w, ...hot[i - 30] })),
-      true,
-    );
+    const drying = dryingFromWeather(normal.map((w, i) => ({ ...w, ...hot[i - 30] })));
     const model = learnRhythm(events([20, 16, 12, 8, 4], 5), 5, drying);
-    expect(model.estimate).toBeGreaterThanOrEqual(5);
+    // Plantes d'intérieur : l'effet de la météo est atténué, il ne raccourcit jamais le rythme appris.
+    expect(model.estimate).toBeGreaterThanOrEqual(
+      learnRhythm(events([20, 16, 12, 8, 4], 5), 5).estimate!,
+    );
   });
 });
 
@@ -105,17 +105,17 @@ describe('dueInfo', () => {
     });
   });
 
-  it('avance l’arrosage par temps chaud et sec, au plus de 2 jours', () => {
+  it('avance l’arrosage par temps chaud et sec', () => {
     const hot: Record<number, Partial<DailyWeather>> = {};
     for (let n = -3; n <= 7; n += 1) hot[n] = { et0: 9, tempMean: 30 };
-    const info = dueInfo(plant, dryingFromWeather(weather(hot), true), NOW);
-    expect(info).toMatchObject({ shift: -2, dueDays: 6, daysUntilNext: 3, cause: 'hot' });
+    const info = dueInfo(plant, dryingFromWeather(weather(hot)), NOW);
+    expect(info).toMatchObject({ shift: -1, dueDays: 7, daysUntilNext: 4, cause: 'hot' });
   });
 
   it('retarde par temps frais et humide', () => {
     const cool: Record<number, Partial<DailyWeather>> = {};
     for (let n = -3; n <= 7; n += 1) cool[n] = { et0: 1.5, tempMean: 8, humidity: 92 };
-    const info = dueInfo(plant, dryingFromWeather(weather(cool), true), NOW);
+    const info = dueInfo(plant, dryingFromWeather(weather(cool)), NOW);
     expect(info.shift).toBeGreaterThan(0);
     expect(info.cause).toBe('cool');
   });
@@ -123,11 +123,10 @@ describe('dueInfo', () => {
   it('atténue fortement la météo pour une plante d’intérieur', () => {
     const hot: Record<number, Partial<DailyWeather>> = {};
     for (let n = -3; n <= 7; n += 1) hot[n] = { et0: 6, tempMean: 26 };
-    expect(dueInfo(plant, dryingFromWeather(weather(hot), true), NOW).shift).toBeLessThan(0);
-    expect(dueInfo(plant, dryingFromWeather(weather(hot), false), NOW).shift).toBe(0);
+    expect(dueInfo(plant, dryingFromWeather(weather(hot)), NOW).shift).toBe(0);
   });
 
   it('ne déduit rien de trop peu de jours de météo', () => {
-    expect(dryingFromWeather(weather().slice(0, 3), true)).toBeNull();
+    expect(dryingFromWeather(weather().slice(0, 3))).toBeNull();
   });
 });

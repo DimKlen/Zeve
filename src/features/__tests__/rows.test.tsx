@@ -11,9 +11,6 @@ const gaston: GardenPlant = {
   speciesId: 'monstera',
   speciesName: 'Monstera',
   latin: 'Monstera deliciosa',
-  roomId: 'salon',
-  roomName: 'Salon',
-  light: 'indirect',
   lightLabel: 'Vive, indirecte',
   air: 'Humide',
   tip: '',
@@ -24,7 +21,6 @@ const gaston: GardenPlant = {
   gardenId: 'paris',
   gardenName: 'Paris 1',
   gardenPlace: { latitude: 48.85, countryCode: 'FR', country: 'France', city: 'Paris' },
-  outdoor: false,
   history: [],
   learnedEveryDays: null,
   declined: null,
@@ -38,7 +34,7 @@ describe('TodoCard (lignes « À arroser »)', () => {
       { plant: gaston, done: false, sinceLabel: '9 j sans eau', daysSinceWater: 9 },
     ];
     await render(<TodoCard items={todo} onWater={onWater} />);
-    expect(screen.getByText('Salon · 9 j sans eau')).toBeOnTheScreen();
+    expect(screen.getByText('9 j sans eau')).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: "J'ai arrosé" }));
     expect(onWater).toHaveBeenCalledWith(gaston);
 

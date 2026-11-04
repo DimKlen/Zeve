@@ -50,7 +50,7 @@ export function BottomSheet({ visible, onClose, children }: Props) {
 
   return (
     <Modal transparent visible={mounted} onRequestClose={onClose} statusBarTranslucent>
-      {/* La feuille remonte au-dessus du clavier (champs : renommer, nouvelle pièce…). */}
+      {/* La feuille remonte au-dessus du clavier (champs : renommer, nouveau jardin…). */}
       <KeyboardAvoidingView style={styles.root} behavior="padding">
         <Animated.View style={[StyleSheet.absoluteFill, styles.overlay, overlay]}>
           <Pressable

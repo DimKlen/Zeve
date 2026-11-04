@@ -12,7 +12,7 @@ type Props = {
   backLabel: string;
   /** Ligne sous le titre (compteur de la liste des espèces). */
   caption?: string;
-  /** Variante centrée de la fiche : sous-titre « latin · pièce » et bouton à droite. */
+  /** Variante centrée de la fiche : sous-titre « latin » et bouton à droite. */
   subtitle?: string;
   right?: ReactNode;
 };

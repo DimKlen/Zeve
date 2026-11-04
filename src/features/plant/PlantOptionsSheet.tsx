@@ -3,7 +3,6 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 
 import { BottomSheet } from '@/components/BottomSheet';
 import { Button } from '@/components/Button';
-import { Chip } from '@/components/Chip';
 import { IconChevronRight, IconMinus, IconPlus } from '@/components/icons';
 import { IconButton } from '@/components/IconButton';
 import { TextField } from '@/components/TextField';
@@ -16,9 +15,9 @@ import { t } from '@/i18n';
 import { learnRhythm } from '@/plants/wateringModel';
 import { makeStyles, space, type } from '@/theme';
 
-import { useRooms, useUpdatePlant, useWateringHistory } from './api';
+import { useUpdatePlant, useWateringHistory } from './api';
 
-type View_ = 'menu' | 'rename' | 'room' | 'garden' | 'interval' | 'history' | 'delete';
+type View_ = 'menu' | 'rename' | 'garden' | 'interval' | 'history' | 'delete';
 
 type Props = {
   plant: GardenPlant;
@@ -30,7 +29,6 @@ type Props = {
 
 const MENU: { view: Exclude<View_, 'menu'>; key: string; danger?: boolean }[] = [
   { view: 'rename', key: 'plant.menuRename' },
-  { view: 'room', key: 'plant.menuRoom' },
   { view: 'garden', key: 'gardens.move' },
   { view: 'interval', key: 'plant.menuInterval' },
   { view: 'history', key: 'plant.menuHistory' },
@@ -53,12 +51,20 @@ export function PlantOptionsSheet({ plant, visible, onClose, onDeleted }: Props)
   const [name, setName] = useState(plant.nickname);
   const [every, setEvery] = useState(plant.waterEveryDays);
   const update = useUpdatePlant();
-  const rooms = useRooms();
   const { data: gardens = [] } = useGardens();
   const { data: plants = [] } = usePlants();
   const move = useMovePlant();
   const [target, setTarget] = useState<Garden | null>(null);
-  const history = useWateringHistory(plant.id, visible && view === 'history');
+  const historyQuery = useWateringHistory(plant.id, visible && view === 'history');
+  // Pendant le chargement, les arrosages déjà connus de la fiche (mis à jour tout de suite).
+  const history = {
+    data:
+      historyQuery.data ??
+      (historyQuery.isPending
+        ? plant.history.map((e) => ({ id: e.at.toISOString(), wateredAt: e.at }))
+        : undefined),
+  };
+  const events = history.data ?? [];
   // Rythme observé d'après les arrosages (repère dans « Rythme d'arrosage »).
   const learned = learnRhythm(plant.history, plant.waterEveryDays, plant.drying);
   // Retirer la dernière plante d'un jardin le supprime (jamais de jardin vide) : on le dit avant.
@@ -73,7 +79,7 @@ export function PlantOptionsSheet({ plant, visible, onClose, onDeleted }: Props)
   };
   const moveTo = (garden: Garden) =>
     move.mutate(
-      { plantId: plant.id, gardenId: garden.id, roomName: plant.roomName },
+      { plantId: plant.id, gardenId: garden.id },
       {
         onSuccess: () => {
           close();
@@ -126,25 +132,6 @@ export function PlantOptionsSheet({ plant, visible, onClose, onDeleted }: Props)
             loading={update.isPending}
             onPress={() => save({ nickname: name.trim() })}
           />
-        </View>
-      )}
-
-      {view === 'room' && (
-        <View style={styles.panel}>
-          <Text style={styles.label}>{t('newPlant.room')}</Text>
-          <View style={styles.chips}>
-            {(rooms.data ?? [])
-              .filter((room) => room.gardenId === plant.gardenId)
-              .map((room) => (
-                <Chip
-                  key={room.id}
-                  label={room.name}
-                  variant="room"
-                  selected={room.id === plant.roomId}
-                  onPress={() => save({ room_id: room.id })}
-                />
-              ))}
-          </View>
         </View>
       )}
 
@@ -219,11 +206,8 @@ export function PlantOptionsSheet({ plant, visible, onClose, onDeleted }: Props)
           {history.data?.length === 0 && (
             <Text style={styles.muted}>{t('plant.historyEmpty')}</Text>
           )}
-          {history.data?.map((event, i) => (
-            <View
-              key={event.id}
-              style={[styles.row, i < history.data.length - 1 && styles.separator]}
-            >
+          {events.map((event, i) => (
+            <View key={event.id} style={[styles.row, i < events.length - 1 && styles.separator]}>
               <Text style={styles.rowText}>{capitalize(dayFormat.format(event.wateredAt))}</Text>
             </View>
           ))}

@@ -34,7 +34,7 @@ export type Climate = {
   group: Group;
   /** Humidité de l'air idéale, en %. */
   humidity: [number, number];
-  /** Température idéale de la pièce, en °C. */
+  /** Température ambiante idéale, en °C. */
   ideal: [number, number];
   /** Température minimale supportée, en °C. */
   min: number;

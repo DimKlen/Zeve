@@ -6,44 +6,29 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BottomSheet } from '@/components/BottomSheet';
 import { Button } from '@/components/Button';
 import { Chip } from '@/components/Chip';
-import { IconPlus, IconShuffle } from '@/components/icons';
+import { IconPlus, IconRefreshLeaf } from '@/components/icons';
 import { IconButton } from '@/components/IconButton';
-import { LightOption } from '@/components/LightOption';
-import { Rise } from '@/components/Rise';
 import { Screen } from '@/components/Screen';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { TextField } from '@/components/TextField';
 import { showToast } from '@/components/Toast';
 import { usePlants } from '@/features/garden/api';
 import { useGardens, type GardenPlace } from '@/features/gardens/api';
-import { DEFAULT_ROOMS, defaultGardenName, type Garden } from '@/features/gardens/gardenRules';
+import { defaultGardenName, type Garden } from '@/features/gardens/gardenRules';
 import { geocodePlace } from '@/features/gardens/location';
 import { EMPTY_PLACE, PlaceForm } from '@/features/gardens/PlaceForm';
-import {
-  loadLastGarden,
-  loadLastRoom,
-  useCreatePlant,
-  useCreateRoom,
-} from '@/features/newPlant/api';
+import { loadLastGarden, useCreatePlant } from '@/features/newPlant/api';
 import { useNewPlantDraft } from '@/features/newPlant/draftStore';
 import { suggestName } from '@/features/newPlant/plantNames';
 import { SpeciesPicker } from '@/features/newPlant/SpeciesPicker';
 import { useRecognition } from '@/features/newPlant/useRecognition';
-import { useRooms } from '@/features/plant/api';
 import { t } from '@/i18n';
 import { go, goBack } from '@/motion/transitions';
-import { FORM_INFO, LIGHT_TIPS, type Light } from '@/plants/careInfo';
 import { SPECIES_BY_ID } from '@/plants/species';
 import { layout, makeStyles, space, type } from '@/theme';
 
-const LIGHTS: { id: Light; label: string; hint: string }[] = [
-  { id: 'ombre', label: t('newPlant.lightShade'), hint: t('newPlant.lightShadeHint') },
-  { id: 'indirect', label: t('newPlant.lightBright'), hint: t('newPlant.lightBrightHint') },
-  { id: 'soleil', label: t('newPlant.lightSun'), hint: t('newPlant.lightSunHint') },
-];
 const NAME_MAX = 24;
 const GARDEN_NAME_MAX = 40;
-const DEFAULT_ROOM = 'Salon';
 
 /** Nouvelle plante (docs/04 §11), ouverte uniquement depuis le + du jardin. */
 export default function NewPlantScreen() {
@@ -52,15 +37,12 @@ export default function NewPlantScreen() {
   const draft = useNewPlantDraft();
   const { data: gardens } = useGardens();
   const { data: plants } = usePlants();
-  const rooms = useRooms();
   const create = useCreatePlant();
   const recognize = useRecognition();
-  const [roomSheet, setRoomSheet] = useState(false);
   const [gardenSheet, setGardenSheet] = useState(false);
 
   const garden = draft.garden;
   const gardenId = garden?.kind === 'existing' ? garden.id : null;
-  const gardenRooms = (rooms.data ?? []).filter((r) => r.gardenId === gardenId);
   // Noms déjà portés dans le jardin choisi : jamais suggérés.
   const taken = (plants ?? []).filter((p) => p.gardenId === gardenId).map((p) => p.nickname);
 
@@ -68,10 +50,7 @@ export default function NewPlantScreen() {
   useEffect(() => {
     if (!gardens || useNewPlantDraft.getState().garden) return;
     if (!gardens.length) {
-      draft.set({
-        garden: { kind: 'new', name: defaultGardenName(null, []), place: null },
-        roomName: DEFAULT_ROOM,
-      });
+      draft.set({ garden: { kind: 'new', name: defaultGardenName(null, []), place: null } });
       return;
     }
     void loadLastGarden().then((last) => {
@@ -80,18 +59,6 @@ export default function NewPlantScreen() {
         draft.set({ garden: { kind: 'existing', id: chosen.id } });
     });
   }, [gardens, draft]);
-
-  // Pièce par défaut dans le jardin choisi : la dernière utilisée, sinon Salon (docs/06 F6).
-  useEffect(() => {
-    if (!gardenId || !rooms.data) return;
-    const list = rooms.data.filter((r) => r.gardenId === gardenId);
-    if (list.some((r) => r.id === useNewPlantDraft.getState().roomId)) return;
-    void loadLastRoom().then((last) => {
-      const room =
-        list.find((r) => r.id === last) ?? list.find((r) => r.name === DEFAULT_ROOM) ?? list[0];
-      draft.set({ roomId: room?.id ?? null });
-    });
-  }, [gardenId, rooms.data, draft]);
 
   // Nom suggéré dès l'ouverture (modifiable, « Autre nom » en propose un autre).
   useEffect(() => {
@@ -110,8 +77,6 @@ export default function NewPlantScreen() {
   );
 
   const species = draft.speciesId ? SPECIES_BY_ID[draft.speciesId] : undefined;
-  const preferred = species ? FORM_INFO[species.form].light : null;
-  const lightTip = preferred ? LIGHT_TIPS[`${preferred}>${draft.light}`] : undefined;
 
   const close = () => {
     draft.reset();
@@ -131,9 +96,6 @@ export default function NewPlantScreen() {
         source: draft.source ?? 'list',
         name: draft.name,
         garden,
-        roomId: garden.kind === 'existing' ? draft.roomId : null,
-        roomName: garden.kind === 'new' ? draft.roomName : null,
-        light: draft.light,
         photoPath: draft.photoPath,
       },
       {
@@ -187,7 +149,7 @@ export default function NewPlantScreen() {
               accessibilityLabel={t('newPlant.otherName')}
               onPress={otherName}
               size={50}
-              icon={(c) => <IconShuffle size={20} color={c} />}
+              icon={(c) => <IconRefreshLeaf size={22} color={c} />}
             />
           </View>
 
@@ -198,7 +160,7 @@ export default function NewPlantScreen() {
                 <Chip
                   key={g.id}
                   label={g.name}
-                  variant="room"
+                  variant="option"
                   selected={gardenId === g.id}
                   onPress={() => draft.set({ garden: { kind: 'existing', id: g.id } })}
                 />
@@ -206,14 +168,14 @@ export default function NewPlantScreen() {
               {garden?.kind === 'new' ? (
                 <Chip
                   label={garden.name}
-                  variant="room"
+                  variant="option"
                   selected
                   onPress={() => setGardenSheet(true)}
                 />
               ) : (
                 <Chip
                   label={`+ ${t('gardens.newGarden')}`}
-                  variant="room"
+                  variant="option"
                   onPress={() => setGardenSheet(true)}
                 />
               )}
@@ -222,62 +184,6 @@ export default function NewPlantScreen() {
               <Text style={styles.hint}>
                 {garden.place?.city ? t('gardens.newGardenText') : t('gardens.newGardenHint')}
               </Text>
-            )}
-          </View>
-
-          <View style={styles.group}>
-            <Text style={styles.label}>{t('newPlant.room')}</Text>
-            <View style={styles.chips}>
-              {garden?.kind === 'new'
-                ? DEFAULT_ROOMS.map((name) => (
-                    <Chip
-                      key={name}
-                      label={name}
-                      variant="room"
-                      selected={name === draft.roomName}
-                      onPress={() => draft.set({ roomName: name })}
-                    />
-                  ))
-                : gardenRooms.map((room) => (
-                    <Chip
-                      key={room.id}
-                      label={room.name}
-                      variant="room"
-                      selected={room.id === draft.roomId}
-                      onPress={() => draft.set({ roomId: room.id })}
-                    />
-                  ))}
-              {/* Les pièces d'un nouveau jardin sont créées avec lui : en ajouter ensuite. */}
-              {gardenId && (
-                <Chip
-                  label={`+ ${t('newPlant.addRoom')}`}
-                  variant="room"
-                  onPress={() => setRoomSheet(true)}
-                />
-              )}
-            </View>
-          </View>
-
-          <View style={styles.group}>
-            <Text style={styles.label}>{t('newPlant.light')}</Text>
-            <View style={styles.lights}>
-              {LIGHTS.map((l) => (
-                <View key={l.id} style={styles.light}>
-                  <LightOption
-                    label={l.label}
-                    hint={l.hint}
-                    selected={draft.light === l.id}
-                    onPress={() => draft.set({ light: l.id })}
-                  />
-                </View>
-              ))}
-            </View>
-            {lightTip && (
-              <Rise key={lightTip}>
-                <Text style={styles.tip} accessibilityLiveRegion="polite">
-                  {lightTip}
-                </Text>
-              </Rise>
             )}
           </View>
         </ScrollView>
@@ -293,15 +199,6 @@ export default function NewPlantScreen() {
         </View>
       </KeyboardAvoidingView>
 
-      {gardenId && (
-        <NewRoomSheet
-          visible={roomSheet}
-          gardenId={gardenId}
-          position={gardenRooms.length}
-          onClose={() => setRoomSheet(false)}
-          onCreated={(roomId) => draft.set({ roomId })}
-        />
-      )}
       <NewGardenSheet
         key={gardenSheet ? 'open' : 'closed'}
         visible={gardenSheet}
@@ -309,11 +206,7 @@ export default function NewPlantScreen() {
         initial={garden?.kind === 'new' ? garden : null}
         onClose={() => setGardenSheet(false)}
         onSave={(name, place) => {
-          draft.set({
-            garden: { kind: 'new', name, place },
-            roomId: null,
-            roomName: useNewPlantDraft.getState().roomName ?? DEFAULT_ROOM,
-          });
+          draft.set({ garden: { kind: 'new', name, place } });
           setGardenSheet(false);
         }}
       />
@@ -390,59 +283,6 @@ function NewGardenSheet({
   );
 }
 
-/** « + Pièce » (non maquetté) : création d'une pièce dans une feuille du bas. */
-function NewRoomSheet({
-  visible,
-  gardenId,
-  position,
-  onClose,
-  onCreated,
-}: {
-  visible: boolean;
-  gardenId: string;
-  position: number;
-  onClose: () => void;
-  onCreated: (roomId: string) => void;
-}) {
-  const styles = useStyles();
-  const [name, setName] = useState('');
-  const createRoom = useCreateRoom();
-  const save = () =>
-    createRoom.mutate(
-      { name, position, gardenId },
-      {
-        onSuccess: (room) => {
-          onCreated(room.id);
-          setName('');
-          onClose();
-        },
-        onError: () => showToast(t('toast.offline')),
-      },
-    );
-  return (
-    <BottomSheet visible={visible} onClose={onClose}>
-      <View style={styles.sheet}>
-        <TextField
-          label={t('newPlant.newRoomTitle')}
-          value={name}
-          onChangeText={setName}
-          placeholder={t('newPlant.newRoomPlaceholder')}
-          maxLength={NAME_MAX}
-          autoFocus
-          returnKeyType="done"
-          onSubmitEditing={() => name.trim() && save()}
-        />
-        <Button
-          label={t('common.save')}
-          disabled={!name.trim()}
-          loading={createRoom.isPending}
-          onPress={save}
-        />
-      </View>
-    </BottomSheet>
-  );
-}
-
 const useStyles = makeStyles((colors) => ({
   flex: { flex: 1 },
   header: { paddingTop: space.xs, paddingHorizontal: layout.screenPadDetail },
@@ -456,9 +296,6 @@ const useStyles = makeStyles((colors) => ({
   hint: { ...type.caption, color: colors.inkMuted },
   nameRow: { flexDirection: 'row', alignItems: 'flex-end', gap: space.s },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: space.s },
-  lights: { flexDirection: 'row', gap: space.s },
-  light: { flex: 1 },
-  tip: { ...type.caption, color: colors.warnText },
   footer: { paddingTop: space.sm, paddingHorizontal: layout.screenPadDetail },
   sheet: { gap: space.m },
   sheetTitle: { ...type.subTitle, color: colors.forest },

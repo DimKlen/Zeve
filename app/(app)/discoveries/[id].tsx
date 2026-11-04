@@ -119,7 +119,7 @@ export default function DiscoveryScreen() {
                   <Chip
                     key={c.latin}
                     label={c.commonName ?? c.latin}
-                    variant="room"
+                    variant="option"
                     selected={i === item.selected}
                     onPress={() => void choose(i)}
                   />

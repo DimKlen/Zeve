@@ -3,7 +3,6 @@ import { RefreshControl, ScrollView, View } from 'react-native';
 
 import { Screen } from '@/components/Screen';
 import { showToast } from '@/components/Toast';
-import { useProfile } from '@/features/auth/profile';
 import { usePlants, useWatering } from '@/features/garden/api';
 import { EmptyGarden } from '@/features/garden/EmptyGarden';
 import { GardenPlants } from '@/features/garden/GardenPlants';
@@ -32,7 +31,6 @@ const DELAYS: (keyof typeof riseDelay)[] = ['d2', 'd3', 'd4'];
 export default function HomeScreen() {
   const colors = useColors();
   const styles = useStyles();
-  const { data: profile } = useProfile();
   const { data: plants, isError, refetch, isRefetching } = usePlants();
   const { data: gardens } = useGardens();
   const refreshGardens = useRefreshGardens();
@@ -55,14 +53,11 @@ export default function HomeScreen() {
     useNewPlantDraft.getState().reset(single?.garden.id);
     go('newPlant');
   };
-  const name = profile?.first_name;
-  const hello = name ? t('garden.hello', { name }) : t('garden.helloNoName');
 
   let header;
   if (single) {
     header = (
       <GardenHeader
-        hello={hello}
         title={single.garden.name}
         place={placeLabel(single.garden)}
         subtitle={gardenSubtitle(single.plants, now)}
@@ -74,14 +69,13 @@ export default function HomeScreen() {
     const thirsty = summaries.reduce((n, s) => n + s.thirsty, 0);
     header = (
       <GardenHeader
-        hello={hello}
         title={t('gardens.homeTitle')}
         subtitle={t('gardens.homeCount', { count: summaries.length, thirst: thirstLine(thirsty) })}
         onAdd={addPlant}
       />
     );
   } else {
-    header = <GardenHeader hello={hello} title={t('garden.title')} onAdd={addPlant} />;
+    header = <GardenHeader title={t('garden.title')} onAdd={addPlant} />;
   }
 
   return (
@@ -138,7 +132,7 @@ function GardenList({ summaries, now }: { summaries: GardenSummary[]; now: Date 
   );
   return (
     <>
-      {todo.length > 0 && <TodoCard items={todo} onWater={water} place="garden" />}
+      {todo.length > 0 && <TodoCard items={todo} onWater={water} showGarden />}
       <View style={styles.list}>
         {summaries.map((summary, i) => (
           <GardenCard

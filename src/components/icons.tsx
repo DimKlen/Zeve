@@ -107,10 +107,12 @@ export const IconPin = ({ size = 22, color = '#1F3D2B', strokeWidth = 2 }: P) =>
     <Circle cx={12} cy={9.5} r={2.5} {...line(color, strokeWidth)} />
   </S>
 );
-export const IconShuffle = ({ size = 22, color = '#1F3D2B', strokeWidth = 2 }: P) => (
+// Régénérer : flèche circulaire dessinée comme une tige dont le bout porte une feuille.
+export const IconRefreshLeaf = ({ size = 22, color = '#1F3D2B', strokeWidth = 2 }: P) => (
   <S size={size}>
+    <Path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3" {...line(color, strokeWidth)} />
     <Path
-      d="M3 7h4c4 0 6 10 10 10h4M18 14l3 3-3 3M3 17h4c1.5 0 2.7-1.4 3.7-3.2M13.3 10.2C14.3 8.4 15.5 7 17 7h4M18 4l3 3-3 3"
+      d="M17.3 6.7c2.9-.3 4.5 1.3 4.2 4.2-2.9.3-4.5-1.3-4.2-4.2zM17.3 6.7l2.4 2.4"
       {...line(color, strokeWidth)}
     />
   </S>
