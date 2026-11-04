@@ -2,6 +2,8 @@
 import { parseTime } from '@/features/notifications/reminderPlan';
 import { t } from '@/i18n';
 
+import { topicLabel } from './rules';
+
 export type FollowupRow = { plantId: string; nickname: string; topic: string; dueAt: Date };
 export type PlannedFollowup = { date: Date; title: string; body: string; plantId: string };
 
@@ -34,4 +36,15 @@ export function planFollowups(
       plantId: row.plantId,
     };
   });
+}
+
+const shortDate = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short' });
+
+/** Ligne de la fiche : « Suivi en cours : cochenilles · prochain point le 8 nov. » */
+export function followupLine(followup: { topic: string; dueAt: Date }, now = new Date()): string {
+  const topic = topicLabel(followup.topic);
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+  return followup.dueAt < today
+    ? t('followup.lineDue', { topic })
+    : t('followup.line', { topic, date: shortDate.format(followup.dueAt) });
 }

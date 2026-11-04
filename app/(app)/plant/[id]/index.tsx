@@ -19,6 +19,8 @@ import { forecastMin, useWeather } from '@/features/gardens/weather';
 import { MascotScene } from '@/features/plant/MascotScene';
 import { PlantOptionsSheet } from '@/features/plant/PlantOptionsSheet';
 import { RhythmCard } from '@/features/plant/RhythmCard';
+import { useOpenFollowup } from '@/features/followups/api';
+import { followupLine } from '@/features/followups/plan';
 import { SeasonCard } from '@/features/plant/SeasonCard';
 import { CareGuideSheet } from '@/features/plant/CareGuide';
 import { TextButton } from '@/components/TextButton';
@@ -42,6 +44,8 @@ export default function PlantScreen() {
   const [justWatered, setJustWatered] = useState(false);
   const [menu, setMenu] = useState(false);
   const [guide, setGuide] = useState(false);
+  // Suivi de soins en cours (F22) : rappelé sur la carte du chat.
+  const { data: followup } = useOpenFollowup(id);
 
   if (!plant) {
     return (
@@ -183,7 +187,12 @@ export default function PlantScreen() {
             <PressableScale
               onPress={() => go('chat', { id: plant.id })}
               accessibilityRole="button"
-              accessibilityLabel={t('plant.chatA11y', { name: plant.nickname })}
+              accessibilityLabel={[
+                t('plant.chatA11y', { name: plant.nickname }),
+                followup ? followupLine(followup) : null,
+              ]
+                .filter(Boolean)
+                .join(', ')}
               style={styles.chatCard}
             >
               <View style={styles.chatTexts}>
@@ -191,6 +200,7 @@ export default function PlantScreen() {
                   {t('plant.chatTitle', { name: plant.nickname })}
                 </Text>
                 <Text style={styles.chatText}>{t('plant.chatText')}</Text>
+                {followup && <Text style={styles.followup}>{followupLine(followup)}</Text>}
               </View>
               <View style={styles.chatIcon}>
                 <IconCamera size={20} color={colors.bg} />
@@ -272,6 +282,7 @@ const useStyles = makeStyles((colors) => ({
   chatTexts: { flex: 1 },
   chatTitle: { ...type.sectionTitle, color: colors.forest },
   chatText: { ...type.caption, color: colors.forestText },
+  followup: { ...type.label, color: colors.forest, marginTop: space.xs },
   chatIcon: {
     width: control.roundIcon,
     height: control.roundIcon,

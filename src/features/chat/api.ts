@@ -7,7 +7,8 @@ import { Platform } from 'react-native';
 
 import { useAuthStore } from '@/features/auth/authStore';
 import { uploadPhoto, type PickedPhoto } from '@/features/newPlant/api';
-import { REMIND_KIND } from '@/features/notifications/schedule';
+import { followupKey } from '@/features/followups/api';
+import { REMIND_KIND, rescheduleReminders } from '@/features/notifications/schedule';
 import { t } from '@/i18n';
 import type { Database } from '@/lib/database.types';
 import { supabase } from '@/lib/supabase';
@@ -89,7 +90,9 @@ export function useSendMessage(plantId: string, nickname?: string) {
   const queryClient = useQueryClient();
   const userId = useAuthStore((s) => s.session?.user.id);
   return useMutation({
-    mutationFn: async (input: SendInput): Promise<SendInput & { reply: string | null }> => {
+    mutationFn: async (
+      input: SendInput,
+    ): Promise<SendInput & { reply: string | null; followup: string | null }> => {
       let photoPath = input.photoPath;
       if (input.photo && !photoPath) {
         photoPath = await uploadPhoto(
@@ -97,7 +100,10 @@ export function useSendMessage(plantId: string, nickname?: string) {
           `${userId}/${plantId}/chat/${Crypto.randomUUID()}.jpg`,
         );
       }
-      const { data, error } = await supabase.functions.invoke<{ content?: string }>('plant-chat', {
+      const { data, error } = await supabase.functions.invoke<{
+        content?: string;
+        followup?: string | null;
+      }>('plant-chat', {
         body: { plantId, text: input.text, photoPath },
       });
       if (error) {
@@ -107,10 +113,20 @@ export function useSendMessage(plantId: string, nickname?: string) {
             : null;
         throw new ChatError(body?.error === 'quota' ? 'quota' : 'failed', photoPath);
       }
-      return { ...input, photoPath, reply: data?.content ?? null };
+      return {
+        ...input,
+        photoPath,
+        reply: data?.content ?? null,
+        followup: data?.followup ?? null,
+      };
     },
-    onSuccess: async ({ reply }) => {
+    onSuccess: async ({ reply, followup }) => {
       if (reply && nickname) await notifyChatReply({ id: plantId, nickname }, reply);
+      // Suivi de soins créé, replanifié ou clos (F22) : fiche et notifications à jour.
+      if (followup) {
+        void queryClient.invalidateQueries({ queryKey: followupKey(plantId) });
+        void rescheduleReminders();
+      }
       await queryClient.invalidateQueries({ queryKey: chatKey(plantId) });
     },
   });

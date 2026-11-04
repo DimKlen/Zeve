@@ -245,7 +245,7 @@ Deno.serve(async (req) => {
   if (Deno.env.get('CHAT_MOCK') && followup && /mieux|disparu|réglé|plus rien/i.test(text ?? '')) {
     // Suivi de démo (F22) : « ça va mieux » clôt le suivi en cours.
     reply =
-      `Super nouvelle pour ${followup.topic}, merci de m’avoir si bien soignée !\n` +
+      `Super nouvelle pour ${followup.topic}, merci pour tes bons soins !\n` +
       '{"action":{"type":"followup_done"}}';
   } else if (Deno.env.get('CHAT_MOCK') && /cochenille/i.test(text ?? '')) {
     // Suivi de démo (F22) : un message qui parle de cochenilles ouvre un suivi à 7 jours.
