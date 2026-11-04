@@ -15,6 +15,12 @@ import {
   type GeminiPart,
   type StoredMessage,
 } from '../_shared/chatPrompt.ts';
+import {
+  applyFollowup,
+  dueCheck,
+  followupPrompt,
+  type OpenFollowup,
+} from '../_shared/followup.ts';
 import { dayKey, dryingFromWeather, dueInfo, learnRhythm } from '../_shared/wateringModel.ts';
 
 const DEFAULT_MODEL = 'gemini-3.5-flash-lite';
@@ -58,6 +64,27 @@ function recentWeatherLine(
   return `${avg(temps)} °C en moyenne${hums.length ? `, ${avg(hums)} % d’humidité` : ''}`;
 }
 
+type Client = ReturnType<typeof createClient>;
+
+/** Suivi de soins ouvert de la plante (un seul au plus). */
+async function openFollowup(supabase: Client, plantId: string): Promise<OpenFollowup | null> {
+  const { data } = await supabase
+    .from('plant_followups')
+    .select('id, topic, due_at, checks, created_at')
+    .eq('plant_id', plantId)
+    .eq('status', 'open')
+    .maybeSingle();
+  return data
+    ? {
+        id: data.id,
+        topic: data.topic,
+        dueAt: new Date(data.due_at),
+        checks: data.checks,
+        createdAt: new Date(data.created_at),
+      }
+    : null;
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
@@ -74,7 +101,33 @@ Deno.serve(async (req) => {
     plantId?: string;
     text?: string;
     photoPath?: string;
+    /** Ouverture du fil : la plante prend des nouvelles si un suivi est échu (F22). */
+    check?: boolean;
   };
+
+  if (body.check && body.plantId) {
+    const open = await openFollowup(supabase, body.plantId);
+    const due = dueCheck(open, new Date());
+    if (!due) return json({ checked: false });
+    if (due.op === 'expire') {
+      await supabase.from('plant_followups').update({ status: 'expired' }).eq('id', due.id);
+      return json({ checked: false });
+    }
+    // Échéance déplacée d'abord : deux ouvertures rapprochées n'ajoutent qu'un message.
+    const { data: moved } = await supabase
+      .from('plant_followups')
+      .update({ checks: due.checks, due_at: due.dueAt.toISOString() })
+      .eq('id', due.id)
+      .lte('due_at', new Date().toISOString())
+      .select('id');
+    if (!moved?.length) return json({ checked: false });
+    const { error } = await supabase
+      .from('chat_messages')
+      .insert({ user_id: user.id, plant_id: body.plantId, role: 'assistant', content: due.message });
+    if (error) return json({ error: 'save_failed' }, 500);
+    return json({ checked: true });
+  }
+
   const text = body.text?.trim().slice(0, MAX_TEXT) || null;
   const photoPath = body.photoPath ?? null;
   if (!body.plantId || (!text && !photoPath)) return json({ error: 'invalid_request' }, 400);
@@ -114,6 +167,7 @@ Deno.serve(async (req) => {
       .limit(5),
   ]);
 
+  const followup = await openFollowup(supabase, plant.id);
   const southern = isSouthernPlace(plant.garden_latitude, plant.garden_country_code);
 
   // Même calcul que l'app : date d'arrosage ajustée à la météo, rythme appris (wateringModel).
@@ -174,6 +228,7 @@ Deno.serve(async (req) => {
     recentWeather: recentWeatherLine(weather),
     todayWeather: todayWeatherLine(gardenNow?.weather_now),
   });
+  const systemWithFollowup = [system, ...followupPrompt(followup)].join('\n');
 
   // Message courant : texte + photo réelle (image en ligne) si fournie.
   const parts: GeminiPart[] = [];
@@ -187,7 +242,18 @@ Deno.serve(async (req) => {
   parts.push({ text: text ?? 'Regarde cette photo de moi : qu’en penses-tu ?' });
 
   let reply: string;
-  if (Deno.env.get('CHAT_MOCK')) {
+  if (Deno.env.get('CHAT_MOCK') && followup && /mieux|disparu|réglé|plus rien/i.test(text ?? '')) {
+    // Suivi de démo (F22) : « ça va mieux » clôt le suivi en cours.
+    reply =
+      `Super nouvelle pour ${followup.topic}, merci de m’avoir si bien soignée !\n` +
+      '{"action":{"type":"followup_done"}}';
+  } else if (Deno.env.get('CHAT_MOCK') && /cochenille/i.test(text ?? '')) {
+    // Suivi de démo (F22) : un message qui parle de cochenilles ouvre un suivi à 7 jours.
+    reply =
+      'Les cochenilles adorent l’aisselle de mes feuilles. Passe un coton imbibé d’alcool sur chaque tache, ' +
+      'puis isole-moi des autres plantes une semaine.\n' +
+      '{"action":{"type":"followup","days":7,"topic":"les cochenilles"}}';
+  } else if (Deno.env.get('CHAT_MOCK')) {
     reply =
       `Merci de prendre soin de moi ! ${photoPath ? 'Sur ta photo, mes feuilles ont l’air en forme. ' : ''}` +
       `Mon dernier arrosage date de ${plant.days_since_water} jours ; je préfère tous les ${plant.water_every_days} jours.\n` +
@@ -208,7 +274,7 @@ Deno.serve(async (req) => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            systemInstruction: { parts: [{ text: system }] },
+            systemInstruction: { parts: [{ text: systemWithFollowup }] },
             contents,
             generationConfig: { temperature: 0.7, maxOutputTokens: 600 },
           }),
@@ -230,7 +296,7 @@ Deno.serve(async (req) => {
     if (!reply) return json({ error: 'empty_reply' }, 502);
   }
 
-  const { content, actions } = extractAction(reply);
+  const { content, actions, followup: followupAction } = extractAction(reply);
 
   // Les deux messages ne sont enregistrés qu'une fois la réponse obtenue : « Réessayer » ne duplique rien.
   const { error: userError } = await supabase
@@ -250,5 +316,23 @@ Deno.serve(async (req) => {
     .single();
   if (botError) return json({ error: 'save_failed' }, 500);
 
-  return json(saved);
+  // Suivi de soins : créé, replanifié ou clos selon la réponse (un seul ouvert par plante).
+  const write = applyFollowup(followup, followupAction, new Date());
+  if (write?.op === 'insert') {
+    await supabase.from('plant_followups').insert({
+      user_id: user.id,
+      plant_id: plant.id,
+      topic: write.topic,
+      due_at: write.dueAt.toISOString(),
+    });
+  } else if (write?.op === 'update') {
+    await supabase
+      .from('plant_followups')
+      .update({ topic: write.topic, due_at: write.dueAt.toISOString() })
+      .eq('id', write.id);
+  } else if (write?.op === 'resolve') {
+    await supabase.from('plant_followups').update({ status: 'resolved' }).eq('id', write.id);
+  }
+
+  return json({ ...saved, followup: write?.op ?? null });
 });

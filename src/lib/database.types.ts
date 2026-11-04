@@ -213,6 +213,55 @@ export type Database = {
         };
         Relationships: [];
       };
+      plant_followups: {
+        Row: {
+          checks: number;
+          created_at: string;
+          due_at: string;
+          id: string;
+          plant_id: string;
+          status: string;
+          topic: string;
+          user_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          checks?: number;
+          created_at?: string;
+          due_at: string;
+          id?: string;
+          plant_id: string;
+          status?: string;
+          topic: string;
+          user_id?: string;
+        };
+        Update: {
+          checks?: number;
+          created_at?: string;
+          due_at?: string;
+          id?: string;
+          plant_id?: string;
+          status?: string;
+          topic?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'plant_followups_plant_id_fkey';
+            columns: ['plant_id'];
+            isOneToOne: false;
+            referencedRelation: 'plant_overview';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'plant_followups_plant_id_fkey';
+            columns: ['plant_id'];
+            isOneToOne: false;
+            referencedRelation: 'plants';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       plants: {
         Row: {
           archived_at: string | null;
