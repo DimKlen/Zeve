@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { FlatList, KeyboardAvoidingView, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { AssistantAvatar } from '@/components/AssistantAvatar';
 import { ChatBubble } from '@/components/ChatBubble';
 import { Chip } from '@/components/Chip';
 import { IconBack, IconCamera, IconSend } from '@/components/icons';
@@ -121,7 +122,6 @@ export default function ChatScreen() {
             >
               {name}
             </Text>
-            <Text style={styles.subtitle}>{t('chat.subtitle')}</Text>
           </View>
         </View>
 
@@ -131,6 +131,14 @@ export default function ChatScreen() {
           keyExtractor={(item) => item.key}
           contentContainerStyle={styles.thread}
           keyboardShouldPersistTaps="handled"
+          // Fil inversé : le pied de liste s'affiche en haut, au-dessus de la salutation.
+          ListFooterComponent={
+            messages.length === 0 ? (
+              <View style={styles.empty}>
+                <AssistantAvatar size={EMPTY_AVATAR} />
+              </View>
+            ) : undefined
+          }
           ListHeaderComponent={
             <View style={styles.live}>
               {pending && <PendingBubbles pending={pending} />}
@@ -246,6 +254,7 @@ function FailureBubble({ failure, onRetry }: { failure: Failure; onRetry: () => 
 }
 
 const AVATAR = control.roundIcon;
+const EMPTY_AVATAR = 96;
 
 const useStyles = makeStyles((colors) => ({
   flex: { flex: 1 },
@@ -270,10 +279,10 @@ const useStyles = makeStyles((colors) => ({
   },
   titles: { flex: 1 },
   name: { ...type.cardTitle, fontFamily: type.button.fontFamily, color: colors.forest },
-  subtitle: { ...type.caption, color: colors.inkMuted },
   thread: { padding: layout.screenPadDetail },
   live: { gap: space.m, paddingTop: space.m },
   gap: { height: space.m },
+  empty: { alignItems: 'center', paddingBottom: space.xl },
   userGroup: { gap: space.m, alignItems: 'flex-end' },
   date: { ...type.micro, color: colors.inkMuted, textAlign: 'center' },
   suggestionsScroll: { flexGrow: 0 },

@@ -11,7 +11,6 @@ const gaston: PlantContext = {
   nickname: 'Gaston',
   speciesName: 'Monstera',
   latin: 'Monstera deliciosa',
-  roomName: 'Salon',
   daysSinceWater: 9,
   waterEveryDays: 8,
   light: 'indirect',
@@ -24,22 +23,21 @@ const gaston: PlantContext = {
 };
 
 describe('buildSystemPrompt', () => {
-  it('donne à la plante son nom, son espèce, sa pièce et son état', () => {
+  it('donne à la plante son nom, son espèce et son état', () => {
     const prompt = buildSystemPrompt(gaston);
     expect(prompt).toContain(
-      'Tu es Gaston, une plante (Monstera, Monstera deliciosa) qui vit dans le/la Salon',
+      'Tu es Gaston, une plante (Monstera, Monstera deliciosa) qui vit chez ton humain·e, à Paris, France.',
     );
     expect(prompt).toContain('dernier arrosage il y a 9 jours (rythme idéal : tous les 8 jours)');
-    expect(prompt).toContain('lumière à ton emplacement : lumineux, sans soleil direct');
+    expect(prompt).toContain(
+      'exposition idéale pour ton espèce : lumière vive mais sans soleil direct (Vive, indirecte), emplacement conseillé : près d’une fenêtre',
+    );
     expect(prompt).toContain('Derniers arrosages : 21 oct., 13 oct.');
     expect(prompt).toContain('"type":"remind"');
   });
 
   it('donne la saison pour adapter les conseils', () => {
     expect(buildSystemPrompt(gaston)).toContain('Saison actuelle : automne (hémisphère nord)');
-    expect(buildSystemPrompt(gaston)).toContain(
-      'dans le/la Salon de ton humain·e, à Paris, France.',
-    );
     expect(seasonNameOf(new Date(2026, 0, 5), true)).toBe('été');
     expect(isSouthernPlace(-33.9, null)).toBe(true);
     expect(isSouthernPlace(null, 'au')).toBe(true);
@@ -49,15 +47,34 @@ describe('buildSystemPrompt', () => {
     expect(seasonNameOf(new Date(2026, 10, 1))).toBe('automne');
   });
 
-  it('se passe de pièce et d’arrosages', () => {
-    const prompt = buildSystemPrompt({
-      ...gaston,
-      roomName: null,
-      place: null,
-      recentWaterings: [],
-    });
+  it('se passe de lieu et d’arrosages', () => {
+    const prompt = buildSystemPrompt({ ...gaston, place: null, recentWaterings: [] });
     expect(prompt).toContain('qui vit chez ton humain·e.');
     expect(prompt).toContain('Aucun arrosage enregistré');
+  });
+
+  it('ne parle plus de pièce ni de lumière choisie par l’utilisateur', () => {
+    const prompt = buildSystemPrompt(gaston);
+    expect(prompt).not.toMatch(/pièce|Salon/);
+    expect(prompt).not.toContain('à ton emplacement');
+  });
+
+  it('demande des réponses courtes de 2 à 4 phrases, développées sur demande seulement', () => {
+    const prompt = buildSystemPrompt(gaston);
+    expect(prompt).toContain('2 à 4 phrases par défaut');
+    expect(prompt).toContain('Ne développe que si ton humain·e te le demande');
+  });
+
+  it('cadre strictement le périmètre et résiste aux contournements', () => {
+    const prompt = buildSystemPrompt(gaston);
+    expect(prompt).toContain('PÉRIMÈTRE STRICT');
+    for (const topic of ['maladies', 'nuisibles', 'rempotage', 'arrosage', 'placement']) {
+      expect(prompt).toContain(topic);
+    }
+    expect(prompt).toContain('refuse poliment en une seule phrase');
+    expect(prompt).toContain('sans répondre à la question');
+    expect(prompt).toContain('oublier');
+    expect(prompt).toContain('jouer un autre rôle');
   });
 });
 

@@ -4,6 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { t } from '@/i18n';
 import { makeStyles, radius, space, type, useColors } from '@/theme';
 
+import { AssistantAvatar } from './AssistantAvatar';
 import { Button } from './Button';
 import { IconCamera } from './icons';
 import { Rise } from './Rise';
@@ -13,6 +14,7 @@ type Props =
   | { from: 'photo'; uri?: string; caption?: string };
 
 const PHOTO = { w: 190, h: 150 };
+const AVATAR = 32;
 
 /** Bulle de chat (docs/02 §7) : moi à droite (forest), assistant à gauche (surface), photo. */
 export function ChatBubble(props: Props) {
@@ -52,16 +54,21 @@ export function ChatBubble(props: Props) {
 
   return (
     <Rise style={styles.left}>
-      <View style={styles.bot}>
-        <Text style={styles.botText}>{props.text}</Text>
-        {props.action && (
-          <Button
-            label={props.action.label}
-            onPress={props.action.onPress}
-            variant="secondary"
-            size="s"
-          />
-        )}
+      <View style={styles.botRow}>
+        <View style={styles.botAvatar}>
+          <AssistantAvatar size={AVATAR} />
+        </View>
+        <View style={styles.bot}>
+          <Text style={styles.botText}>{props.text}</Text>
+          {props.action && (
+            <Button
+              label={props.action.label}
+              onPress={props.action.onPress}
+              variant="secondary"
+              size="s"
+            />
+          )}
+        </View>
       </View>
     </Rise>
   );
@@ -84,7 +91,10 @@ const useStyles = makeStyles((colors) => ({
     paddingHorizontal: space.ml,
   },
   meText: { ...type.bodyS, color: colors.bg },
+  botRow: { flexDirection: 'row', alignItems: 'flex-end', gap: space.s },
+  botAvatar: { width: AVATAR, height: AVATAR * 1.1 },
   bot: {
+    flexShrink: 1,
     maxWidth: 300 + space.ml * 2,
     backgroundColor: colors.surface,
     borderTopLeftRadius: radius.xl,
