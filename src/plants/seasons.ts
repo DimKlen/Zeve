@@ -143,9 +143,17 @@ export const SPECIES_CLIMATE: Record<string, Partial<Climate>> = {
   cymbidium: { outdoors: 'summer', min: 8, ideal: [10, 24] },
 };
 
+/** Plantes de pleine terre (arbres, fruitiers, herbes sauvages) : rustiques, dehors toute l'année. */
+const GROUND: Partial<Climate> = { outdoors: 'year', min: -15 };
+
 export function climateOf(speciesId: string): Climate {
-  const form = SPECIES_BY_ID[speciesId]?.form ?? 'monstera';
-  return { ...FORM_CLIMATE[form], ...SPECIES_CLIMATE[speciesId] };
+  const species = SPECIES_BY_ID[speciesId];
+  const form = species?.form ?? 'monstera';
+  return {
+    ...FORM_CLIMATE[form],
+    ...(species?.hardy ? GROUND : {}),
+    ...SPECIES_CLIMATE[speciesId],
+  };
 }
 
 /** Clés i18n `season.*` des conseils de la saison pour une espèce. */

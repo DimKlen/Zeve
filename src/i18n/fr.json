@@ -244,7 +244,17 @@
     "repotOrchid": "Tous les 2 ans, après la floraison, quand les écorces se décomposent.",
     "repotRarely": "Rarement : seulement si le support s’abîme.",
     "repotNone": "Jamais : elle n’a pas de pot.",
-    "repotBulb": "Après la floraison, laisse le bulbe se reposer au sec avant de le replanter."
+    "repotBulb": "Après la floraison, laisse le bulbe se reposer au sec avant de le replanter.",
+    "soilGarden": "Terre de jardin ordinaire, en pleine terre.",
+    "potGround": "En pleine terre de préférence ; en pot, un grand bac percé.",
+    "repotGround": "En pleine terre, pas de rempotage ; en bac, tous les 2 à 3 ans.",
+    "weed": "Mauvaise herbe",
+    "weedPull": "Arrache-la avant qu’elle fasse ses graines : elle se ressème vite.",
+    "weedRoots": "Ses racines repoussent : retire-les entièrement, sans les casser.",
+    "waterGround": "En pleine terre, la pluie suffit souvent : arrose quand le sol est sec en profondeur, surtout en été.",
+    "lightGroundOmbre": "À l’ombre au jardin : sous les arbres ou au nord.",
+    "lightGroundIndirect": "Mi-ombre au jardin : soleil le matin, ombre l’après-midi.",
+    "lightGroundSoleil": "En plein soleil au jardin."
   },
   "season": {
     "title": "Saison",
@@ -394,7 +404,8 @@
     "emptyTitle": "Aucune espèce trouvée",
     "emptyText": "Essaie un autre nom, ou prends-la en photo.",
     "emptyCta": "Prendre une photo",
-    "selectedA11y": "sélectionnée"
+    "selectedA11y": "sélectionnée",
+    "wildType": "Herbe sauvage"
   },
   "toast": {
     "remindersOn": "Rappels activés",

@@ -1,10 +1,13 @@
 // Recherche du catalogue (docs/06 F6) : nom, latin et type, sans accents ; catégorie ; tri alphabétique fr.
+import { t } from '@/i18n';
 import { FORM_INFO, type Category } from '@/plants/careInfo';
 import { normalize } from '@/plants/plantStatus';
 import { SPECIES, type Species } from '@/plants/species';
 
-export const typeLabel = (s: Species) => FORM_INFO[s.form].label;
-export const categoryOf = (s: Species): Category => FORM_INFO[s.form].cat;
+/** Type affiché : celui du dessin, ou « Herbe sauvage » pour les herbes sauvages et adventices. */
+export const typeLabel = (s: Species) =>
+  s.category === 'sauvages' ? t('species.wildType') : FORM_INFO[s.form].label;
+export const categoryOf = (s: Species): Category => s.category ?? FORM_INFO[s.form].cat;
 
 const collator = new Intl.Collator('fr', { sensitivity: 'base' });
 

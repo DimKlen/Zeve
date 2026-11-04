@@ -3,22 +3,26 @@ import { join } from 'path';
 
 import { SPECIES } from '@/plants/species';
 
-import { searchSpecies, waterEveryDaysOf } from './searchSpecies';
+import { categoryOf, searchSpecies, waterEveryDaysOf } from './searchSpecies';
 
 const names = (list: { name: string }[]) => list.map((s) => s.name);
 
 describe('searchSpecies', () => {
-  it('liste les 220 espèces par ordre alphabétique sans filtre', () => {
+  it('liste les 324 espèces par ordre alphabétique sans filtre', () => {
     const all = searchSpecies('');
-    expect(all).toHaveLength(220);
-    expect(all[0]!.name).toBe('Aechmea');
+    expect(all).toHaveLength(324);
+    expect(all[0]!.name).toBe('Abricotier');
   });
 
   it('« fic » trouve les ficus et Figuier lyre, aussi par le type et le nom latin (capture 12b)', () => {
     expect(names(searchSpecies('fic'))).toEqual([
       'Avocatier',
+      'Bourrache',
       'Caféier',
       'Caoutchouc',
+      'Consoude',
+      'Cresson',
+      'Ficaire',
       'Ficus altissima',
       'Ficus Audrey',
       'Ficus benjamina',
@@ -27,8 +31,11 @@ describe('searchSpecies', () => {
       'Figuier',
       'Figuier lyre',
       'Mélisse',
+      'Pissenlit',
       'Sauge',
       'Schefflera',
+      'Souci',
+      'Valériane',
     ]);
   });
 
@@ -44,6 +51,25 @@ describe('searchSpecies', () => {
     );
     expect(names(searchSpecies('eche', 'succulentes'))).toEqual(['Echeveria']);
     expect(searchSpecies('basilic', 'succulentes')).toEqual([]);
+  });
+});
+
+describe('catégories', () => {
+  it('« Sauvages » regroupe herbes sauvages et mauvaises herbes, dessinées avec d’autres types', () => {
+    const wild = names(searchSpecies('', 'sauvages'));
+    expect(wild).toEqual(expect.arrayContaining(['Ortie', 'Pissenlit', 'Chiendent', 'Pâquerette']));
+    expect(wild).not.toContain('Basilic');
+  });
+
+  it('chaque espèce a dans l’app la catégorie enregistrée en base', () => {
+    const dir = join(__dirname, '../../../supabase/migrations');
+    const sql = readdirSync(dir)
+      .map((file) => readFileSync(join(dir, file), 'utf8'))
+      .join('\n');
+    for (const s of SPECIES) {
+      const row = sql.match(new RegExp(`\\('${s.id}', '(?:[^']|'')*', '[^']*', '\\w+', '(\\w+)'`));
+      expect([s.id, row?.[1]]).toEqual([s.id, categoryOf(s)]);
+    }
   });
 });
 

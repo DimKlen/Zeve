@@ -61,7 +61,7 @@ describe('matchSpecies', () => {
   });
 
   it('renvoie null si rien ne correspond au catalogue', () => {
-    expect(matchSpecies([result('Quercus robur', 0.95)], catalog)).toEqual({
+    expect(matchSpecies([result('Pinus sylvestris', 0.95)], catalog)).toEqual({
       speciesId: null,
       confidence: 0,
       alternatives: [],

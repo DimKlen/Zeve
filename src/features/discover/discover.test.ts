@@ -116,7 +116,8 @@ describe('catalogMatch', () => {
   it('relie une plante du catalogue, synonymes compris, et rien d’autre', () => {
     expect(catalogMatch('Monstera deliciosa', catalog)).toBe('monstera');
     expect(catalogMatch('Sansevieria trifasciata', catalog)).toBe('sansevieria');
-    expect(catalogMatch('Taraxacum officinale', catalog)).toBeNull();
+    expect(catalogMatch('Taraxacum officinale', catalog)).toBe('pissenlit');
+    expect(catalogMatch('Pinus sylvestris', catalog)).toBeNull();
     // Même genre ne suffit pas : on ne propose pas un guide d'entretien approximatif.
     expect(catalogMatch('Ficus maclellandii', catalog)).toBeNull();
   });

@@ -26,6 +26,12 @@ const LIGHT_TEXT: Record<Light, string> = {
   indirect: 'care.lightIndirect',
   soleil: 'care.lightSoleil',
 };
+/** Plantes de pleine terre : conseils de jardin, pas d'appartement. */
+const LIGHT_TEXT_GROUND: Record<Light, string> = {
+  ombre: 'care.lightGroundOmbre',
+  indirect: 'care.lightGroundIndirect',
+  soleil: 'care.lightGroundSoleil',
+};
 const SHEET_MAX = 0.68;
 
 /** Degrés avec un vrai signe moins (« −10 »). */
@@ -108,13 +114,15 @@ export function CareGuideSheet({ speciesId, name, waterEveryDays, visible, onClo
     {
       key: 'water',
       label: t('care.water'),
-      text: t('care.waterText', { n: waterEveryDays ?? waterEveryDaysOf(species) }),
+      text: species.hardy
+        ? t('care.waterGround')
+        : t('care.waterText', { n: waterEveryDays ?? waterEveryDaysOf(species) }),
       icon: <IconDrop size={18} color={icon} />,
     },
     {
       key: 'light',
       label: t('care.light'),
-      text: t(LIGHT_TEXT[info.light]),
+      text: t((species.hardy ? LIGHT_TEXT_GROUND : LIGHT_TEXT)[info.light]),
       icon: <IconSun size={18} color={icon} />,
     },
     {
@@ -154,6 +162,15 @@ export function CareGuideSheet({ speciesId, name, waterEveryDays, visible, onClo
       icon: <IconRepot size={18} color={icon} />,
     },
   ];
+  // Mauvaise herbe : comment la contenir, en premier.
+  if (species.weed) {
+    rows.unshift({
+      key: 'weed',
+      label: t('care.weed'),
+      text: t(species.weed === 'roots' ? 'care.weedRoots' : 'care.weedPull'),
+      icon: <IconSprout size={18} color={icon} />,
+    });
+  }
 
   return (
     <BottomSheet visible={visible} onClose={onClose}>
