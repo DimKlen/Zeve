@@ -104,6 +104,7 @@ export type Database = {
           precipitation_mm: number | null;
           sunshine_hours: number | null;
           temp_mean: number | null;
+          temp_min: number | null;
         };
         ComputedFields: never;
         Insert: {
@@ -115,6 +116,7 @@ export type Database = {
           precipitation_mm?: number | null;
           sunshine_hours?: number | null;
           temp_mean?: number | null;
+          temp_min?: number | null;
         };
         Update: {
           day?: string;
@@ -125,6 +127,7 @@ export type Database = {
           precipitation_mm?: number | null;
           sunshine_hours?: number | null;
           temp_mean?: number | null;
+          temp_min?: number | null;
         };
         Relationships: [
           {
@@ -147,6 +150,8 @@ export type Database = {
           longitude: number | null;
           name: string;
           user_id: string;
+          weather_at: string | null;
+          weather_now: Json | null;
         };
         ComputedFields: never;
         Insert: {
@@ -159,6 +164,8 @@ export type Database = {
           longitude?: number | null;
           name: string;
           user_id: string;
+          weather_at?: string | null;
+          weather_now?: Json | null;
         };
         Update: {
           city?: string | null;
@@ -170,6 +177,8 @@ export type Database = {
           longitude?: number | null;
           name?: string;
           user_id?: string;
+          weather_at?: string | null;
+          weather_now?: Json | null;
         };
         Relationships: [];
       };
