@@ -39,7 +39,7 @@ type Props = {
 };
 
 const EASE_IN_OUT = Easing.inOut(Easing.ease);
-const SWAY_DEG = 2.5;
+const SWAY_DEG = 4;
 const THIRSTY_TILT_DEG = -9;
 const MOOD_MS = 600;
 const EYE_RY = 3.2;
@@ -147,31 +147,48 @@ function PlantAvatarBase({
           </Svg>
         </Animated.View>
       </Animated.View>
-      {/* Pot et visage, fixes, au-dessus du feuillage. */}
-      <Svg width={size} height={h} viewBox="0 0 100 110" style={StyleSheet.absoluteFill}>
-        <Rect x={23} y={62} width={54} height={10} rx={4} fill="#E8B931" />
-        <Path d="M27 72 H73 L66 106 H34 Z" fill="#D6A132" />
-        {face === 'full' && (
-          <Ellipse cx={50} cy={72} rx={24} ry={1.4} fill="#B88424" opacity={0.5} />
-        )}
-        {face === 'simple' && (
-          <>
-            <Circle cx={43} cy={84} r={2.6} fill="#1F3D2B" />
-            <Circle cx={57} cy={84} r={2.6} fill="#1F3D2B" />
-          </>
-        )}
-        {face === 'full' && (
-          <>
-            <AEllipse cx={43} cy={84} rx={2.7} animatedProps={eyeProps} fill="#1F3D2B" />
-            <AEllipse cx={57} cy={84} rx={2.7} animatedProps={eyeProps} fill="#1F3D2B" />
-            <Circle cx={37} cy={90} r={2.4} fill="#E98B6B" opacity={thirsty ? 0 : 0.55} />
-            <Circle cx={63} cy={90} r={2.4} fill="#E98B6B" opacity={thirsty ? 0 : 0.55} />
-          </>
-        )}
-        {face !== 'none' && (
-          <Path d={g.mouth} stroke="#1F3D2B" strokeWidth={2} fill="none" strokeLinecap="round" />
-        )}
-      </Svg>
+      {g.tree ? (
+        <Svg width={size} height={h} viewBox="0 0 100 110" style={StyleSheet.absoluteFill}>
+          {/* Arbre en pleine terre : butte de terre, cailloux et brins d'herbe, sans pot. */}
+          <Ellipse cx={50} cy={72} rx={32} ry={9} fill="#8A6A48" />
+          <Ellipse cx={50} cy={69.5} rx={26} ry={6} fill="#A07C55" />
+          <Ellipse cx={37} cy={72} rx={3} ry={1.8} fill="#6F5236" />
+          <Ellipse cx={63} cy={73} rx={3.6} ry={2} fill="#6F5236" />
+          <Path
+            d="M28 70c-1-4-3-6-4-7M31 70c0-3 0-5 1-7M72 70c1-3 3-5 4-6M69 71c0-3 0-5-1-7"
+            stroke="#5F8F4A"
+            strokeWidth={1.6}
+            strokeLinecap="round"
+            fill="none"
+          />
+        </Svg>
+      ) : (
+        /* Pot et visage, fixes, au-dessus du feuillage. */
+        <Svg width={size} height={h} viewBox="0 0 100 110" style={StyleSheet.absoluteFill}>
+          <Rect x={23} y={62} width={54} height={10} rx={4} fill="#E8B931" />
+          <Path d="M27 72 H73 L66 106 H34 Z" fill="#D6A132" />
+          {face === 'full' && (
+            <Ellipse cx={50} cy={72} rx={24} ry={1.4} fill="#B88424" opacity={0.5} />
+          )}
+          {face === 'simple' && (
+            <>
+              <Circle cx={43} cy={84} r={2.6} fill="#1F3D2B" />
+              <Circle cx={57} cy={84} r={2.6} fill="#1F3D2B" />
+            </>
+          )}
+          {face === 'full' && (
+            <>
+              <AEllipse cx={43} cy={84} rx={2.7} animatedProps={eyeProps} fill="#1F3D2B" />
+              <AEllipse cx={57} cy={84} rx={2.7} animatedProps={eyeProps} fill="#1F3D2B" />
+              <Circle cx={37} cy={90} r={2.4} fill="#E98B6B" opacity={thirsty ? 0 : 0.55} />
+              <Circle cx={63} cy={90} r={2.4} fill="#E98B6B" opacity={thirsty ? 0 : 0.55} />
+            </>
+          )}
+          {face !== 'none' && (
+            <Path d={g.mouth} stroke="#1F3D2B" strokeWidth={2} fill="none" strokeLinecap="round" />
+          )}
+        </Svg>
+      )}
       {showDrops && !reduced && <WaterDrops size={size} />}
     </Animated.View>
   );

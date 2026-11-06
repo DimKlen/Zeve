@@ -3,7 +3,7 @@ import { Text, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 
 import { Button } from '@/components/Button';
-import { IconCamera, IconSearch } from '@/components/icons';
+import { IconCamera, IconClose, IconSearch } from '@/components/icons';
 import { PressableScale } from '@/components/PressableScale';
 import { Rise } from '@/components/Rise';
 import { Spinner } from '@/components/Spinner';
@@ -26,6 +26,8 @@ type Props = {
   recognizing: boolean;
   onPhoto: () => void;
   onList: () => void;
+  /** Retire l'espèce choisie : retour au choix photo / liste. */
+  onRemove: () => void;
 };
 
 /** Bloc « Espèce » de Nouvelle plante (docs/04 §11) : choix, reconnaissance, carte d'espèce. */
@@ -36,6 +38,7 @@ export function SpeciesPicker({
   recognizing,
   onPhoto,
   onList,
+  onRemove,
 }: Props) {
   const colors = useColors();
   const styles = useStyles();
@@ -96,6 +99,7 @@ export function SpeciesPicker({
       title={source === 'photo' ? t('newPlant.recognized') : t('newPlant.chosen')}
       unsure={source === 'photo' && confidence !== null && confidence < UNSURE_BELOW}
       onChange={onList}
+      onRemove={onRemove}
     />
   );
 }
@@ -105,12 +109,15 @@ function SpeciesCard({
   title,
   unsure,
   onChange,
+  onRemove,
 }: {
   speciesId: string;
   title: string;
   unsure: boolean;
   onChange: () => void;
+  onRemove: () => void;
 }) {
+  const colors = useColors();
   const styles = useStyles();
   const species = SPECIES_BY_ID[speciesId]!;
   const pop = usePop(speciesId, true);
@@ -132,6 +139,15 @@ function SpeciesCard({
           <Text style={styles.type}>{typeLabel(species)}</Text>
         </View>
         <ChangeButton onPress={onChange} />
+        <PressableScale
+          onPress={onRemove}
+          accessibilityRole="button"
+          accessibilityLabel={t('newPlant.removeA11y')}
+          hitSlop={8}
+          style={styles.remove}
+        >
+          <IconClose size={14} color={colors.forest} />
+        </PressableScale>
       </Animated.View>
       {unsure && <Text style={styles.unsure}>{t('newPlant.unsure')}</Text>}
       <CareSummary speciesId={species.id} onOpen={() => setGuide(true)} />
@@ -215,5 +231,19 @@ const useStyles = makeStyles((colors) => ({
   latin: { ...type.caption, fontStyle: 'italic', color: colors.inkMuted, paddingRight: 2 },
   type: { ...type.micro, color: colors.forestText },
   change: { flexShrink: 0 },
+  // Pastille dans le coin supérieur gauche de la carte ; zone tactile de 44 px avec hitSlop.
+  remove: {
+    position: 'absolute',
+    top: -10,
+    left: -10,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: colors.surface,
+    borderWidth: 1.5,
+    borderColor: colors.inputBorder,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   unsure: { ...type.caption, color: colors.warnText },
 }));

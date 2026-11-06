@@ -6,13 +6,17 @@ import { Rise } from '@/components/Rise';
 import { Screen } from '@/components/Screen';
 import { useAuthStore } from '@/features/auth/authStore';
 import { LaunchArt } from '@/features/auth/LaunchArt';
+import { usePlants } from '@/features/garden/api';
+import { useGardens } from '@/features/gardens/api';
 import { fetchProfile, profileKey, type Profile } from '@/features/auth/profile';
-import { nextRoute } from '@/features/auth/rules';
+import { nextRoute, type AfterAuthRoute } from '@/features/auth/rules';
 import { t } from '@/i18n';
 import { queryClient } from '@/lib/queryClient';
 import { splashTimings } from '@/motion';
 import { go } from '@/motion/transitions';
 import { a11y, makeStyles, space, type } from '@/theme';
+
+const LOAD_TIMEOUT_MS = 8000;
 
 /**
  * Lancement (docs/04 §1) : séquence animée de 2.6 s pendant la restauration de session,
@@ -24,6 +28,13 @@ export default function LaunchScreen() {
   const ready = useAuthStore((s) => s.ready);
   const session = useAuthStore((s) => s.session);
   const [elapsed, setElapsed] = useState(false);
+  const [route, setRoute] = useState<AfterAuthRoute | null>(null);
+  const [gaveUp, setGaveUp] = useState(false);
+  // Jardins et plantes se chargent pendant le lancement : l'animation dure jusqu'à « Mes jardins ».
+  const plants = usePlants();
+  const gardens = useGardens();
+  const settled = (q: { data: unknown; isError: boolean }) => q.data !== undefined || q.isError;
+  const dataReady = settled(plants) && settled(gardens);
 
   useEffect(() => {
     const timer = setTimeout(() => setElapsed(true), reduced ? 0 : splashTimings.autoAdvance);
@@ -47,12 +58,25 @@ export default function LaunchScreen() {
           profile = queryClient.getQueryData<Profile | null>(key) ?? null;
         }
       }
-      if (!cancelled) go(nextRoute(!!session, profile), { replace: true });
+      if (!cancelled) setRoute(nextRoute(!!session, profile));
     })();
     return () => {
       cancelled = true;
     };
   }, [ready, elapsed, session]);
+
+  // Garde-fou : réseau trop lent, on ouvre le jardin (squelettes) plutôt que de rester bloqué.
+  useEffect(() => {
+    if (route !== 'garden') return;
+    const timer = setTimeout(() => setGaveUp(true), LOAD_TIMEOUT_MS);
+    return () => clearTimeout(timer);
+  }, [route]);
+
+  useEffect(() => {
+    if (!route) return;
+    if (route === 'garden' && !dataReady && !gaveUp) return;
+    go(route, { replace: true });
+  }, [route, dataReady, gaveUp]);
 
   return (
     <Screen name="launch" tone="dark">

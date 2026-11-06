@@ -4,7 +4,8 @@ import { join } from 'path';
 import { FORM_INFO } from './careInfo';
 import { drawPlant, mix, MOUTH_HAPPY, MOUTH_SAD, stageOf, STAGE_SCALE } from './drawPlant';
 import { PLANT_FORMS, type PlantForm } from './plantForms.generated';
-import { SPECIES, SPECIES_BY_ID } from './species';
+import { isTree, SPECIES, SPECIES_BY_ID } from './species';
+import { FRUIT_TREES } from './treeForms';
 
 const FORMS = Object.keys(PLANT_FORMS) as PlantForm[];
 /** Une espèce représentative par type de dessin. */
@@ -81,5 +82,36 @@ describe('stageOf / mix', () => {
   it('mélange deux couleurs', () => {
     expect(mix('#000000', '#ffffff', 0.5)).toBe('#808080');
     expect(mix('#3F7A4E', '#3F7A4E', 0.5)).toBe('#3f7a4e');
+  });
+});
+
+describe('arbres', () => {
+  const trees = SPECIES.filter(isTree);
+
+  it('les arbres sont dessinés en pleine terre, les plantes d’intérieur en pot', () => {
+    expect(trees.length).toBeGreaterThan(40);
+    expect(drawPlant('chene', 3, false).tree).toBe(true);
+    expect(drawPlant('monstera', 3, false).tree).toBe(false);
+    expect(isTree(SPECIES_BY_ID.olivier!)).toBe(false);
+  });
+
+  it('les arbres fruitiers existent dans le catalogue', () => {
+    for (const id of FRUIT_TREES) expect(isTree(SPECIES_BY_ID[id]!)).toBe(true);
+  });
+
+  it.each(['chene', 'pommier'])('%s : 3 stades, du jeune plant à l’arbre adulte', (id) => {
+    const n = ([1, 2, 3] as const).map((stage) => drawPlant(id, stage, false).shapes.length);
+    expect(n[0]).toBeLessThan(n[1]!);
+    expect(n[1]).toBeLessThan(n[2]!);
+  });
+
+  it('adulte : fruits pour un fruitier, seulement des feuilles pour les autres', () => {
+    const sp = SPECIES_BY_ID.pommier!;
+    const withFruit = (id: string) => drawPlant(id, 3, false).shapes.some((s) => s.fill === sp.f);
+    expect(withFruit('pommier')).toBe(true);
+    expect(drawPlant('pommier', 2, false).shapes.some((s) => s.fill === sp.f)).toBe(false);
+    expect(drawPlant('chene', 3, false).shapes.some((s) => s.fill === SPECIES_BY_ID.chene!.f)).toBe(
+      false,
+    );
   });
 });

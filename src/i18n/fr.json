@@ -84,8 +84,7 @@
   },
   "gardens": {
     "defaultBase": "Jardin",
-    "homeTitle": "Mes jardins",
-    "homeCount": "{count} jardins · {thirst}",
+    "homeTitle": "Mes jardins ({count})",
     "plantsOne": "1 plante",
     "plantsMany": "{n} plantes",
     "thirstNone": "tout le monde est hydraté",
@@ -392,6 +391,7 @@
     "identifyTimeout": "La reconnaissance prend trop de temps. Choisis-la dans la liste.",
     "addingA11y": "Ajout en cours",
     "changeA11y": "Changer d’espèce",
+    "removeA11y": "Retirer cette espèce",
     "namePlaceholderDefault": "Ex. : Monty",
     "otherName": "Autre nom",
     "gardenLabel": "Jardin"

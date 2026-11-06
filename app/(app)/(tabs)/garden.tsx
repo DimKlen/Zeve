@@ -20,7 +20,6 @@ import { useNewPlantDraft } from '@/features/newPlant/draftStore';
 import { t } from '@/i18n';
 import type { riseDelay } from '@/motion';
 import { go } from '@/motion/transitions';
-import { thirstLine } from '@/plants/plantStatus';
 import { layout, makeStyles, space, useColors } from '@/theme';
 
 const DELAYS: (keyof typeof riseDelay)[] = ['d2', 'd3', 'd4'];
@@ -79,13 +78,8 @@ export default function HomeScreen() {
       />
     );
   } else if (summaries && summaries.length > 1) {
-    const thirsty = summaries.reduce((n, s) => n + s.thirsty, 0);
     header = (
-      <GardenHeader
-        title={t('gardens.homeTitle')}
-        subtitle={t('gardens.homeCount', { count: summaries.length, thirst: thirstLine(thirsty) })}
-        onAdd={addPlant}
-      />
+      <GardenHeader title={t('gardens.homeTitle', { count: summaries.length })} onAdd={addPlant} />
     );
   } else {
     header = <GardenHeader title={t('garden.title')} onAdd={addPlant} />;

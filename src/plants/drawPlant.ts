@@ -1,7 +1,8 @@
 // Moteur de dessin des plantes — port exact de draw() du prototype Claude Design.
 // Retourne les éléments SVG résolus (couleurs, taille) pour une espèce, une taille et un état de soif.
 import { PLANT_FORMS, type ColorKey } from './plantForms.generated';
-import { SPECIES_BY_ID } from './species';
+import { isTree, SPECIES_BY_ID } from './species';
+import { treeShapes } from './treeForms';
 
 export type Stage = 1 | 2 | 3; // 1 Pousse, 2 Jeune, 3 Adulte
 export type ResolvedShape = {
@@ -20,6 +21,8 @@ export type PlantDrawing = {
   tilt: string;
   /** Path de la bouche dessinée sur le pot. */
   mouth: string;
+  /** Arbre planté dans la terre (pas de pot ni de visage). */
+  tree: boolean;
 };
 
 export const STAGE_SCALE: Record<Stage, number> = { 1: 0.62, 2: 0.82, 3: 1 };
@@ -68,7 +71,8 @@ export function drawPlant(speciesId: string, stage: Stage, thirsty: boolean): Pl
     T: '#7A5A3A',
   };
   const c = (k?: ColorKey) => (!k ? 'none' : (col[k] ?? k));
-  const shapes = PLANT_FORMS[sp.form]
+  const tree = isTree(sp);
+  const shapes = (tree ? treeShapes(sp.id) : PLANT_FORMS[sp.form])
     .filter((sh) => sh.s <= stage)
     .map((sh) => ({
       d: sh.d,
@@ -84,6 +88,7 @@ export function drawPlant(speciesId: string, stage: Stage, thirsty: boolean): Pl
     scaleFactor: k,
     tilt: thirsty ? 'rotate(-9 50 64)' : '',
     mouth: thirsty ? MOUTH_SAD : MOUTH_HAPPY,
+    tree,
   };
   cache.set(key, out);
   return out;

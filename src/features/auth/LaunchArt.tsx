@@ -1,11 +1,14 @@
 import { useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import Animated, {
+  cancelAnimation,
   useAnimatedProps,
   useAnimatedStyle,
   useReducedMotion,
   useSharedValue,
   withDelay,
+  withRepeat,
+  withSequence,
   withTiming,
 } from 'react-native-reanimated';
 import Svg, { Circle, Path } from 'react-native-svg';
@@ -52,14 +55,49 @@ export function LaunchArt() {
     bud.set(grow(splashTimings.bud));
   }, [reduced, stem, leafL, leafR, bud]);
 
+  // Après l'entrée, la plante continue de vivre (balancement, bourgeon qui bat) tant que
+  // l'écran est affiché : le chargement n'a jamais l'air figé.
+  const idle = useSharedValue(0);
+  const pulse = useSharedValue(1);
+  useEffect(() => {
+    if (reduced) return;
+    const start = splashTimings.bud + LEAF_MS;
+    idle.set(
+      withDelay(start, withRepeat(withTiming(1, { duration: 1800, easing: ease.inOut }), -1, true)),
+    );
+    pulse.set(
+      withDelay(
+        start,
+        withRepeat(
+          withSequence(
+            withTiming(1.25, { duration: 700, easing: ease.inOut }),
+            withTiming(1, { duration: 700, easing: ease.inOut }),
+          ),
+          -1,
+        ),
+      ),
+    );
+    return () => {
+      cancelAnimation(idle);
+      cancelAnimation(pulse);
+    };
+  }, [reduced, idle, pulse]);
+  const idleStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${(idle.value - 0.5) * 6}deg` }],
+  }));
+  const pulseStyle = useAnimatedStyle(() => ({
+    opacity: (pulse.value - 1) * 2,
+    transform: [{ scale: pulse.value }],
+  }));
+
   const stemProps = useAnimatedProps(() => ({ strokeDashoffset: stem.value }));
   const leafLStyle = useAnimatedStyle(() => ({ transform: [{ scale: leafL.value }] }));
   const leafRStyle = useAnimatedStyle(() => ({ transform: [{ scale: leafR.value }] }));
   const budStyle = useAnimatedStyle(() => ({ transform: [{ scale: bud.value }] }));
 
   return (
-    <View
-      style={styles.box}
+    <Animated.View
+      style={[styles.box, idleStyle]}
       accessible={false}
       importantForAccessibility="no-hide-descendants"
       accessibilityElementsHidden
@@ -84,7 +122,12 @@ export function LaunchArt() {
       <Layer style={[styles.bud, budStyle]}>
         <Circle cx={60} cy={30} r={8} fill={colors.sun} />
       </Layer>
-    </View>
+      <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.bud, pulseStyle]}>
+        <Svg width={W} height={H} viewBox={`0 0 ${W} ${H}`}>
+          <Circle cx={60} cy={30} r={11} fill="none" stroke={colors.sun} strokeWidth={2} />
+        </Svg>
+      </Animated.View>
+    </Animated.View>
   );
 }
 
@@ -105,7 +148,7 @@ function Layer({
 }
 
 const styles = StyleSheet.create({
-  box: { width: W, height: H },
+  box: { width: W, height: H, transformOrigin: origin(60, 124) },
   leafL: { transformOrigin: origin(60, 84) },
   leafR: { transformOrigin: origin(60, 66) },
   bud: { transformOrigin: origin(60, 30) },

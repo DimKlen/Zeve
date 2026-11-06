@@ -1,5 +1,5 @@
 import { Text, View } from 'react-native';
-import Svg, { Rect } from 'react-native-svg';
+import Svg, { Path, Rect } from 'react-native-svg';
 
 import { PressableScale } from '@/components/PressableScale';
 import { Rise } from '@/components/Rise';
@@ -10,6 +10,7 @@ import { PlantAvatar } from '@/plants/PlantAvatar';
 import { makeStyles, radius, space, type, useColors } from '@/theme';
 
 import { placeLabel, type GardenSummary } from './gardenRules';
+import { FenceFoliage } from './FenceFoliage';
 import { plotLayout } from './plotLayout';
 
 /** Pelouse dans le repère 0..100 du dessin : la clôture l'entoure. */
@@ -19,6 +20,21 @@ const POST = 4.4;
 const POSTS = [2.4, 18.6, 34.8, 51, 67.2, 83.4, 93.2];
 /** Les plantes d'un jardin ne se balancent pas toutes en même temps. */
 const SWAY_STAGGER_MS = 430;
+/** Quelques brins d'herbe clairsemés, légers (x, y dans le repère 0..100, taille) : on voit toujours les plantes. */
+const GRASS: [number, number, number][] = [
+  [16, 22, 1],
+  [30, 14, 0.8],
+  [74, 18, 1],
+  [86, 40, 0.8],
+  [14, 58, 0.9],
+  [62, 52, 0.8],
+  [24, 82, 1],
+  [48, 86, 0.8],
+  [80, 80, 1],
+  [88, 66, 0.7],
+];
+/** Un brin d'herbe : trois lames fines qui partent du même point. */
+const TUFT = 'M0 0C-.6-2.4-1.8-3.8-2.8-4.6M0 0C0-3 0-4.8.4-6M0 0C.6-2.4 1.8-3.8 2.8-4.6';
 
 export const plantsLabel = (n: number) =>
   n === 1 ? t('gardens.plantsOne') : t('gardens.plantsMany', { n });
@@ -80,6 +96,18 @@ export function GardenPlot({ summary, now, size, delay, active, onPress }: Props
               rx={5}
               fill={colors.sage}
             />
+            {GRASS.map(([x, y, k]) => (
+              <Path
+                key={`${x}-${y}`}
+                d={TUFT}
+                transform={`translate(${x} ${y}) scale(${k})`}
+                stroke={colors.grass}
+                strokeWidth={1.1}
+                strokeLinecap="round"
+                fill="none"
+                opacity={0.55}
+              />
+            ))}
             {RAIL.map((inset) => (
               <Rect
                 key={inset}
@@ -109,6 +137,7 @@ export function GardenPlot({ summary, now, size, delay, active, onPress }: Props
               )),
             )}
           </Svg>
+          <FenceFoliage size={size} active={active} />
           {layout.slots.map((slot) => {
             const plant = plants[slot.index]!;
             const s = statusOf(plant, now);
