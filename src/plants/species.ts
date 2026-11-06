@@ -3133,3 +3133,6 @@ export const SPECIES: Species[] = [
 export const SPECIES_BY_ID: Record<string, Species> = Object.fromEntries(
   SPECIES.map((s) => [s.id, s]),
 );
+
+/** Arbre ou arbuste de pleine terre : dessiné planté dans la terre, sans pot ni visage. */
+export const isTree = (sp: Species): boolean => sp.form === 'olive' && !!sp.hardy;

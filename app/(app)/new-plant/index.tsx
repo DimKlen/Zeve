@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BottomSheet } from '@/components/BottomSheet';
 import { Button } from '@/components/Button';
 import { Chip } from '@/components/Chip';
-import { IconPlus, IconRefreshLeaf } from '@/components/icons';
+import { IconPlus, IconShuffle } from '@/components/icons';
 import { IconButton } from '@/components/IconButton';
 import { Screen } from '@/components/Screen';
 import { ScreenHeader } from '@/components/ScreenHeader';
@@ -127,6 +127,9 @@ export default function NewPlantScreen() {
             recognizing={draft.status === 'recognizing'}
             onPhoto={() => void recognize()}
             onList={() => go('species')}
+            onRemove={() =>
+              draft.set({ speciesId: null, source: null, confidence: null, photoPath: null })
+            }
           />
 
           <View style={styles.nameRow}>
@@ -149,7 +152,7 @@ export default function NewPlantScreen() {
               accessibilityLabel={t('newPlant.otherName')}
               onPress={otherName}
               size={50}
-              icon={(c) => <IconRefreshLeaf size={22} color={c} />}
+              icon={(c) => <IconShuffle size={22} color={c} />}
             />
           </View>
 

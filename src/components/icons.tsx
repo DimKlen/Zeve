@@ -117,6 +117,19 @@ export const IconRefreshLeaf = ({ size = 22, color = '#1F3D2B', strokeWidth = 2 
     />
   </S>
 );
+// Aléatoire : deux flèches qui se croisent (shuffle).
+export const IconShuffle = ({ size = 22, color = '#1F3D2B', strokeWidth = 2 }: P) => (
+  <S size={size}>
+    <Path d="M3 7h3.5c2 0 3.2 1 4.5 3l2 4c1.3 2 2.5 3 4.5 3H21" {...line(color, strokeWidth)} />
+    <Path d="M3 17h3.5c2 0 3.2-1 4.5-3M13 10c1.3-2 2.5-3 4.5-3H21" {...line(color, strokeWidth)} />
+    <Path d="M18.500 4.5L21 7l-2.5 2.5M18.500 14.5L21 17l-2.5 2.5" {...line(color, strokeWidth)} />
+  </S>
+);
+export const IconClose = ({ size = 18, color = '#1F3D2B', strokeWidth = 2.4 }: P) => (
+  <S size={size}>
+    <Path d="M6 6l12 12M18 6L6 18" {...line(color, strokeWidth)} />
+  </S>
+);
 export const IconLeafSearch = ({ size = 22, color = '#1F3D2B', strokeWidth = 2 }: P) => (
   <S size={size}>
     <Circle cx={10.5} cy={10.5} r={6.5} {...line(color, strokeWidth)} />

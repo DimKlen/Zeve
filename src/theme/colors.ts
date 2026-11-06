@@ -31,6 +31,9 @@ export const lightColors = {
   sageDash: '#8DAA80', // pointillé photo dans le chat
   fence: '#C9A06B', // clôture des jardins (lattes et traverses)
   fencePost: '#A87F4C', // poteaux de la clôture
+  fenceLeaf: '#6E9F4E', // feuillage qui court sur la clôture
+  fenceLeafDark: '#4F8350', // feuillage de la clôture, second ton
+  grass: '#8DB46A', // brins d'herbe clairsemés sur la pelouse
 
   // Lignes & bordures
   line: '#E2D9C6', // séparateurs d'en-tête, bordures d'étapes
@@ -109,6 +112,9 @@ export const darkColors: Palette = {
   sageDash: '#5E7A58',
   fence: '#8A6B45',
   fencePost: '#6E5335',
+  fenceLeaf: '#5E8A4C',
+  fenceLeafDark: '#487A47',
+  grass: '#5E8A4C',
 
   line: '#2E3A31',
   lineSoft: '#26302A',
