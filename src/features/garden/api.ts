@@ -11,6 +11,7 @@ import { t } from '@/i18n';
 import type { Database } from '@/lib/database.types';
 import { supabase } from '@/lib/supabase';
 
+import { normalizePot } from '@/plants/pots';
 import type { WateringEvent } from '@/plants/wateringModel';
 
 import type { GardenPlant } from './gardenRules';
@@ -24,6 +25,7 @@ export function toGardenPlant(row: OverviewRow): GardenPlant {
     id: row.id!,
     nickname: row.nickname!,
     speciesId: row.species_id!,
+    pot: normalizePot(row.pot),
     speciesName: row.species_name!,
     latin: row.latin!,
     lightLabel: row.light_label!,

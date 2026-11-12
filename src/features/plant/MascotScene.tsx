@@ -12,6 +12,7 @@ import { makeStyles, radius, shadow, space, type, useColors } from '@/theme';
 type Props = {
   name: string;
   speciesId: string;
+  pot?: number;
   stage: Stage;
   thirsty: boolean;
   bubble: string;
@@ -23,7 +24,7 @@ const SCENE_H = 290;
 const HALO = 250;
 
 /** Scène de la fiche (docs/04 §8) : halo, bulle d'humeur, mascotte 230 px. */
-export function MascotScene({ name, speciesId, stage, thirsty, bubble, dropsKey }: Props) {
+export function MascotScene({ name, speciesId, pot, stage, thirsty, bubble, dropsKey }: Props) {
   const colors = useColors();
   const styles = useStyles();
   const halo = useColorTransition(thirsty ? colors.butter : colors.sage, duration.colorChange);
@@ -43,6 +44,7 @@ export function MascotScene({ name, speciesId, stage, thirsty, bubble, dropsKey 
         <PlantAvatar
           key={dropsKey}
           speciesId={speciesId}
+          pot={pot}
           stage={stage}
           thirsty={thirsty}
           size={230}

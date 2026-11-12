@@ -51,7 +51,13 @@ function PlantCardBase({ plant, now, delay, onPress, onMenu, canMove = false }: 
         style={styles.card}
       >
         <View style={styles.well}>
-          <PlantAvatar speciesId={plant.speciesId} stage={s.stage} thirsty={s.thirsty} size={86} />
+          <PlantAvatar
+            speciesId={plant.speciesId}
+            stage={s.stage}
+            thirsty={s.thirsty}
+            size={86}
+            pot={plant.pot}
+          />
           <View style={styles.badge}>
             <Text style={styles.badgeText}>{t(`stage.${s.stage}`)}</Text>
           </View>

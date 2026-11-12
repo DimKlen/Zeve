@@ -84,7 +84,7 @@
   },
   "gardens": {
     "defaultBase": "Jardin",
-    "homeTitle": "Mes jardins ({count})",
+    "homeTitle": "Mes jardins",
     "plantsOne": "1 plante",
     "plantsMany": "{n} plantes",
     "thirstNone": "tout le monde est hydraté",
@@ -148,6 +148,11 @@
     "thanksToast": "{name} te dit merci !",
     "grownToast": "{name} a grandi ! Elle est maintenant {stage}.",
     "menuRename": "Renommer",
+    "menuPot": "Changer de pot",
+    "potTitle": "Choisis ton pot",
+    "potRandom": "Au hasard",
+    "potPickA11y": "Pot {n} sur {total}",
+    "potPreviewA11y": "Aperçu du pot {n}",
     "menuInterval": "Rythme d'arrosage",
     "menuHistory": "Historique d'arrosage",
     "menuDelete": "Supprimer la plante",
@@ -171,6 +176,11 @@
       "Faut-il rempoter ?",
       "Meilleur emplacement",
       "Engrais ?"
+    ],
+    "suggestions": [
+      "Faut-il rempoter ?",
+      "Meilleur emplacement",
+      "Engrais ?"
     ],
     "placeholder": "Pose ta question…",
     "photoA11y": "Prendre une photo",

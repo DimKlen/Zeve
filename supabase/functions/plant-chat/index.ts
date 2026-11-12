@@ -10,6 +10,9 @@ import {
   buildSystemPrompt,
   extractAction,
   isSouthernPlace,
+  leaksSecret,
+  looksLikeInjection,
+  plantDodge,
   seasonNameOf,
   toGeminiContents,
   type GeminiPart,
@@ -168,6 +171,8 @@ Deno.serve(async (req) => {
   ]);
 
   const followup = await openFollowup(supabase, plant.id);
+  // Garde-fou : une tentative d'extraction de secrets ou de détournement ne part jamais au modèle.
+  const refused = !!text && looksLikeInjection(text);
   const southern = isSouthernPlace(plant.garden_latitude, plant.garden_country_code);
 
   // Même calcul que l'app : date d'arrosage ajustée à la météo, rythme appris (wateringModel).
@@ -242,17 +247,19 @@ Deno.serve(async (req) => {
   parts.push({ text: text ?? 'Regarde cette photo de moi : qu’en penses-tu ?' });
 
   let reply: string;
-  if (Deno.env.get('CHAT_MOCK') && followup && /mieux|disparu|réglé|plus rien/i.test(text ?? '')) {
+  if (refused) {
+    reply = plantDodge(text.length);
+  } else if (Deno.env.get('CHAT_MOCK') && followup && /mieux|disparu|réglé|plus rien/i.test(text ?? '')) {
     // Suivi de démo (F22) : « ça va mieux » clôt le suivi en cours.
     reply =
       `Super nouvelle pour ${followup.topic}, merci pour tes bons soins !\n` +
       '{"action":{"type":"followup_done"}}';
   } else if (Deno.env.get('CHAT_MOCK') && /cochenille/i.test(text ?? '')) {
-    // Suivi de démo (F22) : un message qui parle de cochenilles ouvre un suivi à 7 jours.
+    // Suivi de démo (F22) : un message qui parle de cochenilles ouvre un suivi à 5 jours.
     reply =
       'Les cochenilles adorent l’aisselle de mes feuilles. Passe un coton imbibé d’alcool sur chaque tache, ' +
       'puis isole-moi des autres plantes une semaine.\n' +
-      '{"action":{"type":"followup","days":7,"topic":"les cochenilles"}}';
+      '{"action":{"type":"followup","days":5,"topic":"les cochenilles"}}';
   } else if (Deno.env.get('CHAT_MOCK')) {
     reply =
       `Merci de prendre soin de moi ! ${photoPath ? 'Sur ta photo, mes feuilles ont l’air en forme. ' : ''}` +
@@ -277,6 +284,13 @@ Deno.serve(async (req) => {
             systemInstruction: { parts: [{ text: systemWithFollowup }] },
             contents,
             generationConfig: { temperature: 0.7, maxOutputTokens: 600 },
+            // Filtres de contenu du fournisseur au plus strict, en plus du périmètre du prompt.
+            safetySettings: [
+              'HARM_CATEGORY_HARASSMENT',
+              'HARM_CATEGORY_HATE_SPEECH',
+              'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+              'HARM_CATEGORY_DANGEROUS_CONTENT',
+            ].map((category) => ({ category, threshold: 'BLOCK_LOW_AND_ABOVE' })),
           }),
           signal: AbortSignal.timeout(TIMEOUT_MS),
         },
@@ -294,6 +308,8 @@ Deno.serve(async (req) => {
       .join('')
       .trim();
     if (!reply) return json({ error: 'empty_reply' }, 502);
+    // Dernier filet : une réponse qui laisse fuiter une clé ou le prompt est remplacée.
+    if (leaksSecret(reply)) reply = plantDodge(reply.length);
   }
 
   const { content, actions, followup: followupAction } = extractAction(reply);

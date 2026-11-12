@@ -1,12 +1,11 @@
 import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useState } from 'react';
-import { FlatList, KeyboardAvoidingView, ScrollView, Text, View } from 'react-native';
+import { FlatList, KeyboardAvoidingView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AssistantAvatar } from '@/components/AssistantAvatar';
 import { ChatBubble } from '@/components/ChatBubble';
-import { Chip } from '@/components/Chip';
 import { IconBack, IconCamera, IconSend } from '@/components/icons';
 import { IconButton } from '@/components/IconButton';
 import { Rise } from '@/components/Rise';
@@ -30,7 +29,7 @@ import { buildThread, type ThreadItem } from '@/features/chat/thread';
 import { usePlant } from '@/features/garden/api';
 import { statusOf } from '@/features/garden/gardenRules';
 import { pickPlantPhoto } from '@/features/newPlant/api';
-import { t, tList } from '@/i18n';
+import { t } from '@/i18n';
 import { goBack } from '@/motion/transitions';
 import { PlantAvatar } from '@/plants/PlantAvatar';
 import { a11y, control, layout, makeStyles, space, type } from '@/theme';
@@ -128,6 +127,7 @@ export default function ChatScreen() {
             {plant && (
               <PlantAvatar
                 speciesId={plant.speciesId}
+                pot={plant.pot}
                 stage={statusOf(plant).stage}
                 size={36}
                 face="none"
@@ -197,18 +197,6 @@ export default function ChatScreen() {
           }}
           ItemSeparatorComponent={Gap}
         />
-
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.suggestionsScroll}
-          contentContainerStyle={styles.suggestions}
-          keyboardShouldPersistTaps="handled"
-        >
-          {tList('chat.suggestions').map((s) => (
-            <Chip key={s} label={s} variant="suggestion" onPress={() => sendText(s)} />
-          ))}
-        </ScrollView>
 
         <View style={[styles.inputRow, { paddingBottom: Math.max(insets.bottom, 30) }]}>
           <IconButton
@@ -307,12 +295,6 @@ const useStyles = makeStyles((colors) => ({
   empty: { alignItems: 'center', paddingBottom: space.xl },
   userGroup: { gap: space.m, alignItems: 'flex-end' },
   date: { ...type.micro, color: colors.inkMuted, textAlign: 'center' },
-  suggestionsScroll: { flexGrow: 0 },
-  suggestions: {
-    paddingHorizontal: layout.screenPadDetail,
-    paddingBottom: space.sm,
-    gap: space.s,
-  },
   inputRow: {
     paddingTop: space.s,
     paddingHorizontal: space.ml,
