@@ -532,7 +532,7 @@ export type Database = {
           light_label: string;
           nickname: string;
           photo_path: string | null;
-          pot: number | null;
+          pot: number;
           previous_watered_at: string | null;
           species_id: string;
           species_light: string;
