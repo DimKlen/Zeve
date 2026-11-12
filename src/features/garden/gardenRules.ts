@@ -7,6 +7,8 @@ export type GardenPlant = {
   id: string;
   nickname: string;
   speciesId: string;
+  /** Pot choisi dans la collection (0–19) ; absent = pot d'origine. */
+  pot?: number;
   speciesName: string;
   latin: string;
   /** Exposition idéale de l'espèce (fiche technique), ex. « Vive, indirecte ». */

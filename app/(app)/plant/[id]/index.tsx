@@ -108,6 +108,7 @@ export default function PlantScreen() {
         <MascotScene
           name={plant.nickname}
           speciesId={plant.speciesId}
+          pot={plant.pot}
           stage={s.stage}
           thirsty={s.thirsty}
           bubble={moodBubble(s, justWatered)}

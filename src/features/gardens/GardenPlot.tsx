@@ -20,6 +20,10 @@ const POST = 4.4;
 const POSTS = [2.4, 18.6, 34.8, 51, 67.2, 83.4, 93.2];
 /** Les plantes d'un jardin ne se balancent pas toutes en même temps. */
 const SWAY_STAGGER_MS = 430;
+/** Durée du balancement variée d'une plante à l'autre, et léger flottement : elles vivent, sans se synchroniser. */
+const SWAY_BASE_MS = 1900;
+const SWAY_VARIANCE_MS = 330;
+const BOB_PX = 2;
 /** Quelques brins d'herbe clairsemés, légers (x, y dans le repère 0..100, taille) : on voit toujours les plantes. */
 const GRASS: [number, number, number][] = [
   [16, 22, 1],
@@ -159,6 +163,11 @@ export function GardenPlot({ summary, now, size, delay, active, onPress }: Props
                   size={plantW}
                   sway={active}
                   swayDelayMs={slot.index * SWAY_STAGGER_MS}
+                  swayMs={SWAY_BASE_MS + ((slot.index * 7) % 5) * SWAY_VARIANCE_MS}
+                  bob={active}
+                  bobDelayMs={((slot.index * 5) % 7) * SWAY_STAGGER_MS}
+                  bobPx={BOB_PX}
+                  pot={plant.pot}
                 />
               </View>
             );

@@ -1,4 +1,4 @@
-# docs/05 parcours 7 — chat : fiche → « Une question » → suggestion « Engrais ? » → points → réponse.
+# docs/05 parcours 7 — chat : fiche → « Une question » → question écrite → points → réponse.
 # Réponse déterministe : CHAT_MOCK=1 dans supabase/functions/.env.
 appId: com.zeve.app
 name: 07 — Chat
@@ -25,11 +25,11 @@ name: 07 — Chat
     direction: DOWN
 - tapOn: "Poser une question sur Gaston"
 - assertVisible: "Salut.*Je suis Gaston.*"
-# Les suggestions défilent horizontalement : « Engrais ? » est hors de l'écran au départ.
-- swipe:
-    from: "Faut-il rempoter.*"
-    direction: LEFT
-- tapOn: "Engrais.*"
+# Plus de suggestions toutes faites : on écrit la question.
+- tapOn:
+    id: "chat-input"
+- inputText: "Faut-il rempoter ?"
+- pressKey: Enter
 - extendedWaitUntil:
     visible: "Merci de prendre soin de moi.*"
     timeout: 20000

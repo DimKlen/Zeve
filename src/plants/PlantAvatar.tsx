@@ -16,9 +16,10 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import Svg, { Circle, Ellipse, G, Path, Rect } from 'react-native-svg';
+import Svg, { Circle, Ellipse, G, Path } from 'react-native-svg';
 
 import { drawPlant, type Stage } from './drawPlant';
+import { PotArt } from './PotArt';
 
 const AEllipse = Animated.createAnimatedComponent(Ellipse);
 
@@ -35,6 +36,12 @@ type Props = {
   bobDelayMs?: number;
   /** Décalage du balancement (plantes d'un même jardin qui ne bougent pas en même temps). */
   swayDelayMs?: number;
+  /** Pot de la collection (0–19, voir pots.ts) ; 0 = pot d'origine. */
+  pot?: number;
+  /** Durée d'un aller du balancement (ms) : varier d'une plante à l'autre pour un rendu naturel. */
+  swayMs?: number;
+  /** Amplitude du flottement vertical (px). */
+  bobPx?: number;
   showDrops?: boolean; // déclenche l'animation des gouttes (arrosage)
 };
 
@@ -58,6 +65,9 @@ function PlantAvatarBase({
   bob = false,
   bobDelayMs = 0,
   swayDelayMs = 0,
+  pot,
+  swayMs = 2250,
+  bobPx = 6,
   showDrops = false,
 }: Props) {
   const reduced = useReducedMotion();
@@ -75,10 +85,10 @@ function PlantAvatarBase({
     rot.value = -SWAY_DEG;
     rot.value = withDelay(
       swayDelayMs,
-      withRepeat(withTiming(SWAY_DEG, { duration: 2250, easing: EASE_IN_OUT }), -1, true),
+      withRepeat(withTiming(SWAY_DEG, { duration: swayMs, easing: EASE_IN_OUT }), -1, true),
     );
     return () => cancelAnimation(rot);
-  }, [sway, swayDelayMs, reduced, rot]);
+  }, [sway, swayDelayMs, swayMs, reduced, rot]);
   const swayStyle = useAnimatedStyle(() => ({ transform: [{ rotate: `${rot.value}deg` }] }));
 
   // changement d'humeur : inclinaison −9° ↔ 0°, 600 ms
@@ -99,10 +109,10 @@ function PlantAvatarBase({
     }
     y.value = withDelay(
       bobDelayMs,
-      withRepeat(withTiming(-6, { duration: 1600, easing: EASE_IN_OUT }), -1, true),
+      withRepeat(withTiming(-bobPx, { duration: 1600, easing: EASE_IN_OUT }), -1, true),
     );
     return () => cancelAnimation(y);
-  }, [bob, bobDelayMs, reduced, y]);
+  }, [bob, bobDelayMs, bobPx, reduced, y]);
   const bobStyle = useAnimatedStyle(() => ({ transform: [{ translateY: y.value }] }));
 
   // blink : cycle de 5 s, l'œil s'écrase à 10 % vers 93–96 %
@@ -165,8 +175,7 @@ function PlantAvatarBase({
       ) : (
         /* Pot et visage, fixes, au-dessus du feuillage. */
         <Svg width={size} height={h} viewBox="0 0 100 110" style={StyleSheet.absoluteFill}>
-          <Rect x={23} y={62} width={54} height={10} rx={4} fill="#E8B931" />
-          <Path d="M27 72 H73 L66 106 H34 Z" fill="#D6A132" />
+          <PotArt pot={pot} />
           {face === 'full' && (
             <Ellipse cx={50} cy={72} rx={24} ry={1.4} fill="#B88424" opacity={0.5} />
           )}

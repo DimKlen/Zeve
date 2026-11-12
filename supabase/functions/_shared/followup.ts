@@ -80,10 +80,11 @@ export function checkMessage(topic: string, days: number): string {
 /** Consignes de suivi ajoutées au prompt système. */
 export function followupPrompt(open: OpenFollowup | null): string[] {
   const lines = [
-    'Si ton humain·e décrit un problème de santé (nuisibles, maladie, champignon, pourriture) et que tu conseilles un traitement, ' +
-      'termine par une ligne JSON seule pour reprendre de ses nouvelles plus tard, à la place du rappel :',
-    '{"action":{"type":"followup","days":N,"topic":"les cochenilles"}} (N = jours avant de vérifier, entre 3 et 14 ; topic = le problème avec son article).',
-    'Jamais de suivi pour l’arrosage, la lumière, un rempotage ou une simple question.',
+    'Si ton humain·e te demande conseil pour soigner un problème (nuisibles, maladie, champignon, pourriture, feuilles qui jaunissent ou tombent) ' +
+      'ou pour corriger un souci d’entretien dont l’évolution se verra avec le temps, termine par une ligne JSON seule pour reprendre de ses nouvelles plus tard, à la place du rappel :',
+    '{"action":{"type":"followup","days":5,"topic":"les cochenilles"}} (days = jours avant de vérifier, 5 par défaut, entre 3 et 14 selon le temps que ton conseil met à se voir ; ' +
+      'topic = le sujet de sa demande, avec son article, en 60 caractères max, par exemple « mes feuilles qui jaunissent »).',
+    'Jamais de suivi pour une simple question d’information (quand arroser, quel pot, quelle lumière) sans problème à soigner.',
   ];
   if (!open) return lines;
   return [

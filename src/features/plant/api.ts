@@ -10,6 +10,7 @@ import { supabase } from '@/lib/supabase';
 type PlantUpdate = Pick<
   Database['public']['Tables']['plants']['Update'],
   | 'nickname'
+  | 'pot'
   | 'water_every_days'
   | 'archived_at'
   | 'learned_every_days'

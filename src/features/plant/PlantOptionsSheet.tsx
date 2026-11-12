@@ -12,14 +12,16 @@ import type { GardenPlant } from '@/features/garden/gardenRules';
 import { useGardens, useMovePlant } from '@/features/gardens/api';
 import { isLastInGarden, type Garden } from '@/features/gardens/gardenRules';
 import { t } from '@/i18n';
+import { normalizePot } from '@/plants/pots';
 import { learnRhythm } from '@/plants/wateringModel';
 import { makeStyles, space, type } from '@/theme';
 
 import { useUpdatePlant, useWateringHistory } from './api';
+import { PotPicker } from './PotPicker';
 
 type View_ = 'menu' | PlantAction;
 /** Actions du menu « … » d'une plante. */
-export type PlantAction = 'rename' | 'garden' | 'interval' | 'history' | 'delete';
+export type PlantAction = 'rename' | 'garden' | 'interval' | 'history' | 'pot' | 'delete';
 
 type Props = {
   plant: GardenPlant;
@@ -38,6 +40,7 @@ const MENU: { view: Exclude<View_, 'menu'>; key: string; danger?: boolean }[] = 
   { view: 'garden', key: 'gardens.move' },
   { view: 'interval', key: 'plant.menuInterval' },
   { view: 'history', key: 'plant.menuHistory' },
+  { view: 'pot', key: 'plant.menuPot' },
   { view: 'delete', key: 'plant.menuDelete', danger: true },
 ];
 
@@ -63,6 +66,7 @@ export function PlantOptionsSheet({
   const [view, setView] = useState<View_>(initialView ?? 'menu');
   const [name, setName] = useState(plant.nickname);
   const [every, setEvery] = useState(plant.waterEveryDays);
+  const [pot, setPot] = useState(normalizePot(plant.pot));
   const update = useUpdatePlant();
   const { data: gardens = [] } = useGardens();
   const { data: plants = [] } = usePlants();
@@ -152,6 +156,17 @@ export function PlantOptionsSheet({
             disabled={!name.trim()}
             loading={update.isPending}
             onPress={() => save({ nickname: name.trim() })}
+          />
+        </View>
+      )}
+
+      {view === 'pot' && (
+        <View style={styles.panel}>
+          <PotPicker speciesId={plant.speciesId} value={pot} onChange={setPot} />
+          <Button
+            label={t('common.save')}
+            loading={update.isPending}
+            onPress={() => save({ pot })}
           />
         </View>
       )}

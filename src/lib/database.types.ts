@@ -272,6 +272,7 @@ export type Database = {
           learned_every_days: number | null;
           nickname: string;
           photo_path: string | null;
+          pot: number;
           species_id: string;
           species_source: string | null;
           suggestion_declined_count: number | null;
@@ -289,6 +290,7 @@ export type Database = {
           learned_every_days?: number | null;
           nickname: string;
           photo_path?: string | null;
+          pot?: number;
           species_id: string;
           species_source?: string | null;
           suggestion_declined_count?: number | null;
@@ -305,6 +307,7 @@ export type Database = {
           learned_every_days?: number | null;
           nickname?: string;
           photo_path?: string | null;
+          pot?: number;
           species_id?: string;
           species_source?: string | null;
           suggestion_declined_count?: number | null;
@@ -529,6 +532,7 @@ export type Database = {
           light_label: string;
           nickname: string;
           photo_path: string | null;
+          pot: number | null;
           previous_watered_at: string | null;
           species_id: string;
           species_light: string;
