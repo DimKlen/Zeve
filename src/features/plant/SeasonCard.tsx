@@ -1,93 +1,88 @@
-import type { ReactElement } from 'react';
 import { Text, View } from 'react-native';
 
-import {
-  IconAir,
-  IconDrop,
-  IconHome,
-  IconSprout,
-  IconSun,
-  IconThermometer,
-} from '@/components/icons';
+import { IconAir, IconThermometer } from '@/components/icons';
 import { t } from '@/i18n';
-import { climateOf, seasonalAdvice, seasonOf } from '@/plants/seasons';
+import { climateOf, seasonalAdvice, seasonOf, type Season } from '@/plants/seasons';
 import { weatherAdvice, type AdviceTopic, type WeatherNow } from '@/plants/weatherAdvice';
 import { makeStyles, radius, space, type, useColors } from '@/theme';
+
+/** Météo réelle du jardin : ligne « Aujourd'hui à … » et conseils du jour. */
+export type GardenWeather = {
+  now: WeatherNow | null;
+  forecastMin: number | null;
+  place: string | null;
+} | null;
 
 type Props = {
   speciesId: string;
   /** Jardin dans l'hémisphère sud : saisons inversées. */
   southern?: boolean;
-  /** Météo réelle du jardin : ligne « Aujourd'hui à … » et conseils du jour. */
-  weather?: { now: WeatherNow | null; forecastMin: number | null; place: string | null } | null;
+  weather?: GardenWeather;
   now?: Date;
 };
 
 /** Degrés avec un vrai signe moins (« −10 »). */
 const degrees = (n: number) => (n < 0 ? `−${-n}` : String(n));
 
+export type SeasonRowIcon = 'water' | 'light' | 'place' | 'feed' | 'air';
+export type SeasonRow = { key: SeasonRowIcon; label: string; text: string };
+
 /**
- * Carte « Saison » de la fiche (non maquettée, même style que « Bon à savoir ») : saison en cours,
- * humidité et température idéales, puis les conseils de la saison pour cette espèce.
+ * Conseils de la saison pour cette espèce (arrosage, lumière, emplacement, engrais, air), remplacés
+ * par ceux de la météo réelle quand elle s'en mêle. Affichés dans le guide d'entretien.
  */
-export function SeasonCard({ speciesId, southern = false, weather, now = new Date() }: Props) {
-  const colors = useColors();
-  const styles = useStyles();
+export function seasonRowsOf(
+  speciesId: string,
+  southern: boolean,
+  weather: GardenWeather | undefined,
+  now: Date = new Date(),
+): { season: Season; rows: SeasonRow[] } {
   const season = seasonOf(now, southern);
   const climate = climateOf(speciesId);
   const advice = seasonalAdvice(speciesId, season);
-  // Conseils d'après la météo réelle : ils remplacent le conseil de saison du même sujet.
   const today = weatherAdvice(climate, weather?.now ?? null, weather?.forecastMin ?? null, season);
   const todayFor = (topic: AdviceTopic) => today.find((a) => a.replaces === topic);
-  const icon = colors.forest2;
 
-  const rows: { key: string; label: string; text: string; icon: ReactElement }[] = [
-    {
-      key: 'water',
-      label: t('season.water'),
-      text: t(`season.${advice.water}`),
-      icon: <IconDrop size={18} color={icon} />,
-    },
-    {
-      key: 'light',
-      label: t('season.light'),
-      text: t(`season.${advice.light}`),
-      icon: <IconSun size={18} color={icon} />,
-    },
-    {
-      key: 'place',
-      label: t('season.place'),
-      text: t(`season.${advice.place}`),
-      icon: <IconHome size={18} color={icon} />,
-    },
-    {
-      key: 'feed',
-      label: t('season.feed'),
-      text: t(`season.${advice.feed}`),
-      icon: <IconSprout size={18} color={icon} />,
-    },
+  const rows: SeasonRow[] = [
+    { key: 'water', label: t('season.water'), text: t(`season.${advice.water}`) },
+    { key: 'light', label: t('season.light'), text: t(`season.${advice.light}`) },
+    { key: 'place', label: t('season.place'), text: t(`season.${advice.place}`) },
+    { key: 'feed', label: t('season.feed'), text: t(`season.${advice.feed}`) },
   ];
   if (advice.humidity || todayFor('humidity')) {
     rows.push({
       key: 'air',
       label: t('season.air'),
       text: advice.humidity ? t(`season.${advice.humidity}`) : '',
-      icon: <IconAir size={18} color={icon} />,
     });
   }
-  const TOPIC: Record<string, AdviceTopic> = {
+  const TOPIC: Partial<Record<SeasonRowIcon, AdviceTopic>> = {
     water: 'water',
     light: 'light',
     place: 'place',
     air: 'humidity',
   };
   for (const row of rows) {
-    const replaced = TOPIC[row.key] && todayFor(TOPIC[row.key]!);
+    const topic = TOPIC[row.key];
+    const replaced = topic && todayFor(topic);
     if (replaced) {
       row.label = `${row.label} · ${t('weather.label')}`;
       row.text = t(`weather.${replaced.key}`);
     }
   }
+  return { season, rows };
+}
+
+/**
+ * Carte « Saison » de la fiche (non maquettée, même style que « Bon à savoir ») : saison en cours,
+ * météo du jour, humidité et température idéales. Les conseils détaillés sont dans le guide d'entretien.
+ */
+export function SeasonCard({ speciesId, southern = false, weather, now = new Date() }: Props) {
+  const colors = useColors();
+  const styles = useStyles();
+  const season = seasonOf(now, southern);
+  const climate = climateOf(speciesId);
+  const icon = colors.forest2;
   const nowWeather = weather?.now;
   const todayLine =
     nowWeather && weather?.place
@@ -154,21 +149,6 @@ export function SeasonCard({ speciesId, southern = false, weather, now = new Dat
           </View>
         </View>
       </View>
-
-      {rows.map((row) => (
-        <View
-          key={row.key}
-          style={styles.row}
-          accessible
-          accessibilityLabel={`${row.label} : ${row.text}`}
-        >
-          <View style={styles.rowIcon}>{row.icon}</View>
-          <View style={styles.rowTexts}>
-            <Text style={styles.rowLabel}>{row.label}</Text>
-            <Text style={styles.rowText}>{row.text}</Text>
-          </View>
-        </View>
-      ))}
     </View>
   );
 }
@@ -198,9 +178,4 @@ const useStyles = makeStyles((colors) => ({
   statLabel: { ...type.micro, color: colors.inkMuted },
   statValue: { ...type.cardTitle, color: colors.ink },
   statHint: { ...type.micro, color: colors.inkMuted },
-  row: { flexDirection: 'row', gap: space.sm, alignItems: 'flex-start' },
-  rowIcon: { paddingTop: 2 },
-  rowTexts: { flex: 1, gap: 1 },
-  rowLabel: { ...type.label, color: colors.ink },
-  rowText: { ...type.small, color: colors.inkSoft },
 }));

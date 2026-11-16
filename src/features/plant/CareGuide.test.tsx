@@ -40,4 +40,31 @@ describe('CareGuideSheet', () => {
     expect(screen.getByLabelText(/^Engrais : Engrais pour plantes vertes/)).toBeOnTheScreen();
     expect(screen.getByLabelText(/^Rempotage : Tous les 1 à 2 ans/)).toBeOnTheScreen();
   });
+
+  it('dit si elle est dangereuse et avec qui la mettre en pot', async () => {
+    await render(
+      <SafeAreaProvider initialMetrics={METRICS}>
+        <CareGuideSheet speciesId="monstera" name="Gaston" visible onClose={() => undefined} />
+      </SafeAreaProvider>,
+    );
+    expect(screen.getByLabelText(/^Animaux : Un peu toxique/)).toBeOnTheScreen();
+    expect(screen.getByLabelText(/^Humains : Un peu toxique/)).toBeOnTheScreen();
+    expect(screen.getByLabelText(/^Dans le même pot : Possible avec/)).toBeOnTheScreen();
+  });
+
+  it('ajoute les conseils de la saison sur la fiche d’une plante', async () => {
+    await render(
+      <SafeAreaProvider initialMetrics={METRICS}>
+        <CareGuideSheet
+          speciesId="calathea"
+          name="Zoé"
+          visible
+          onClose={() => undefined}
+          season={{ southern: false, weather: null, now: new Date(2026, 0, 10) }}
+        />
+      </SafeAreaProvider>,
+    );
+    expect(screen.getByRole('header', { name: 'En ce moment : hiver' })).toBeOnTheScreen();
+    expect(screen.getByLabelText(/^Arrosage : La terre sèche plus lentement/)).toBeOnTheScreen();
+  });
 });
