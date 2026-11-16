@@ -283,7 +283,7 @@ Deno.serve(async (req) => {
           body: JSON.stringify({
             systemInstruction: { parts: [{ text: systemWithFollowup }] },
             contents,
-            generationConfig: { temperature: 0.7, maxOutputTokens: 600 },
+            generationConfig: { temperature: 0.85, maxOutputTokens: 600 },
             // Filtres de contenu du fournisseur au plus strict, en plus du périmètre du prompt.
             safetySettings: [
               'HARM_CATEGORY_HARASSMENT',

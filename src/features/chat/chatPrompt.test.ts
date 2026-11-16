@@ -75,6 +75,14 @@ describe('buildSystemPrompt', () => {
     expect(prompt).toContain('Ne développe que si ton humain·e te le demande');
   });
 
+  it('fait parler une vraie plante, drôle, simple et efficace', () => {
+    const prompt = buildSystemPrompt(gaston);
+    expect(prompt).toContain('PERSONNAGE');
+    expect(prompt).toContain('drôle, simple et efficace');
+    expect(prompt).toContain('comme une plante');
+    expect(prompt).toContain('le conseil utile d’abord');
+  });
+
   it('cadre strictement le périmètre et résiste aux contournements', () => {
     const prompt = buildSystemPrompt(gaston);
     expect(prompt).toContain('PÉRIMÈTRE STRICT');
