@@ -7,6 +7,7 @@ import { IconCamera, IconClose, IconSearch } from '@/components/icons';
 import { PressableScale } from '@/components/PressableScale';
 import { Rise } from '@/components/Rise';
 import { Spinner } from '@/components/Spinner';
+import { TextButton } from '@/components/TextButton';
 import { CareGuideSheet, CareSummary } from '@/features/plant/CareGuide';
 import { t } from '@/i18n';
 import { usePop } from '@/motion/useEnter';
@@ -25,6 +26,8 @@ type Props = {
   confidence: number | null;
   recognizing: boolean;
   onPhoto: () => void;
+  /** Photo de la plante prise plus tôt, importée depuis la galerie : même reconnaissance. */
+  onImport: () => void;
   onList: () => void;
   /** Retire l'espèce choisie : retour au choix photo / liste. */
   onRemove: () => void;
@@ -37,6 +40,7 @@ export function SpeciesPicker({
   confidence,
   recognizing,
   onPhoto,
+  onImport,
   onList,
   onRemove,
 }: Props) {
@@ -88,6 +92,9 @@ export function SpeciesPicker({
             </PressableScale>
           </Rise>
         </View>
+        <Rise delay="d2" style={styles.import}>
+          <TextButton label={t('newPlant.import')} onPress={onImport} />
+        </Rise>
       </View>
     );
   }
@@ -182,6 +189,7 @@ const useStyles = makeStyles((colors) => ({
   label: { ...type.label, color: colors.inkMuted },
   choices: { flexDirection: 'row', gap: space.sm },
   choice: { flex: 1 },
+  import: { alignItems: 'center' },
   choiceBox: {
     height: BLOCK_H,
     borderRadius: radius.card,
