@@ -5,14 +5,16 @@ import { Text, View } from 'react-native';
 
 import { AddedBadge } from '@/components/AddedBadge';
 import { Button } from '@/components/Button';
+import { IconClose } from '@/components/icons';
+import { IconButton } from '@/components/IconButton';
 import { Rise } from '@/components/Rise';
 import { Screen } from '@/components/Screen';
 import { TextButton } from '@/components/TextButton';
 import { showToast } from '@/components/Toast';
 import { useNewPlantDraft } from '@/features/newPlant/draftStore';
 import { t } from '@/i18n';
-import { go } from '@/motion/transitions';
-import { a11y, makeStyles, space, type, useColors } from '@/theme';
+import { go, goBack } from '@/motion/transitions';
+import { a11y, layout, makeStyles, space, type, useColors } from '@/theme';
 
 /** Plante ajoutée (docs/04 §13). Le retour système ramène au jardin (pile de la modale vidée). */
 export default function PlantAddedScreen() {
@@ -28,6 +30,14 @@ export default function PlantAddedScreen() {
 
   return (
     <Screen name="added" tone="dark" enter="up">
+      {/* Croix : ferme la modale et revient aux plantes, comme le retour système. */}
+      <View style={styles.top}>
+        <IconButton
+          accessibilityLabel={t('added.closeA11y')}
+          onPress={goBack}
+          icon={(c) => <IconClose size={18} color={c} />}
+        />
+      </View>
       <View style={styles.center}>
         <AddedBadge speciesId={created.speciesId} name={created.name} />
         <Rise delay="d1" style={styles.texts}>
@@ -64,6 +74,12 @@ export default function PlantAddedScreen() {
 }
 
 const useStyles = makeStyles((colors) => ({
+  top: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    paddingTop: space.xs,
+    paddingHorizontal: layout.screenPadDetail,
+  },
   center: {
     flex: 1,
     alignItems: 'center',
