@@ -64,6 +64,12 @@ export default function PlantScreen() {
   }
 
   const s = statusOf(plant);
+  // Météo réelle du jardin : carte Saison et conseils du moment du guide.
+  const gardenWeather = {
+    now: gardens?.find((g) => g.id === plant.gardenId)?.weatherNow ?? null,
+    forecastMin: forecastMin(weather?.[plant.gardenId]),
+    place: plant.gardenPlace.city,
+  };
 
   const toggleWater = () => {
     if (s.wateredToday) {
@@ -176,11 +182,7 @@ export default function PlantScreen() {
             <SeasonCard
               speciesId={plant.speciesId}
               southern={isSouthern(plant.gardenPlace)}
-              weather={{
-                now: gardens?.find((g) => g.id === plant.gardenId)?.weatherNow ?? null,
-                forecastMin: forecastMin(weather?.[plant.gardenId]),
-                place: plant.gardenPlace.city,
-              }}
+              weather={gardenWeather}
             />
           </Rise>
 
@@ -215,6 +217,7 @@ export default function PlantScreen() {
         speciesId={plant.speciesId}
         name={plant.nickname}
         waterEveryDays={plant.waterEveryDays}
+        season={{ southern: isSouthern(plant.gardenPlace), weather: gardenWeather }}
         visible={guide}
         onClose={() => setGuide(false)}
       />

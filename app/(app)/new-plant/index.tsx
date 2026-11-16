@@ -125,7 +125,8 @@ export default function NewPlantScreen() {
             source={draft.source}
             confidence={draft.confidence}
             recognizing={draft.status === 'recognizing'}
-            onPhoto={() => void recognize()}
+            onPhoto={() => void recognize('camera')}
+            onImport={() => void recognize('library')}
             onList={() => go('species')}
             onRemove={() =>
               draft.set({ speciesId: null, source: null, confidence: null, photoPath: null })
@@ -249,9 +250,7 @@ function NewGardenSheet({
   const save = async () => {
     setSaving(true);
     const located =
-      place.latitude === null && place.city.trim()
-        ? await geocodePlace(place.city, place.country)
-        : place;
+      place.latitude === null && place.city.trim() ? await geocodePlace(place) : place;
     setSaving(false);
     onSave(name.trim(), located.city.trim() || located.latitude !== null ? located : null);
   };

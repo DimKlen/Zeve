@@ -190,6 +190,19 @@ export const IconPerson = ({ size = 18, color = '#2F5A3A', strokeWidth = 2 }: P)
     <Path d="M4 21c1-4 4.5-6 8-6s7 2 8 6" {...line(color, strokeWidth)} />
   </S>
 );
+/** Patte (animaux de compagnie) : coussinet et quatre doigts. */
+export const IconPaw = ({ size = 18, color = '#2F5A3A', strokeWidth = 2 }: P) => (
+  <S size={size}>
+    <Path
+      d="M12 13c-3 0-5.5 3.2-5.5 5.3 0 1.6 1.4 2.2 3 1.8 1-.3 1.7-.6 2.5-.6s1.5.3 2.5.6c1.6.4 3-.2 3-1.8 0-2.1-2.5-5.3-5.5-5.3z"
+      {...line(color, strokeWidth)}
+    />
+    <Circle cx={5} cy={10.5} r={1.8} {...line(color, strokeWidth)} />
+    <Circle cx={9} cy={6} r={1.8} {...line(color, strokeWidth)} />
+    <Circle cx={15} cy={6} r={1.8} {...line(color, strokeWidth)} />
+    <Circle cx={19} cy={10.5} r={1.8} {...line(color, strokeWidth)} />
+  </S>
+);
 export const IconMail = ({ size = 18, color = '#2F5A3A', strokeWidth = 2 }: P) => (
   <S size={size}>
     <Rect x={3} y={5} width={18} height={14} rx={2} {...line(color, strokeWidth)} />

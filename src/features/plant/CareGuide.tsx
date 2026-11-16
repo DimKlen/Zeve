@@ -5,7 +5,10 @@ import { BottomSheet } from '@/components/BottomSheet';
 import {
   IconAir,
   IconDrop,
+  IconHome,
   IconLayers,
+  IconPaw,
+  IconPerson,
   IconPot,
   IconRepot,
   IconSprout,
@@ -17,9 +20,12 @@ import { waterEveryDaysOf } from '@/features/newPlant/searchSpecies';
 import { t } from '@/i18n';
 import { FORM_INFO, type Light } from '@/plants/careInfo';
 import { careGuideOf } from '@/plants/careGuide';
+import { potMateOf, toxicityOf, type ToxicLevel } from '@/plants/safety';
 import { climateOf } from '@/plants/seasons';
 import { SPECIES_BY_ID } from '@/plants/species';
 import { makeStyles, radius, space, type, useColors } from '@/theme';
+
+import { seasonRowsOf, type GardenWeather, type SeasonRowIcon } from './SeasonCard';
 
 const LIGHT_TEXT: Record<Light, string> = {
   ombre: 'care.lightOmbre',
@@ -94,12 +100,33 @@ type SheetProps = {
   name: string;
   /** Rythme réglé sur la plante ; par défaut celui de l'espèce. */
   waterEveryDays?: number;
+  /** Plante d'un jardin : conseils de la saison et de la météo du lieu, en fin de guide. */
+  season?: { southern: boolean; weather: GardenWeather; now?: Date };
   visible: boolean;
   onClose: () => void;
 };
 
-/** Guide d'entretien complet dans une feuille du bas : une ligne courte par sujet. */
-export function CareGuideSheet({ speciesId, name, waterEveryDays, visible, onClose }: SheetProps) {
+type Row = { key: string; label: string; text: string; icon: ReactElement };
+
+const TOXIC_TEXT: Record<ToxicLevel, string> = {
+  safe: 'care.toxicSafe',
+  mild: 'care.toxicMild',
+  toxic: 'care.toxicDanger',
+  unknown: 'care.toxicUnknown',
+};
+
+/**
+ * Guide d'entretien complet dans une feuille du bas : une ligne courte par sujet, la sécurité
+ * (animaux, humains, pot partagé), puis les conseils de la saison pour une plante du jardin.
+ */
+export function CareGuideSheet({
+  speciesId,
+  name,
+  waterEveryDays,
+  season,
+  visible,
+  onClose,
+}: SheetProps) {
   const colors = useColors();
   const styles = useStyles();
   const { height } = useWindowDimensions();
@@ -108,9 +135,10 @@ export function CareGuideSheet({ speciesId, name, waterEveryDays, visible, onClo
   const info = FORM_INFO[species.form];
   const climate = climateOf(speciesId);
   const guide = careGuideOf(speciesId);
+  const toxicity = toxicityOf(speciesId);
   const icon = colors.forest2;
 
-  const rows: { key: string; label: string; text: string; icon: ReactElement }[] = [
+  const rows: Row[] = [
     {
       key: 'water',
       label: t('care.water'),
@@ -161,6 +189,24 @@ export function CareGuideSheet({ speciesId, name, waterEveryDays, visible, onClo
       text: t(`care.${guide.repot}`),
       icon: <IconRepot size={18} color={icon} />,
     },
+    {
+      key: 'potMate',
+      label: t('care.potMate'),
+      text: t(`care.potMate_${potMateOf(speciesId)}`),
+      icon: <IconPot size={18} color={icon} />,
+    },
+    {
+      key: 'pets',
+      label: t('care.pets'),
+      text: t(TOXIC_TEXT[toxicity.pets]),
+      icon: <IconPaw size={18} color={icon} />,
+    },
+    {
+      key: 'humans',
+      label: t('care.humans'),
+      text: t(TOXIC_TEXT[toxicity.humans]),
+      icon: <IconPerson size={18} color={icon} />,
+    },
   ];
   // Mauvaise herbe : comment la contenir, en premier.
   if (species.weed) {
@@ -171,6 +217,9 @@ export function CareGuideSheet({ speciesId, name, waterEveryDays, visible, onClo
       icon: <IconSprout size={18} color={icon} />,
     });
   }
+  const seasonal = season
+    ? seasonRowsOf(speciesId, season.southern, season.weather, season.now)
+    : null;
 
   return (
     <BottomSheet visible={visible} onClose={onClose}>
@@ -180,21 +229,44 @@ export function CareGuideSheet({ speciesId, name, waterEveryDays, visible, onClo
       <Text style={styles.latin}>{species.latin}</Text>
       <ScrollView style={{ maxHeight: height * SHEET_MAX }} contentContainerStyle={styles.rows}>
         {rows.map((row) => (
-          <View
-            key={row.key}
-            style={styles.row}
-            accessible
-            accessibilityLabel={`${row.label} : ${row.text}`}
-          >
-            <View style={styles.rowIcon}>{row.icon}</View>
-            <View style={styles.rowTexts}>
-              <Text style={styles.rowLabel}>{row.label}</Text>
-              <Text style={styles.rowText}>{row.text}</Text>
-            </View>
-          </View>
+          <GuideRow key={row.key} row={row} />
         ))}
+        {seasonal && (
+          <>
+            <Text style={styles.section} accessibilityRole="header">
+              {t('care.seasonTitle', { season: t(`season.nowNames.${seasonal.season}`) })}
+            </Text>
+            {seasonal.rows.map((row) => (
+              <GuideRow
+                key={`season-${row.key}`}
+                row={{ ...row, icon: SEASON_ICON[row.key](icon) }}
+              />
+            ))}
+          </>
+        )}
       </ScrollView>
     </BottomSheet>
+  );
+}
+
+const SEASON_ICON: Record<SeasonRowIcon, (color: string) => ReactElement> = {
+  water: (c) => <IconDrop size={18} color={c} />,
+  light: (c) => <IconSun size={18} color={c} />,
+  place: (c) => <IconHome size={18} color={c} />,
+  feed: (c) => <IconSprout size={18} color={c} />,
+  air: (c) => <IconAir size={18} color={c} />,
+};
+
+function GuideRow({ row }: { row: Row }) {
+  const styles = useStyles();
+  return (
+    <View style={styles.row} accessible accessibilityLabel={`${row.label} : ${row.text}`}>
+      <View style={styles.rowIcon}>{row.icon}</View>
+      <View style={styles.rowTexts}>
+        <Text style={styles.rowLabel}>{row.label}</Text>
+        <Text style={styles.rowText}>{row.text}</Text>
+      </View>
+    </View>
   );
 }
 
@@ -217,6 +289,7 @@ const useStyles = makeStyles((colors) => ({
   title: { ...type.subTitle, color: colors.forest },
   latin: { ...type.caption, fontStyle: 'italic', color: colors.inkMuted, marginBottom: space.m },
   rows: { gap: space.ml, paddingBottom: space.s },
+  section: { ...type.sectionTitle, color: colors.forest, marginTop: space.s },
   row: { flexDirection: 'row', gap: space.m, alignItems: 'flex-start' },
   rowIcon: {
     width: ICON_BOX,

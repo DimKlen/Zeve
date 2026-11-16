@@ -6,7 +6,6 @@ import { Screen } from '@/components/Screen';
 import { showToast } from '@/components/Toast';
 import { usePlants, useWatering } from '@/features/garden/api';
 import { EmptyGarden } from '@/features/garden/EmptyGarden';
-import { GardenPlants } from '@/features/garden/GardenPlants';
 import { GardenSkeleton } from '@/features/garden/GardenSkeleton';
 import { gardenSubtitle, todoList } from '@/features/garden/gardenRules';
 import { TodoCard } from '@/features/garden/TodoCard';
@@ -28,8 +27,8 @@ const DELAYS: (keyof typeof riseDelay)[] = ['d2', 'd3', 'd4'];
 type Viewport = { top: number; bottom: number };
 
 /**
- * Accueil (docs/04 §7, étendu aux jardins) : un seul jardin s'affiche directement, comme avant ;
- * à partir de deux, la liste des jardins avec les arrosages du jour de tous les jardins.
+ * Accueil (docs/04 §7, étendu aux jardins) : les arrosages du jour puis les jardins en carrés clôturés
+ * et animés. Un seul jardin garde son en-tête (nom, météo, menu) et son carré en pleine largeur.
  */
 export default function HomeScreen() {
   const colors = useColors();
@@ -117,8 +116,6 @@ export default function HomeScreen() {
           <GardenSkeleton />
         ) : !summaries.length ? (
           <EmptyGarden onAdd={addPlant} />
-        ) : single ? (
-          <GardenPlants plants={single.plants} now={now} />
         ) : (
           <GardenList summaries={summaries} now={now} viewport={focused ? viewport : null} />
         )}
@@ -138,7 +135,7 @@ export default function HomeScreen() {
   );
 }
 
-/** Plusieurs jardins : arrosages du jour (tous jardins), puis les jardins en carrés, 2 par ligne. */
+/** Arrosages du jour (tous jardins), puis les jardins en carrés : 2 par ligne, ou un seul en pleine largeur. */
 function GardenList({
   summaries,
   now,
@@ -157,7 +154,9 @@ function GardenList({
     summaries.flatMap((s) => s.plants),
     now,
   );
-  const size = Math.floor((width - 2 * layout.screenPadTabs - space.l) / 2);
+  const full = width - 2 * layout.screenPadTabs;
+  // Un seul jardin : son carré prend toute la largeur ; sinon 2 par ligne.
+  const size = Math.floor(summaries.length === 1 ? full : (full - space.l) / 2);
   // Hauteur d'une ligne : carré + nom, lieu et soif sur deux lignes au plus.
   const rowHeight = size + space.l + 76;
   return (

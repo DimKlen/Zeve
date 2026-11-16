@@ -61,9 +61,7 @@ export function GardenOptionsSheet({ garden, plantCount, visible, onClose, onDel
   const savePlace = async () => {
     setSaving(true);
     const located =
-      place.latitude === null && place.city.trim()
-        ? await geocodePlace(place.city, place.country)
-        : place;
+      place.latitude === null && place.city.trim() ? await geocodePlace(place) : place;
     setSaving(false);
     update.mutate({ id: garden.id, place: located }, { onSuccess: done, onError: failed });
   };
