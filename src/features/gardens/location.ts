@@ -38,9 +38,9 @@ export async function locateGarden(): Promise<LocateResult> {
  * Lieu saisi à la main : coordonnées retrouvées si possible (saisons de l'hémisphère sud),
  * sans jamais bloquer l'enregistrement.
  */
-export async function geocodePlace(city: string, country: string): Promise<GardenPlace> {
-  const place: GardenPlace = { city, country, countryCode: null, latitude: null, longitude: null };
-  const query = [city, country]
+export async function geocodePlace(input: GardenPlace): Promise<GardenPlace> {
+  const place: GardenPlace = { ...input, latitude: null, longitude: null };
+  const query = [input.city, input.country]
     .map((s) => s.trim())
     .filter(Boolean)
     .join(', ');

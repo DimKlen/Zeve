@@ -265,7 +265,26 @@
     "waterGround": "En pleine terre, la pluie suffit souvent : arrose quand le sol est sec en profondeur, surtout en été.",
     "lightGroundOmbre": "À l’ombre au jardin : sous les arbres ou au nord.",
     "lightGroundIndirect": "Mi-ombre au jardin : soleil le matin, ombre l’après-midi.",
-    "lightGroundSoleil": "En plein soleil au jardin."
+    "lightGroundSoleil": "En plein soleil au jardin.",
+    "seasonTitle": "En ce moment : {season}",
+    "pets": "Animaux",
+    "humans": "Humains",
+    "toxicSafe": "Sans danger connu : pas d’inquiétude si on la grignote.",
+    "toxicMild": "Un peu toxique : irritations ou maux de ventre si on la mâche. Garde-la hors de portée.",
+    "toxicDanger": "Toxique : dangereuse si on l’avale. Mets-la hors de portée et appelle un vétérinaire ou le centre antipoison en cas d’ingestion.",
+    "toxicUnknown": "Toxicité mal connue : par prudence, garde-la hors de portée.",
+    "potMate": "Dans le même pot",
+    "potMate_alone": "Seule dans son pot : ses racines prennent toute la place et étoufferaient une voisine.",
+    "potMate_harmful": "Seule, et à l’écart : elle libère dans la terre des substances qui freinent les autres plantes.",
+    "potMate_dry": "Possible avec d’autres cactus et succulentes : même terre sèche. Jamais avec une plante qui aime l’eau.",
+    "potMate_mediterranean": "Possible avec d’autres aromates du Sud (thym, romarin, sauge) : soleil et terre sèche pour tous.",
+    "potMate_herbs": "Possible avec d’autres aromates qui aiment la fraîcheur (basilic, persil, ciboulette). Évite la menthe, envahissante.",
+    "potMate_moist": "Possible avec des plantes qui aiment l’humidité (calathéas, fougères, fittonias). Évite les succulentes.",
+    "potMate_orchid": "Seule dans ses écorces : ses racines ont besoin d’air, une voisine en terre les ferait pourrir.",
+    "potMate_shared": "Possible avec des plantes aux mêmes besoins de lumière et d’arrosage, dans un pot assez grand.",
+    "potMate_ground": "En pleine terre, laisse-lui de la place : ses racines s’étendent loin.",
+    "potMate_weed": "À ne pas inviter dans un pot : elle prendrait la place des autres.",
+    "potMate_none": "Pas de pot : elle vit sans terre, à côté des autres."
   },
   "season": {
     "title": "Saison",
@@ -385,6 +404,7 @@
     "speciesQuestion": "Quelle est son espèce ?",
     "photo": "Prendre une photo",
     "photoHint": "Reconnaissance automatique",
+    "import": "Importer une photo de ta plante",
     "list": "Choisir dans la liste",
     "listHint": "{count} espèces",
     "recognizing": "Reconnaissance de l'espèce…",
@@ -447,6 +467,7 @@
     "text": "Elle commence petite : elle grandira dans l'app au fil des mois.",
     "seePlant": "Voir sa fiche",
     "addAnother": "Ajouter une autre plante",
+    "closeA11y": "Fermer et revenir à mes plantes",
     "toast": "{name} a rejoint ton jardin"
   },
   "dev": {
